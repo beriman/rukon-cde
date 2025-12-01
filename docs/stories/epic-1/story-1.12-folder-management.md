@@ -23,6 +23,7 @@
 
 - [ ] Implement `POST /api/projects/:id/folders`
 - [ ] Implement `GET /api/projects/:id/folders` (tree structure)
+- [ ] **Performance**: Use Recursive CTE or Materialized Path for efficient tree query
 - [ ] Implement `PATCH /api/folders/:id` (rename)
 - [ ] Implement `DELETE /api/folders/:id` (with empty check)
 - [ ] Path update logic untuk nested folders

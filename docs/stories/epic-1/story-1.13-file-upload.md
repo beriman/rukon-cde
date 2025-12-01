@@ -31,6 +31,7 @@
 ### Backend
 - [ ] Setup AWS S3 SDK dan configuration
 - [ ] Implement multipart upload handler
+- [ ] **Performance**: Implement streaming upload directly to S3 (avoid memory buffering)
 - [ ] Implement `POST /api/projects/:id/files` (upload endpoint)
 - [ ] Generate file hash (MD5/SHA256) untuk duplicate detection
 - [ ] Create File record di database

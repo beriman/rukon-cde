@@ -12,7 +12,9 @@
 - [ ] URL expires dalam 5 minutes
 - [ ] Download logged di audit trail
 - [ ] Metadata view: uploader, timestamps, CDE state, version count
-- [ ] Support batch download (zip multiple files)
+- [ ] Metadata view: uploader, timestamps, CDE state, version count
+- [ ] **Nice to Have (MVP) / Phase 2**: Support batch download (zip multiple files)
+- [ ] **Nice to Have**: Download specific folder as zip
 
 ### API: `GET /api/files/:id/download?version=2`
 
@@ -52,6 +54,7 @@ async getDownloadUrl(fileId: string, version?: number) {
 - [ ] File moved dari `/WIP/` folder ke `/Shared/` folder (logical move)
 - [ ] CDE state updated di database
 - [ ] Transition logged dengan timestamp & user
+- [ ] **Testing**: Implement E2E test (Playwright) untuk flow Upload -> WIP -> Shared
 
 ### API: `POST /api/files/:id/promote`
 

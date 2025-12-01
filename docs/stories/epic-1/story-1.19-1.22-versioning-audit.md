@@ -19,38 +19,41 @@
 async uploadFile(file: File) {
   const uniqueId = this.extractUniqueId(file.name);
   
-  // Check existing file
-  const existingFile = await this.prisma.file.findUnique({
-    where: { uniqueId },
-    include: { versions: true },
-  });
-  
-  if (existingFile) {
-    // Create new version
-    const newVersion = existingFile.currentVersion + 1;
-    const s3Key = `org-${orgId}/project-${projectId}/files/${fileId}-v${newVersion}`;
+  // Use transaction to prevent race conditions
+  await this.prisma.$transaction(async (tx) => {
+    // Lock the file record for update
+    const existingFile = await tx.file.findUnique({
+      where: { uniqueId },
+      include: { versions: true },
+    });
     
-    await this.s3Upload(s3Key, file);
-    
-    await this.prisma.file.update({
-      where: { id: existingFile.id },
-      data: {
-        currentVersion: newVersion,
-        versions: {
-          create: {
-            version: newVersion,
-            s3Key,
-            size: file.size,
-            uploadedBy: userId,
-            cdeState: CdeState.WIP,
+    if (existingFile) {
+      // Create new version
+      const newVersion = existingFile.currentVersion + 1;
+      const s3Key = `org-${orgId}/project-${projectId}/files/${fileId}-v${newVersion}`;
+      
+      // Upload to S3 (outside transaction ideally, but for simplicity here)
+      await this.s3Upload(s3Key, file);
+      
+      await tx.file.update({
+        where: { id: existingFile.id },
+        data: {
+          currentVersion: newVersion,
+          versions: {
+            create: {
+              version: newVersion,
+              s3Key,
+              size: file.size,
+              uploadedBy: userId,
+              cdeState: CdeState.WIP,
+            },
           },
         },
-      },
-    });
-  } else {
-    // Create new file with version 1
-    // ... (Story 1.13 logic)
-  }
+      });
+    } else {
+      // Create new file logic
+    }
+  });
 }
 ```
 

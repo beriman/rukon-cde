@@ -16,7 +16,8 @@
 
 - [ ] Org Admin dapat send invitation via email
 - [ ] Invitation email berisi signup link dengan pre-filled organization
-- [ ] Recipient klik link dan register dengan auto-assigned ke correct organization
+- [ ] **Scenario 1 (New User)**: Recipient klik link -> Register -> Auto-assigned ke organization
+- [ ] **Scenario 2 (Existing User)**: Recipient klik link -> Login -> Auto-added ke organization baru (Multi-org support)
 - [ ] Invitation link valid selama 7 days
 - [ ] Admin dapat resend atau revoke invitation
 - [ ] Invitation cannot be used twice

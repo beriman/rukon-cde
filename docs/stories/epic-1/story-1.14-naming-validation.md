@@ -14,6 +14,8 @@
 
 - [ ] System validate file name format: `Project-Originator-Volume-Level-Type-Role-Number`
 - [ ] Clear error message jika format salah, dengan contoh yang benar
+- [ ] **UI Requirement**: Error message harus visual (misal: highlight bagian nama yang salah)
+- [ ] **UI Requirement**: Show "Expected Format" vs "Your Filename" comparison
 - [ ] Auto-suggest naming based on project context (optional di frontend)
 - [ ] validation dapat di-configure per project (strict vs lenient mode)
 - [ ] Naming pattern documented dan accessible ke users

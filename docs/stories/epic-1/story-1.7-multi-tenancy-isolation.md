@@ -23,6 +23,8 @@
 ### Security Testing
 - [ ] Penetration testing confirms no cross-organization data leakage
 - [ ] User dari Org A tidak bisa access project dari Org B via API tampering
+- [ ] **Negative Test**: Attempt access resource Org B dengan valid token Org A -> Expect 403/404
+- [ ] **Negative Test**: Attempt SQL Injection pada organizationId filter -> Expect Blocked
 - [ ] Database tests confirm organization filtering works correctly
 
 ## Technical Tasks

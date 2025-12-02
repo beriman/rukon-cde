@@ -158,7 +158,16 @@ Generate professional reports instantly from project data:
 -   **HazMat Mapping:** Layer for hazardous materials in 3D view.
 -   **Material Passport:** Metadata for material recyclability and salvage value.
 
-### 3.8 Technical Enablers
+### 3.9 Integration & System Testing (Epic 9)
+-   **E2E Workflow Testing:** Automated testing of critical user journeys (e.g., BQ Import -> Payment Claim).
+-   **Cross-Epic Integration:** Verification of data consistency between modules (e.g., Progress vs. S-Curve).
+-   **Performance Benchmarking:** Stress testing to ensure < 3s response time under load (1000+ users).
+
+### 3.10 User Onboarding & Training (Epic 10)
+-   **Interactive Product Tour:** Step-by-step guided tour for new users to learn key features.
+-   **Help Center:** Centralized knowledge base with video tutorials and context-sensitive help.
+
+### 3.11 Technical Enablers
 -   **Classification:** Built-in dictionary for **Uniclass 2015** and **OmniClass**. Auto-suggest based on file content.
 -   **LOIN Manager:** **IDS (Information Delivery Specification)** editor and validator to check information completeness (EN 17412-1).
 
@@ -218,3 +227,37 @@ To achieve a professional, "Enterprise-Grade" UI similar to Autodesk Constructio
 -   Asset Information Model (AIM).
 -   Health & Safety Risk Maps.
 -   Deconstruction Tools.
+
+### Phase 5: Quality & Launch (Month 8-9)
+-   Integration & System Testing (Epic 9).
+-   User Onboarding & Training (Epic 10).
+-   Production Deployment.
+
+## 6. Visual Roadmap (Timeline)
+
+```mermaid
+gantt
+    title ISO 19650 CDE Development Roadmap
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %Y
+
+    section Phase 1: Foundation
+    Core CDE (Epic 1)       :active, p1, 2024-01-01, 60d
+    ISO Planning (Epic 2)   :p2, after p1, 30d
+    DevOps Setup            :crit, 2024-01-01, 30d
+
+    section Phase 2: Collaboration
+    Design Collab (Epic 3)  :p3, after p2, 45d
+    Const. Monitor (Epic 4) :p4, after p3, 45d
+
+    section Phase 3: Advanced
+    HSE Mgmt (Epic 5)       :p5, after p4, 30d
+    Adv. BIM (Epic 6)       :p6, after p4, 60d
+    Mobile AI (Epic 7)      :p7, after p5, 45d
+    Security (Epic 8)       :p8, after p6, 30d
+
+    section Phase 4: QA & Launch
+    Integration Test (Epic 9):p9, after p8, 30d
+    User Onboarding (Epic 10):p10, after p9, 15d
+    GO LIVE                 :milestone, after p10, 0d
+```

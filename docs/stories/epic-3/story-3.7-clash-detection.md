@@ -24,12 +24,15 @@
 - [ ] **Export**: Export selected clashes to **BCF 2.1** (BIM Collaboration Format) zip file
 
 ### Performance
-- [ ] Clash check runs in background or WebWorker (non-blocking)
+- [ ] **Backend Processing**: Clash check runs as background job on server (not in browser) to handle large models
+- [ ] **For Small Models**: Optionally support browser-based clash using WebWorker for models < 50MB
 
 ## Technical Tasks
 
 ### Backend
 - [ ] Implement BCF file generation (XML structure + Snapshots)
+- [ ] **Clash Engine**: Implement clash detection using existing library (e.g., `three-bvh-csg`, `web-ifc` collision detection, or similar)
+- [ ] Create background job for clash calculation
 
 ### Frontend
 - [ ] Implement Clash Algorithm (AABB Tree + Triangle Intersection) or use library (e.g., `three-bvh-csg` or `web-ifc` collision)

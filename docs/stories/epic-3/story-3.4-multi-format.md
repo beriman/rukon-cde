@@ -23,7 +23,7 @@
 - [ ] User sees "Processing" state while file is being prepared for viewing
 
 ### Performance
-- [ ] Viewer loads 50MB IFC file in < 5 seconds
+- [ ] Viewer loads 50MB IFC file in < 5 seconds **on standard laptop** (Intel i5/AMD Ryzen 5, 8GB RAM, integrated GPU)
 
 ## Technical Tasks
 

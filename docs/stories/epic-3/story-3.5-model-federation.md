@@ -21,6 +21,8 @@
 - [ ] **Visibility Control**: User can toggle visibility/transparency per model
 - [ ] **Save View**: User can save the federation configuration (list of file IDs + settings) as a "Federated View"
 - [ ] **Performance**: Viewer handles 10+ merged models (up to 500MB total geometry)
+- [ ] **Optimization**: Implement LOD (Level of Detail) system to reduce draw calls for distant objects
+- [ ] **Optimization**: Implement Occlusion Culling to avoid rendering hidden geometry
 
 ## Technical Tasks
 

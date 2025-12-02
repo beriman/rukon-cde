@@ -15,6 +15,7 @@
 ## Acceptance Criteria
 
 ### Functional
+- [ ] **Pre-Development**: Complete Technical Spike to evaluate conversion toolchains (ODA SDK vs Autodesk Platform Services)
 - [ ] **Trigger**: Uploading a 3D file triggers a background job
 - [ ] **Conversion Logic**:
   - RVT -> IFC (for data) & GLTF (for geometry)
@@ -23,6 +24,7 @@
 - [ ] **Status Tracking**: File status updates: `QUEUED` -> `PROCESSING` -> `READY` or `FAILED`
 - [ ] **Retry Logic**: Failed jobs retried 3 times before permanent failure
 - [ ] User receives notification when conversion is complete
+- [ ] **Testing**: Visual regression testing (snapshot comparison) to validate geometry accuracy
 
 ### Performance
 - [ ] Background worker does not block main API thread

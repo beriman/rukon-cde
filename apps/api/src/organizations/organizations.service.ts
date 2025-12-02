@@ -1,11 +1,12 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateOrgDto } from './dto/create-org.dto';
 
 @Injectable()
 export class OrganizationsService {
     constructor(private prisma: PrismaService) { }
 
-    async create(userId: string, dto: any) {
+    async create(userId: string, dto: CreateOrgDto) {
         const { name, slug } = dto;
 
         const existingOrg = await this.prisma.organization.findUnique({

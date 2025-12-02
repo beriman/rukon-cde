@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto, LoginDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,7 +11,7 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
-    async register(dto: any) {
+    async register(dto: RegisterDto) {
         const { email, password, name } = dto;
 
         // Check if user exists
@@ -44,7 +45,7 @@ export class AuthService {
         };
     }
 
-    async login(dto: any) {
+    async login(dto: LoginDto) {
         const { email, password } = dto;
 
         // Find user

@@ -16,6 +16,8 @@
 
 ### Functional
 - [ ] **Help Center**: Searchable knowledge base (FAQ, How-to guides)
+- [ ] **Context-Sensitive**: Page-specific help links (e.g., "How to upload" on Upload page)
+- [ ] **Search**: Client-side fuzzy search (typo-tolerant)
 - [ ] **Videos**: 5-10 short tutorial videos (< 3 min each)
 - [ ] **Topics**: File Upload, Approvals, 3D Viewer, Progress Tracking, HSE Reporting
 - [ ] **Access**: Help icon in navigation bar
@@ -25,9 +27,13 @@
 
 ## Technical Tasks
 
-### Content
-- [ ] Write help articles (Markdown)
-- [ ] Record tutorial videos (Loom/OBS)
+### Content (Critical)
+- [ ] Write help articles (Markdown) - Assign Content Writer
+- [ ] Record tutorial videos (Loom/OBS) - Assign Content Writer
+
+### Frontend
+- [ ] Implement Help Center UI with Markdown renderer
+- [ ] Implement Client-side search using Fuse.js
 
 ## Dependencies
 - **Depends on**: Epic 1-3 (Features exist)

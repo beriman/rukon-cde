@@ -14,20 +14,20 @@
 
 ## Acceptance Criteria
 
-- [ ] User dapat create project baru dengan name dan description
-- [ ] Project auto-associated dengan user's organization
-- [ ] Project memiliki default folder structure (WIP, Shared, Published, Archived)
-- [ ] Project metadata: name, description, status, createdBy, timestamps
-- [ ] Only users dengan role ≥ APPOINTED_PARTY dapat create projects
-- [ ] Project creation logged di audit trail
+- [x] User dapat create project baru dengan name dan description
+- [x] Project auto-associated dengan user's organization
+- [x] Project memiliki default folder structure (WIP, Shared, Published, Archived)
+- [x] Project metadata: name, description, status, createdBy, timestamps
+- [x] Only users dengan role ≥ APPOINTED_PARTY dapat create projects
+- [x] Project creation logged di audit trail (Via transaction)
 
 ## Technical Tasks
 
-- [ ] Create `ProjectsModule`, `ProjectsService`, `ProjectsController`
-- [ ] Implement `POST /api/projects`
-- [ ] Auto-create default CDE folder structure on project creation
-- [ ] Add RBAC permissions
-- [ ] Write unit & integration tests
+- [x] Create `ProjectsModule`, `ProjectsService`, `ProjectsController`
+- [x] Implement `POST /api/projects`
+- [x] Auto-create default CDE folder structure on project creation
+- [x] Add RBAC permissions
+- [x] Write unit & integration tests
 
 ## API Contract
 

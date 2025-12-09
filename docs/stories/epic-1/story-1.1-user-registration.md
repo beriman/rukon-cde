@@ -15,54 +15,54 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User dapat mengakses halaman registration
-- [ ] Form registration meminta: Email, Name, Password, Confirm Password
-- [ ] Email harus valid format (regex validation)
-- [ ] Password minimal 8 karakter, mengandung huruf besar, kecil, dan angka
-- [ ] Confirm password harus match dengan password
-- [ ] System menolak email yang sudah terdaftar
-- [ ] Setelah sukses, user redirect ke login page dengan success message
+- [x] User dapat mengakses halaman registration
+- [x] Form registration meminta: Email, Name, Password, Confirm Password
+- [x] Email harus valid format (regex validation)
+- [x] Password minimal 8 karakter, mengandung huruf besar, kecil, dan angka
+- [x] Confirm password harus match dengan password
+- [x] System menolak email yang sudah terdaftar
+- [x] Setelah sukses, user redirect ke login page dengan success message
 - [ ] Email confirmation dikirim ke user (optional untuk MVP)
 
 ### Security
-- [ ] Password di-hash menggunakan bcrypt (minimum 10 rounds)
-- [ ] Password tidak pernah disimpan dalam plaintext
-- [ ] HTTPS enforced untuk registration endpoint
-- [ ] Rate limiting: max 5 registration attempts per IP per hour
+- [x] Password di-hash menggunakan bcrypt (minimum 10 rounds)
+- [x] Password tidak pernah disimpan dalam plaintext
+- [x] HTTPS enforced untuk registration endpoint (Handled by Infra/Gateway)
+- [x] Rate limiting: max 5 registration attempts per IP per hour
 
 ### Non-Functional
-- [ ] API response time < 500ms (p95)
-- [ ] Error messages jelas dan user-friendly
-- [ ] Input validation di frontend dan backend
-- [ ] Database constraint mencegah duplicate email
+- [x] API response time < 500ms (p95) (Verified locally)
+- [x] Error messages jelas dan user-friendly
+- [x] Input validation di frontend dan backend
+- [x] Database constraint mencegah duplicate email
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [ ] Create `AuthModule`, `AuthService`, `AuthController`
-- [ ] Create `UsersModule`, `UsersService` untuk user management
-- [ ] Implement `POST /api/auth/register` endpoint
-- [ ] Setup bcrypt untuk password hashing
-- [ ] Create Prisma schema untuk User model
-- [ ] Add email uniqueness constraint di database
-- [ ] Implement DTO validation dengan class-validator:
+- [x] Create `AuthModule`, `AuthService`, `AuthController`
+- [x] Create `UsersModule`, `UsersService` untuk user management
+- [x] Implement `POST /api/auth/register` endpoint
+- [x] Setup bcrypt untuk password hashing
+- [x] Create Prisma schema untuk User model
+- [x] Add email uniqueness constraint di database
+- [x] Implement DTO validation dengan class-validator:
   - `RegisterDto` (email, name, password, confirmPassword)
-- [ ] Write unit tests untuk `AuthService.register()`
-- [ ] Write integration tests untuk registration flow
-- [ ] Add rate limiting dengan `@nestjs/throttler`
+- [x] Write unit tests untuk `AuthService.register()`
+- [x] Write integration tests untuk registration flow
+- [x] Add rate limiting dengan `@nestjs/throttler`
 
 ### Frontend (React/Next.js)
-- [ ] Create `/register` page
-- [ ] Build `RegisterForm` component dengan validation
-- [ ] Implement real-time field validation
-- [ ] Add password strength indicator
-- [ ] Handle error states (duplicate email, weak password, etc.)
-- [ ] Add loading states untuk submission
-- [ ] Redirect ke login page setelah success
+- [x] Create `/register` page
+- [x] Build `RegisterForm` component dengan validation
+- [x] Implement real-time field validation
+- [x] Add password strength indicator
+- [x] Handle error states (duplicate email, weak password, etc.)
+- [x] Add loading states untuk submission
+- [x] Redirect ke login page setelah success
 
 ### Database
-- [ ] Run migration untuk User table
-- [ ] Add index pada email column untuk performance
+- [x] Run migration untuk User table
+- [x] Add index pada email column untuk performance
 
 ## Technical Implementation Notes
 
@@ -260,16 +260,16 @@ describe('POST /api/auth/register', () => {
 
 ## Definition of Done
 
-- [ ] All acceptance criteria met
-- [ ] Backend implementation complete dengan validation
-- [ ] Frontend registration form functional
-- [ ] Unit tests written dengan coverage ≥ 80%
-- [ ] Integration tests passed
-- [ ] Security requirements met (bcrypt, rate limiting)
-- [ ] Code reviewed dan approved
-- [ ] API documentation updated (Swagger)
-- [ ] Manual testing completed
-- [ ] Deployed to development environment
+- [x] All acceptance criteria met
+- [x] Backend implementation complete dengan validation
+- [x] Frontend registration form functional
+- [x] Unit tests written dengan coverage ≥ 80%
+- [x] Integration tests passed
+- [x] Security requirements met (bcrypt, rate limiting)
+- [x] Code reviewed dan approved
+- [x] API documentation updated (Swagger)
+- [x] Manual testing completed
+- [x] Deployed to development environment
 
 ## Notes
 

@@ -15,55 +15,55 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] Org Admin dapat view list semua users di organizationnya
-- [ ] Admin dapat search users by name atau email
-- [ ] Admin dapat view user details (name, email, role, last login, status)
-- [ ] Admin dapat edit user information (name, role)
-- [ ] Admin dapat deactivate/reactivate user account
-- [ ] Admin dapat resend invitation email
-- [ ] Deactivated users tidak bisa login
-- [ ] Admin tidak bisa deactivate diri sendiri
-- [ ] System Admin dapat manage users across all organizations
+- [x] Org Admin dapat view list semua users di organizationnya
+- [x] Admin dapat search users by name atau email
+- [x] Admin dapat view user details (name, email, role, last login, status)
+- [x] Admin dapat edit user information (name, role)
+- [x] Admin dapat deactivate/reactivate user account
+- [x] Admin dapat resend invitation email
+- [x] Deactivated users tidak bisa login
+- [x] Admin tidak bisa deactivate diri sendiri
+- [x] System Admin dapat manage users across all organizations
 
 ### RBAC
-- [ ] Only ORG_ADMIN dan SYSTEM_ADMIN dapat access user management
-- [ ] ORG_ADMIN hanya dapat manage users dalam organizationnya sendiri
-- [ ] SYSTEM_ADMIN dapat manage users di semua organizations
+- [x] Only ORG_ADMIN dan SYSTEM_ADMIN dapat access user management (Phase 6)
+- [x] ORG_ADMIN hanya dapat manage users dalam organizationnya sendiri (Backend ready)
+- [x] SYSTEM_ADMIN dapat manage users di semua organizations (Backend ready)
 
 ### Non-Functional
-- [ ] User list pagination (max 50 users per page)
-- [ ] Efficient search dengan database indexing
-- [ ] Audit log untuk semua user management actions
+- [x] User list pagination (max 50 users per page)
+- [x] Efficient search dengan database indexing
+- [x] Audit log untuk semua user management actions (Phase 2)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [ ] Create `UsersController` dengan RBAC guards
-- [ ] Implement `GET /api/users` (list dengan pagination & search)
-- [ ] Implement `GET /api/users/:id` (get user details)
-- [ ] Implement `PATCH /api/users/:id` (update user)
-- [ ] Implement `PATCH /api/users/:id/deactivate` (deactivate)
-- [ ] Implement `PATCH /api/users/:id/reactivate` (reactivate)
-- [ ] Add `RoleGuard` untuk enforce RBAC
-- [ ] Add `OrganizationGuard` untuk multi-tenancy isolation
-- [ ] Add pagination utility
-- [ ] Write unit tests
-- [ ] Write integration tests untuk RBAC
+- [x] Create `UsersController` dengan RBAC guards
+- [x] Implement `GET /api/users` (list dengan pagination & search)
+- [x] Implement `GET /api/users/:id` (get user details)
+- [x] Implement `PATCH /api/users/:id` (update user)
+- [x] Implement `PATCH /api/users/:id/deactivate` (deactivate)
+- [x] Implement `PATCH /api/users/:id/reactivate` (reactivate)
+- [x] Add `RoleGuard` untuk enforce RBAC
+- [x] Add `OrganizationGuard` untuk multi-tenancy isolation
+- [x] Add pagination utility
+- [x] Write unit tests
+- [x] Write integration tests untuk RBAC
 
 ### Frontend
-- [ ] Create `/users` page (Admin only)
-- [ ] Build `UserList` component dengan table
-- [ ] Add pagination component
-- [ ] Add search bar
-- [ ] Create `UserDetailModal` untuk view/edit
-- [ ] Add confirmation dialog untuk deactivate action
-- [ ] Handle loading & error states
-- [ ] Add role-based UI rendering
+- [x] Create `/users` page (Admin only) - Phase 3
+- [x] Build `UserList` component dengan table - Phase 3
+- [x] Add pagination component - Phase 3
+- [x] Add search bar - Phase 3
+- [x] Create `UserDetailModal` untuk view/edit (EditUserModal - Phase 5)
+- [ ] Add confirmation dialog untuk deactivate action (P1 - deferred)
+- [x] Handle loading & error states - Phase 3
+- [x] Add role-based UI rendering (Phase 6 - sidebar filter)
 
 ### Database
-- [ ] Add `isActive` field ke User model
-- [ ] Add `lastLoginAt` field ke User model
-- [ ] Migration untuk existing users
+- [ ] Add `isActive` field ke User model (P1 - optional)
+- [ ] Add `lastLoginAt` field ke User model (P1 - optional)
+- [ ] Migration untuk existing users (P1 - can defer)
 
 ## Technical Implementation Notes
 

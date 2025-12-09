@@ -15,16 +15,16 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] **Auto-generated**: Swagger/OpenAPI spec from code annotations
-- [ ] **Portal**: Interactive documentation (Swagger UI or Redoc)
+- [x] **Auto-generated**: Swagger/OpenAPI spec from code annotations
+- [x] **Portal**: Interactive documentation (Swagger UI or Redoc)
 - [ ] **Authentication**: API key management for third-party integrations
-- [ ] **Examples**: Request/response examples for all endpoints
+- [x] **Examples**: Request/response examples for all endpoints
 
 ## Technical Tasks
 
 ### Backend
-- [ ] Add Swagger/OpenAPI annotations to API routes
-- [ ] Setup Swagger UI endpoint (`/api/docs`)
+- [x] Add Swagger/OpenAPI annotations to API routes
+- [x] Setup Swagger UI endpoint (`/api/docs`)
 
 ## Dependencies
 - **Depends on**: Epic 1 (API exists)

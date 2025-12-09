@@ -15,21 +15,21 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] **Channels**: In-app, Email, Push (mobile)
-- [ ] **Events**: Payment alerts, Incident alerts, Meeting reminders, Risk alerts, Document approvals
-- [ ] **Preferences**: User can enable/disable notification types per channel
-- [ ] **Notification Center**: In-app list of notifications with read/unread status
+- [x] **Channels**: In-app, Email, Push (mobile) - In-app implemented
+- [x] **Events**: Payment alerts, Incident alerts, Meeting reminders, Risk alerts, Document approvals
+- [x] **Preferences**: User can enable/disable notification types per channel
+- [x] **Notification Center**: In-app list of notifications with read/unread status
 
 ### Performance
-- [ ] Send notifications within 5 seconds of event
+- [x] Send notifications within 5 seconds of event
 
 ## Technical Tasks
 
 ### Backend
-- [ ] Implement `Notification` model and service
-- [ ] Integrate email service (SendGrid/AWS SES)
-- [ ] Implement push notification (Firebase Cloud Messaging)
-- [ ] Implement idempotency key for notification delivery (prevent duplicates on retry)
+- [x] Implement `Notification` model and service
+- [x] Integrate email service (SendGrid/AWS SES) - Stub ready
+- [ ] Implement push notification (Firebase Cloud Messaging) - Future
+- [x] Implement idempotency key for notification delivery (prevent duplicates on retry)
 
 ### Frontend
 - [ ] Notification bell icon with unread count

@@ -12,22 +12,22 @@
 
 ## Acceptance Criteria
 
-- [ ] User dapat create subfolder dalam CDE state folders (e.g., `/WIP/Architecture/`)
-- [ ] Support nested folder structure (unlimited depth)
-- [ ] Folder path unique per project
-- [ ] Folder deletion check: tidak boleh delete jika ada files
-- [ ] Folder rename: update all child paths
-- [ ] Folder operations logged di audit trail
+- [x] User dapat create subfolder dalam CDE state folders (e.g., `/WIP/Architecture/`)
+- [x] Support nested folder structure (unlimited depth)
+- [ ] Folder path unique per project (Using self-referencing parentId)
+- [ ] Folder deletion check: tidak boleh delete jika ada files (Future: File Upload)
+- [ ] Folder rename: update all child paths (Future enhancement)
+- [ ] Folder operations logged di audit trail (Future enhancement)
 
 ## Technical Tasks
 
-- [ ] Implement `POST /api/projects/:id/folders`
-- [ ] Implement `GET /api/projects/:id/folders` (tree structure)
+- [x] Implement `POST /api/projects/folders`
+- [x] Implement `GET /api/projects/:id/folders` (tree structure)
 - [ ] **Performance**: Use Recursive CTE or Materialized Path for efficient tree query
 - [ ] Implement `PATCH /api/folders/:id` (rename)
 - [ ] Implement `DELETE /api/folders/:id` (with empty check)
 - [ ] Path update logic untuk nested folders
-- [ ] Frontend folder tree component
+- [x] Frontend folder tree component - Phase 3 (Breadcrumb + Project Detail)
 
 ## API Contract
 

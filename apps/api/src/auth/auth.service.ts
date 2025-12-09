@@ -1,23 +1,30 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { AuditService } from '../common/services/audit.service';
+import { AuditAction } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private prisma: PrismaService,
+        private usersService: UsersService,
         private jwtService: JwtService,
+        private prisma: PrismaService,
+        private auditService: AuditService,
     ) { }
 
     async register(dto: RegisterDto) {
-        const { email, password, name } = dto;
+        const { email, password, confirmPassword, name } = dto;
+
+        if (password !== confirmPassword) {
+            throw new BadRequestException('Passwords do not match');
+        }
 
         // Check if user exists
-        const existingUser = await this.prisma.user.findUnique({
-            where: { email },
-        });
+        const existingUser = await this.usersService.findOneByEmail(email);
 
         if (existingUser) {
             throw new ConflictException('Email already in use');
@@ -27,13 +34,16 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create user
-        const user = await this.prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                name,
-            },
+        const user = await this.usersService.create({
+            email,
+            password: hashedPassword,
+            name,
         });
+
+        // Audit Log
+        // Note: We might not log register if user not fully active, but good for security.
+        // However, userId is available now.
+        // For now, let's keep it simple.
 
         return {
             message: 'User registered successfully',
@@ -49,12 +59,15 @@ export class AuthService {
         const { email, password } = dto;
 
         // Find user
-        const user = await this.prisma.user.findUnique({
-            where: { email },
-        });
+        const user = await this.usersService.findOneByEmail(email);
 
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
+        }
+
+        // Check if user is active
+        if (user.isActive === false) {
+            throw new UnauthorizedException('Account has been deactivated');
         }
 
         // Check password
@@ -64,18 +77,98 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        // Generate token
-        const payload = { sub: user.id, email: user.email, role: user.role };
-        const token = this.jwtService.sign(payload);
+        // Update last login timestamp
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { lastLoginAt: new Date() },
+        });
+
+        // Generate tokens
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+        // Audit Log
+        await this.auditService.log(
+            user.id,
+            AuditAction.LOGIN,
+            undefined,
+            undefined,
+            { ip: 'captured-in-controller-ideally' }
+        );
 
         return {
-            access_token: token,
+            ...tokens,
             user: {
                 id: user.id,
                 email: user.email,
                 name: user.name,
                 role: user.role,
             },
+        };
+    }
+
+    async refresh(userId: string, refreshToken: string) {
+        const user = await this.usersService.findOneById(userId);
+        if (!user) throw new UnauthorizedException('Access Denied');
+
+        const tokenRecord = await this.prisma.refreshToken.findUnique({
+            where: { token: refreshToken },
+        });
+
+        if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+            throw new UnauthorizedException('Access Denied');
+        }
+
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+        return tokens;
+    }
+
+    async logout(userId: string) {
+        // Delete refresh tokens
+        await this.prisma.refreshToken.deleteMany({
+            where: {
+                userId,
+            },
+        });
+
+        // Audit Log
+        await this.auditService.log(userId, AuditAction.LOGOUT);
+
+        return true;
+    }
+
+    async updateRefreshToken(userId: string, refreshToken: string) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+
+        await this.prisma.refreshToken.create({
+            data: {
+                token: refreshToken,
+                userId,
+                expiresAt,
+            },
+        });
+    }
+
+    async generateTokens(userId: string, email: string, role: string) {
+        const payload = { sub: userId, email, role };
+
+        const [at, rt] = await Promise.all([
+            this.jwtService.signAsync(payload, {
+                secret: process.env.JWT_SECRET,
+                expiresIn: '15m',
+            }),
+            this.jwtService.signAsync(payload, {
+                secret: process.env.JWT_SECRET,
+                expiresIn: '7d',
+            }),
+        ]);
+
+        return {
+            access_token: at,
+            refresh_token: rt,
         };
     }
 }

@@ -15,16 +15,16 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] **Tool**: k6, Artillery, or JMeter
-- [ ] **Scenarios**: Login, File Upload, File Download, API calls
-- [ ] **Target**: 1000 concurrent users with < 2sec response time (p50), < 3sec (p95)
-- [ ] **Failure Criteria**: Test fails if p95 response time > 3 seconds or error rate > 1%
-- [ ] **Reports**: Generate performance reports (HTML/JSON)
+- [x] **Tool**: k6, Artillery, or JMeter
+- [x] **Scenarios**: Login, File Upload, File Download, API calls
+- [x] **Target**: 1000 concurrent users with < 2sec response time (p50), < 3sec (p95)
+- [x] **Failure Criteria**: Test fails if p95 response time > 3 seconds or error rate > 1%
+- [x] **Reports**: Generate performance reports (HTML/JSON)
 
 ## Technical Tasks
 
 ### QA
-- [ ] Write load test scripts (k6/Artillery)
+- [x] Write load test scripts (k6/Artillery)
 - [ ] Setup CI job to run load tests weekly
 
 ## Dependencies

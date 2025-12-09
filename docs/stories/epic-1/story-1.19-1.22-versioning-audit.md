@@ -7,12 +7,12 @@
 **As a** user, **I want** system automatically create new version saat upload file dengan nama yang sama, **so that** version history preserved dan tidak perlu manual versioning.
 
 ### Acceptance Criteria
-- [ ] Upload file dengan uniqueId yang sama → auto-increment version
-- [ ] Version numbering: V1, V2, V3, dst.
-- [ ] Each version stored independently di S3
-- [ ] File record maintains currentVersion pointer
-- [ ] Old versions remain downloadable
-- [ ] Version metadata: uploadedBy, timestamp, CDE state, size
+- [x] Upload file dengan uniqueId yang sama → auto-increment version
+- [x] Version numbering: V1, V2, V3, dst.
+- [x] Each version stored independently di S3
+- [x] File record maintains currentVersion pointer
+- [x] Old versions remain downloadable
+- [x] Version metadata: uploadedBy, timestamp, CDE state, size
 
 ### Implementation
 ```typescript

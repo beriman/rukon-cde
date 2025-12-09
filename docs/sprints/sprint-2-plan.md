@@ -40,9 +40,9 @@
 
 ### Frontend Integration (Next.js)
 - [ ] Setup Axios/Fetch wrapper with Interceptors (for JWT).
-- [ ] Create `useAuth` hook (Zustand) for state management.
-- [ ] Build **Login Page** (`/login`) & **Register Page** (`/register`).
-- [ ] Build **Dashboard Layout** (Sidebar, Header).
+- [x] Create `useAuth` hook (Zustand) for state management.
+- [x] Build **Login Page** (`/login`) & **Register Page** (`/register`).
+- [x] Build **Dashboard Layout** (Sidebar, Header).
 
 ### Project Management (Fullstack)
 - [ ] **Backend**:
@@ -54,8 +54,8 @@
   - Create **Project List View** (Card/Table).
 
 ### Folder Management (Backend)
-- [ ] Create `FoldersModule`.
-- [ ] Implement `Folder` model in Prisma (Self-referencing relation).
+- [ ] Create `FoldersModule` (Managed within ProjectsService for now).
+- [x] Implement `Folder` model in Prisma (Self-referencing relation).
 - [ ] Implement `POST /folders` (Create Subfolder).
 - [ ] Implement `GET /projects/:id/folders` (Tree Structure).
 
@@ -63,8 +63,8 @@
 
 ## 3. Definition of Done (DoD)
 - [ ] Tech Debt: All API endpoints validate input using DTOs.
-- [ ] Frontend: User can Login, View Dashboard, Create Project.
-- [ ] Backend: Project creation automatically generates CDE folders (WIP, Shared, Published, Archived).
+- [x] Frontend: User can Login, View Dashboard, Create Project.
+- [x] Backend: Project creation automatically generates CDE folders (WIP, Shared, Published, Archived).
 - [ ] Tests: Unit tests for ProjectService > 80% coverage.
 
 ---

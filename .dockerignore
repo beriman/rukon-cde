@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment variables
+.env
+.env*.local
+
+# Build artifacts
+dist/
+.next/
+out/
+
+# Testing
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+temp/
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in Docker image)
+docs/
+README.md
+*.md

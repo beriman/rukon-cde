@@ -15,43 +15,43 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] System Admin dapat create organization baru
-- [ ] Organization memiliki unique name dan optional domain
-- [ ] System dapat auto-assign first user sebagai ORG_ADMIN
-- [ ] Organization dapat memiliki multiple projects dan users
-- [ ] Organization slug/identifier generated otomatis dari name
+- [x] System Admin dapat create organization baru
+- [x] Organization memiliki unique name dan optional domain
+- [x] System dapat auto-assign first user sebagai ORG_ADMIN
+- [x] Organization dapat memiliki multiple projects dan users
+- [x] Organization slug/identifier generated otomatis dari name
 
 ### Data Isolation
-- [ ] Setiap organization memiliki isolated data space
-- [ ] Organization A tidak bisa access data Organization B
-- [ ] Database queries automatically scoped by organizationId
+- [x] Setiap organization memiliki isolated data space
+- [x] Organization A tidak bisa access data Organization B
+- [x] Database queries automatically scoped by organizationId
 
 ### Non-Functional
-- [ ] Organization name validation (3-100 characters, alphanumeric + spaces)
-- [ ] Domain uniqueness enforced di database level
+- [x] Organization name validation (3-100 characters, alphanumeric + spaces)
+- [x] Domain uniqueness enforced di database level
 
 ## Technical Tasks
 
 ### Backend
-- [ ] Create `OrganizationsModule`, `OrganizationsService`, `OrganizationsController`
-- [ ] Implement `POST /api/organizations`
-- [ ] Implement `GET /api/organizations` (SYSTEM_ADMIN only)
-- [ ] Implement `GET /api/organizations/:id`
-- [ ] Add validation untuk organization creation
-- [ ] Auto-generate organization slug
-- [ ] Write unit tests
-- [ ] Write integration tests
+- [x] Create `OrganizationsModule`, `OrganizationsService`, `OrganizationsController`
+- [x] Implement `POST /api/organizations`
+- [x] Implement `GET /api/organizations` (SYSTEM_ADMIN only)
+- [x] Implement `GET /api/organizations/:id`
+- [x] Add validation untuk organization creation
+- [x] Auto-generate organization slug
+- [x] Write unit tests (Completed in Sprint 1)
+- [x] Write integration tests (Completed in Sprint 1)
 
 ### Frontend
-- [ ] Create `/admin/organizations` page (SYSTEM_ADMIN only)
-- [ ] Build `CreateOrganizationModal`
-- [ ] Show list of organizations dengan stats
-- [ ] Handle permissions (hide from non-SYSTEM_ADMIN)
+- [x] Create `/admin/organizations` page (SYSTEM_ADMIN only) (Completed in Sprint 1)
+- [x] Build `CreateOrganizationModal` (Completed in Sprint 1)
+- [x] Show list of organizations dengan stats (Completed in Sprint 1)
+- [x] Handle permissions (hide from non-SYSTEM_ADMIN) (Completed in Sprint 1)
 
 ### Database
-- [ ] Organization model already exists from Epic schema
-- [ ] Add unique index pada domain field
-- [ ] Add migration
+- [x] Organization model already exists from Epic schema
+- [x] Add unique index pada domain field
+- [x] Add migration
 
 ## Technical Implementation Notes
 
@@ -172,11 +172,11 @@ describe('OrganizationsService', () => {
 
 ## Definition of Done
 
-- [ ] All acceptance criteria met
-- [ ] SYSTEM_ADMIN can create organizations
-- [ ] Slug generation working
-- [ ] Tests passed
-- [ ] Code reviewed
+- [x] All acceptance criteria met
+- [x] SYSTEM_ADMIN can create organizations
+- [x] Slug generation working
+- [x] Tests passed
+- [x] Code reviewed
 
 ---
 

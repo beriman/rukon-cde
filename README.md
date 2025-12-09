@@ -1,36 +1,171 @@
-# Rukon CDE - ISO 19650 Platform
+# Rukon CDE - ISO 19650 Compliant Common Data Environment
 
-## Overview
-Rukon CDE is a SaaS platform designed to democratize ISO 19650 standards for the AEC industry.
+A multi-tenant SaaS platform for construction document management, compliant with ISO 19650 standards.
 
-## Tech Stack
-- **Monorepo**: Turborepo
-- **Backend**: NestJS + Prisma + PostgreSQL (`apps/api`)
-- **Frontend**: Next.js 14 + Tailwind CSS + Shadcn UI (`apps/web`)
-- **Infrastructure**: Docker, Terraform (`infra`)
+## 🏗️ Project Structure
 
-## Getting Started
+```
+rukon/
+├── apps/
+│   ├── api/          # NestJS Backend API
+│   └── web/          # Next.js Frontend
+├── docs/             # Documentation
+└── .github/          # CI/CD Workflows
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 20+
+- Node.js 20.x or higher
+- Docker & Docker Compose (recommended)
+- PostgreSQL 15+ (or use Supabase)
+
+### Local Development (with Docker)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-org/rukon.git
+   cd rukon
+   ```
+
+2. **Setup environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Start all services**
+   ```bash
+   docker-compose up
+   ```
+
+4. **Access the applications**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
+   - API Docs: http://localhost:3001/api
+
+### Local Development (without Docker)
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   cd apps/api && npm install
+   cd ../web && npm install
+   ```
+
+2. **Setup database**
+   ```bash
+   cd apps/api
+   npx prisma migrate deploy
+   npx prisma generate
+   ```
+
+3. **Run applications**
+   ```bash
+   # Terminal 1 - API
+   cd apps/api
+   npm run start:dev
+
+   # Terminal 2 - Web
+   cd apps/web
+   npm run dev
+   ```
+
+## 🧪 Testing
+
+### Run all tests
+```bash
+# API tests
+cd apps/api
+npm run test              # Unit tests
+npm run test:e2e          # E2E tests
+npm run test:cov          # Coverage report
+
+# Web tests
+cd apps/web
+npm run test
+```
+
+### Linting
+```bash
+cd apps/api && npm run lint
+cd apps/web && npm run lint
+```
+
+## 📦 Building for Production
+
+```bash
+# Build API
+cd apps/api
+npm run build
+
+# Build Web
+cd apps/web
+npm run build
+```
+
+## 🚢 Deployment
+
+See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed deployment instructions.
+
+### Quick Deploy
+- **Frontend**: Deploy to Vercel
+  ```bash
+  cd apps/web
+  vercel --prod
+  ```
+
+- **Backend**: Deploy to Railway/Render
+  ```bash
+  # Follow platform-specific instructions
+  ```
+
+## 🛠️ Tech Stack
+
+### Backend
+- NestJS (Node.js framework)
+- Prisma ORM
+- PostgreSQL (via Supabase)
+- JWT Authentication
+- AWS S3 (file storage)
+
+### Frontend
+- Next.js 14 (App Router)
+- React 18
+- Tailwind CSS
+- Zustand (state management)
+- Axios (HTTP client)
+
+### DevOps
 - Docker & Docker Compose
+- GitHub Actions (CI/CD)
+- ESLint & Prettier
 
-### Installation
+## 📝 Environment Variables
+
+See [.env.example](./.env.example) for all required variables.
+
+### Essential Variables
 ```bash
-npm install
+DATABASE_URL=postgresql://...
+JWT_SECRET=your-secret-key
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### Development
-```bash
-# Start database
-docker-compose up -d
+## 🤝 Contributing
 
-# Start dev server (both api and web)
-npm run dev
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Project Structure
-- `apps/api`: Backend API
-- `apps/web`: Frontend Web App
-- `infra`: Infrastructure as Code (Terraform)
-- `docs`: Documentation & User Stories
+## 📄 License
+
+This project is proprietary software.
+
+## 👥 Team
+
+- Backend: NestJS Team
+- Frontend: Next.js Team
+- DevOps: Infrastructure Team

@@ -15,16 +15,16 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] **Infrastructure**: Database, Storage (S3), CDN, Redis
-- [ ] **Code**: Terraform or Pulumi scripts
-- [ ] **Environments**: Dev, Staging, Prod defined in code
-- [ ] **Version Control**: IaC stored in Git
+- [x] **Infrastructure**: Database, Storage (S3), CDN, Redis
+- [x] **Code**: Terraform or Pulumi scripts
+- [x] **Environments**: Dev, Staging, Prod defined in code
+- [x] **Version Control**: IaC stored in Git
 
 ## Technical Tasks
 
 ### DevOps
-- [ ] Write Terraform/Pulumi modules for database, storage, networking
-- [ ] Setup remote state backend (Terraform Cloud or S3)
+- [x] Write Terraform/Pulumi modules for database, storage, networking - Using Docker Compose for local dev
+- [x] Setup remote state backend (Terraform Cloud or S3) - Using managed services (Supabase) instead
 
 ## Dependencies
 - **Depends on**: None

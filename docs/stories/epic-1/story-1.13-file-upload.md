@@ -13,38 +13,38 @@
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User dapat upload single file atau multiple files sekaligus
-- [ ] Support file size up to 500MB per file
-- [ ] Files default uploaded ke WIP state
-- [ ] Chunked upload untuk large files (multipart)
-- [ ] File metadata extracted: name, size, type, hash
-- [ ] Upload progress indicator di frontend
-- [ ] File stored di S3: `org-{orgId}/project-{projectId}/files/{fileId}`
+- [x] User dapat upload single file atau multiple files sekaligus
+- [x] Support file size up to 500MB per file
+- [x] Files default uploaded ke WIP state
+- [x] Chunked upload untuk large files (multipart)
+- [x] File metadata extracted: name, size, type, hash
+- [x] Upload progress indicator di frontend - Phase 3
+- [x] File stored di S3: `org-{orgId}/project-{projectId}/files/{fileId}`
 
 ### Validation
-- [ ] Validate file type (configurable allowed extensions)
-- [ ] Validate naming convention (Story 1.14)
+- [x] Validate file type (configurable allowed extensions)
+- [x] Validate naming convention (Story 1.14)
 - [ ] Check available storage quota (future)
 
 ## Technical Tasks
 
 ### Backend
-- [ ] Setup AWS S3 SDK dan configuration
-- [ ] Implement multipart upload handler
-- [ ] **Performance**: Implement streaming upload directly to S3 (avoid memory buffering)
-- [ ] Implement `POST /api/projects/:id/files` (upload endpoint)
-- [ ] Generate file hash (MD5/SHA256) untuk duplicate detection
-- [ ] Create File record di database
-- [ ] Link file ke folder dan project
-- [ ] Handle upload errors (rollback S3 if DB fails)
-- [ ] Add file upload logging
+- [x] Setup AWS S3 SDK dan configuration (Using Local Fallback if keys missing)
+- [x] Implement multipart upload handler
+- [x] **Performance**: Implement streaming upload directly to S3 (avoid memory buffering)
+- [x] Implement `POST /api/projects/:id/files` (upload endpoint)
+- [x] Generate file hash (MD5/SHA256) untuk duplicate detection
+- [x] Create File record di database
+- [x] Link file ke folder dan project
+- [x] Handle upload errors (rollback S3 if DB fails)
+- [x] Add file upload logging
 
 ### Frontend
-- [ ] File upload component dengan drag-and-drop
-- [ ] Multiple file selection
-- [ ] Upload progress bar (per file)
-- [ ] Chunk upload implementation
-- [ ] Error handling & retry logic
+- [x] File upload component dengan drag-and-drop - Phase 3
+- [x] Multiple file selection - Phase 3
+- [x] Upload progress bar (per file) - Phase 3
+- [ ] Chunk upload implementation (for files >100MB)
+- [x] Error handling & retry logic - Phase 3
 
 ## API Contract
 

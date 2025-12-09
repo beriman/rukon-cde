@@ -7,12 +7,11 @@
 **As a** project member, **I want to** download files dan view metadata, **so that** saya dapat use files dalam workflows saya.
 
 ### Acceptance Criteria
-- [ ] User dapat download file dari any version
-- [ ] Presigned URL generation untuk secure S3 download
-- [ ] URL expires dalam 5 minutes
-- [ ] Download logged di audit trail
-- [ ] Metadata view: uploader, timestamps, CDE state, version count
-- [ ] Metadata view: uploader, timestamps, CDE state, version count
+- [x] User dapat download file dari any version
+- [x] Presigned URL generation untuk secure S3 download
+- [x] URL expires dalam 5 minutes
+- [ ] Download logged di audit trail (Future: Story 1.22)
+- [x] Metadata view: uploader, timestamps, CDE state, version count
 - [ ] **Nice to Have (MVP) / Phase 2**: Support batch download (zip multiple files)
 - [ ] **Nice to Have**: Download specific folder as zip
 

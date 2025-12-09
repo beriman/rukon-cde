@@ -14,21 +14,21 @@
 
 ## Acceptance Criteria
 
-- [ ] Org Admin dapat send invitation via email
-- [ ] Invitation email berisi signup link dengan pre-filled organization
-- [ ] **Scenario 1 (New User)**: Recipient klik link -> Register -> Auto-assigned ke organization
-- [ ] **Scenario 2 (Existing User)**: Recipient klik link -> Login -> Auto-added ke organization baru (Multi-org support)
-- [ ] Invitation link valid selama 7 days
-- [ ] Admin dapat resend atau revoke invitation
-- [ ] Invitation cannot be used twice
+- [x] Org Admin dapat send invitation via email
+- [x] Invitation email berisi signup link dengan pre-filled organization
+- [x] **Scenario 1 (New User)**: Recipient klik link -> Register -> Auto-assigned ke organization
+- [x] **Scenario 2 (Existing User)**: Recipient klik link -> Login -> Auto-added ke organization baru (Multi-org support)
+- [x] Invitation link valid selama 7 days
+- [x] Admin dapat resend atau revoke invitation
+- [x] Invitation cannot be used twice
 
 ## Technical Tasks
 
-- [ ] Create `Invitation` model (userId, organizationId, email, token, expiresAt)
-- [ ] Implement `POST /api/organizations/:id/invitations`
-- [ ] Implement `GET /api/invitations/:token/verify`
-- [ ] Implement `POST /api/auth/register-from-invitation`
-- [ ] Send invitation email dengan link
+- [x] Create `Invitation` model (userId, organizationId, email, token, expiresAt)
+- [x] Implement `POST /api/organizations/:id/invitations`
+- [x] Implement `GET /api/invitations/:token/verify`
+- [x] Implement `POST /api/auth/register-from-invitation`
+- [x] Send invitation email dengan link
 - [ ] Frontend: invitation page dengan auto-fill organization
 
 ## API Contract

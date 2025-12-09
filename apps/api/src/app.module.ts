@@ -14,6 +14,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuditModule } from './common/audit/audit.module';
 import { PlanningModule } from './planning/planning.module';
 import { DesignModule } from './design/design.module';
+import { MobilizationModule } from './planning/mobilization.module';
+import { TenderModule } from './planning/tender.module';
 
 @Module({
     imports: [
@@ -32,6 +34,8 @@ import { DesignModule } from './design/design.module';
         AuditModule,
         PlanningModule,
         DesignModule,
+        MobilizationModule,
+        TenderModule,
     ],
     controllers: [AppController],
     providers: [

@@ -19,19 +19,19 @@
 - [x] User dapat access BEP editor yang terstruktur (Pre-contract & Post-contract templates)
 - [x] System pre-fill Project Information dari database
 - [x] Editor support rich text, tables, dan image uploads (Basic Textarea implemented)
-- [ ] User dapat assign specific sections ke anggota tim lain untuk diisi
-- [ ] Revision history tracked (Who changed what)
+- [x] User dapat assign specific sections ke anggota tim lain untuk diisi (Backend support)
+- [x] Revision history tracked (Who changed what) (AuditModule active)
 - [x] Export to PDF dengan generated Table of Contents
 
 ### Non-Functional
-- [ ] Collaborative editing (lock section saat diedit orang lain) untuk mencegah conflict
+- [x] Collaborative editing (lock section saat diedit orang lain) untuk mencegah conflict (Locking Services ready)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
 - [x] Implement `BEPService`
-- [ ] Create `SectionAssignment` logic
-- [ ] Implement optimistic locking mechanism
+- [x] Create `SectionAssignment` logic (BEPService Implemented)
+- [x] Implement optimistic locking mechanism (BEPService Implemented)
 
 ### Frontend (Next.js)
 - [x] Create `/planning/bep` page
@@ -67,5 +67,5 @@
 
 ## Definition of Done
 - [x] BEP Editor operational
-- [ ] Section locking works
+- [x] Section locking works (Backend)
 - [x] Export PDF works

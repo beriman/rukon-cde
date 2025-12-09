@@ -20,7 +20,7 @@
 - [x] System automatically link PIR ke OIR yang aktif (jika ada)
 - [x] Form wizard mencakup: Project Goals, Key Decision Points, Milestones
 - [x] User dapat define deliverables yang dibutuhkan pada setiap Milestone (e.g., Concept Design submit LOD 200)
-- [ ] System menyediakan template Bahasa Indonesia untuk PIR
+- [x] System menyediakan template Bahasa Indonesia untuk PIR (Seeded)
 - [x] Export ke PDF dan DOCX
 
 ### Non-Functional

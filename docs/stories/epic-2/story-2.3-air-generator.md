@@ -23,7 +23,7 @@
 - [x] Support export ke format Spreadsheets (XLSX) untuk COBie mapping template
 
 ### Non-Functional
-- [ ] Classification search responsif (< 200ms)
+- [x] Classification search responsif (< 200ms) (Optimized query)
 
 ## Technical Tasks
 

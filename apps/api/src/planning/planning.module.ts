@@ -10,6 +10,8 @@ import { WorkflowsController } from './workflows.controller';
 import { WorkflowsService } from './workflows.service';
 import { ValidationService } from './validation.service';
 import { CollaborationGateway } from './collaboration.gateway';
+import { MIDPService } from './midp.service';
+import { BEPService } from './bep.service';
 
 @Module({
     imports: [PrismaModule],
@@ -20,13 +22,17 @@ import { CollaborationGateway } from './collaboration.gateway';
         TaskDeliveryService,
         WorkflowsService,
         ValidationService,
-        CollaborationGateway
+        CollaborationGateway,
+        MIDPService,
+        BEPService
     ],
     exports: [
         PlanningService,
         TaskDeliveryService,
         WorkflowsService,
-        ValidationService
+        ValidationService,
+        MIDPService,
+        BEPService
     ],
 })
 export class PlanningModule { }

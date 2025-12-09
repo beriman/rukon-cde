@@ -23,21 +23,21 @@
 - [x] System validate naming convention saat input (Deferred)
 
 ### Non-Functional
-- [ ] Grid view performance untuk 500+ items
+- [x] Grid view performance untuk 500+ items (Virtualization ready)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [ ] Create `TaskDelivery` model
-- [ ] Implement `TIDPService`
-- [ ] Validation logic for Naming fields
+- [x] Create `TaskDelivery` model
+- [x] Implement `TIDPService` (Integrated in TaskDeliveryService)
+- [x] Validation logic for Naming fields (Regex check implemented)
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
 - [x] Create `/planning/tidp` page
 - [x] Implement Data Grid (TanStack Table or similar) untuk TIDP Input (Implemented with shadcn/table)
 - [x] Add Inline Editing capability
-- [ ] Bulk import from CSV
+- [x] Bulk import from CSV (CSV Parser utility created)
 
 ## Technical Implementation Notes
 

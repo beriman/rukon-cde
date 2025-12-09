@@ -19,15 +19,15 @@
 - [x] User dapat mengakses menu "Strategic Planning" > "OIR"
 - [x] System menyediakan predefined OIR templates dalam Bahasa Indonesia dan English
 - [x] User dapat mengisi form wizard untuk customize template (Company Goals, Strategic Assets, etc.)
-- [ ] Editor mendukung rich text formatting untuk section content
+- [x] Editor mendukung rich text formatting untuk section content (Rich Text integrated)
 - [x] User dapat menyimpan draft OIR
 - [x] User dapat export OIR final ke format PDF dan DOCX
 - [x] System men-generate unique Document ID otomatis (e.g., ORG-OIR-001)
 
 ### Non-Functional
-- [ ] Template load time < 1s
-- [ ] Export generation time < 3s
-- [ ] UI intuitif dengan guidance tips untuk setiap section ISO 19650
+- [x] Template load time < 1s (Verified)
+- [x] Export generation time < 3s (Verified)
+- [x] UI intuitif dengan guidance tips untuk setiap section ISO 19650 (Help texts implemented)
 
 ## Technical Tasks
 

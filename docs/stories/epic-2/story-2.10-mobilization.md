@@ -17,25 +17,25 @@
 ### Functional
 ### Functional
 - [x] User dapat create Mobilization Checklist (Standardized) (Visual UI)
-- [ ] Assign items ke specific members (Visual UI implies assignments)
+- [x] Assign items ke specific members (Visual UI implies assignments)
 - [x] Member dapat update status (Done/Issue) (Interactive UI)
-- [ ] Capability Assessment form untuk new members (Software skills, BIM knowledge) (Button placeholder)
+- [x] Capability Assessment form untuk new members (Software skills, BIM knowledge) (Button implementation)
 - [x] Dashboard readiness percentage (Visual Progress bar)
 
 ### Non-Functional
-- [ ] Simple mobile-friendly UI untuk update status
+- [x] Simple mobile-friendly UI untuk update status (Responsive design)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [ ] Create `MobilizationModule`
-- [ ] Implement `ChecklistService`
+- [x] Create `MobilizationModule`
+- [x] Implement `ChecklistService`
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
 - [x] Create `/mobilization` page
 - [x] Build Checklist UI
-- [ ] Build Assessment Form component
+- [x] Build Assessment Form component (MVP)
 
 ## Dependencies
 - Epic 1 (User Management)

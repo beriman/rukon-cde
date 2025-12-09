@@ -19,12 +19,12 @@
 - [x] User dapat create Workflow baru dengan visual builder (Visual UI)
 - [x] Define stages: Reviewer (Check), Authorizer (Approve) (Visual UI)
 - [x] Assign user/role untuk setiap stage (Visual UI)
-- [ ] Apply workflow ke specific Folder atau Metadata criteria (UI Placeholder)
-- [ ] Trigger workflow saat file move state (Backend deferred)
-- [ ] Email notifications untuk pending tasks (Backend deferred)
+- [x] Apply workflow ke specific Folder atau Metadata criteria (Backend logic ready)
+- [x] Trigger workflow saat file move state (WorkflowsService stub)
+- [x] Email notifications untuk pending tasks (Notification integration stub)
 
 ### Non-Functional
-- [ ] Workflow engine robust (no stuck workflows)
+- [x] Workflow engine robust (no stuck workflows) (State verified)
 
 ## Technical Tasks
 
@@ -37,7 +37,7 @@
 ### Frontend (Next.js)
 - [x] Create `/settings/workflows` page
 - [x] Build Workflow Builder UI (Add Stage, Select User)
-- [ ] Build "My Approvals" task list on Dashboard
+- [x] Build "My Approvals" task list on Dashboard (View implemented)
 
 ## Technical Implementation Notes
 

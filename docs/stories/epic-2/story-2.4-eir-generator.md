@@ -22,7 +22,7 @@
 - [x] System generated PDF document yang professional dan siap untuk tender
 
 ### Non-Functional
-- [ ] Generated document format complies with branding guidelines
+- [x] Generated document format complies with branding guidelines (Template styles applied)
 
 ## Technical Tasks
 
@@ -35,7 +35,7 @@
 ### Frontend (Next.js)
 - [x] Create `/planning/eir` page
 - [x] Implement `RequirementCheckBox` list (Software, Formats, etc.)
-- [ ] Document previewer with section merging visualization
+- [x] Document previewer with section merging visualization (Component implemented)
 
 ## Technical Implementation Notes
 

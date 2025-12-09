@@ -33,7 +33,7 @@ describe('Multi-Tenancy Isolation (E2E)', () => {
 
         // Create Organization 1
         org1 = await prisma.organization.create({
-            data: { name: 'Test Org 1', slug: 'test-org-1' },
+            data: { name: 'Test Org 1' },
         });
 
         // Create User 1
@@ -45,11 +45,11 @@ describe('Multi-Tenancy Isolation (E2E)', () => {
                 name: 'User One',
             });
 
-        const u1 = await prisma.user.findUnique({ where: { email: 'user1@org1.com' } });
-        await prisma.organizationUser.create({
-            data: { userId: u1.id, organizationId: org1.id, role: 'OWNER' },
+        // Update user1 to belong to org1
+        org1User = await prisma.user.update({
+            where: { email: 'user1@org1.com' },
+            data: { organizationId: org1.id },
         });
-        org1User = u1;
 
         // Login user1
         const login1Response = await request(app.getHttpServer())
@@ -72,7 +72,7 @@ describe('Multi-Tenancy Isolation (E2E)', () => {
 
         // Create Organization 2
         org2 = await prisma.organization.create({
-            data: { name: 'Test Org 2', slug: 'test-org-2' },
+            data: { name: 'Test Org 2' },
         });
 
         // Create User 2
@@ -84,11 +84,11 @@ describe('Multi-Tenancy Isolation (E2E)', () => {
                 name: 'User Two',
             });
 
-        const u2 = await prisma.user.findUnique({ where: { email: 'user2@org2.com' } });
-        await prisma.organizationUser.create({
-            data: { userId: u2.id, organizationId: org2.id, role: 'OWNER' },
+        // Update user2 to belong to org2
+        org2User = await prisma.user.update({
+            where: { email: 'user2@org2.com' },
+            data: { organizationId: org2.id },
         });
-        org2User = u2;
 
         // Login user2
         const login2Response = await request(app.getHttpServer())

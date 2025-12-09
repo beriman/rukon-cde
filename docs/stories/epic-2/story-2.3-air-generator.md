@@ -20,10 +20,10 @@
 - [x] System allow mapping asset types ke Uniclass 2015 tables (Pr_System / Pr_Product) (Mocked for now)
 - [x] User dapat specify required attributes untuk setiap asset type (e.g., SerialNumber, WarrantyDate)
 - [x] System automatically generate requirement tables untuk EIR attachment (Visual in UI)
-- [x] Support export ke format Spreadsheets (XLSX) untuk COBie mapping template
+- [ ] Support export ke format Spreadsheets (XLSX) untuk COBie mapping template
 
 ### Non-Functional
-- [x] Classification search responsif (< 200ms) (Optimized query)
+- [ ] Classification search responsif (< 200ms)
 
 ## Technical Tasks
 
@@ -32,7 +32,7 @@
 - [x] Integrate with Classification Service (Epic 3 dependency - mock for now)
 - [x] Create `RequirementAttribute` logic (Dynamic fields) (Frontend Logic)
 - [x] Implement `AssetType` definition endpoint (Using Generic Planning Document)
-- [x] Export service update untuk support XLSX generation
+- [ ] Export service update untuk support XLSX generation
 
 ### Frontend (Next.js)
 - [x] Create `/planning/air` page
@@ -67,4 +67,4 @@
 ## Definition of Done
 - [x] AIR Template functional
 - [x] Attribute builder working
-- [x] XLSX Export valid
+- [ ] XLSX Export valid

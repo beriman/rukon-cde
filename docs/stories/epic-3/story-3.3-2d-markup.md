@@ -15,15 +15,15 @@
 ## Acceptance Criteria
 
 ### Functional
-- [x] Viewer has a "Markup Mode" toggle.
-- [x] Toolbar offers: Cloud, Arrow, Rectangle, Text, Pen.
-- [x] User can Save markup.
-- [x] Markup is saved as a separate Layer (not burned into PDF).
-- [x] Other users can load/toggle the Markup Layer.
+- [ ] Viewer has a "Markup Mode" toggle.
+- [ ] Toolbar offers: Cloud, Arrow, Rectangle, Text, Pen.
+- [ ] User can Save markup.
+- [ ] Markup is saved as a separate Layer (not burned into PDF).
+- [ ] Other users can load/toggle the Markup Layer.
 
 ### Technical
-- [x] Frontend: Implement Canvas overlay on top of PDF/Image viewer.
-- [x] Backend: Save JSON data of vector paths (`DrawingMarkup` model).
+- [ ] Frontend: Implement Canvas overlay on top of PDF/Image viewer.
+- [ ] Backend: Save JSON data of vector paths (`DrawingMarkup` model).
 
 ## Verification Plan
 - **Test**: Open PDF. Draw a red box. Save. Refresh page. Load markup. Box should reappear.

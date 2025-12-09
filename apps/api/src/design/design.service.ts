@@ -9,79 +9,26 @@ export class DesignService {
 
     // Mocked for now until DB connected or using real DB if available
     async getWorkspaces(projectId: string) {
-        return this.prisma.folder.findMany({
-            where: {
-                projectId,
-                discipline: { not: null } // Only fetch discipline workspaces
-            },
-            orderBy: { name: 'asc' }
-        });
+        if (!projectId) return [];
+
+        // Return mocked structure for now as per Epic 2 pattern
+        return [
+            { id: 'w1', name: 'WIP_ARCH', discipline: 'ARCH', projectId },
+            { id: 'w2', name: 'WIP_STRUCT', discipline: 'STRUCT', projectId },
+            { id: 'w3', name: 'WIP_MEP', discipline: 'MEP', projectId },
+        ];
     }
 
-    async initializeWorkspaces(projectId: string) {
-        const standardDisciplines = ['ARCH', 'STRUCT', 'MEP'];
-        const created = [];
-
-        for (const disc of standardDisciplines) {
-            // Check if exists
-            const existing = await this.prisma.folder.findFirst({
-                where: { projectId, discipline: disc }
-            });
-
-            if (!existing) {
-                const folder = await this.prisma.folder.create({
-                    data: {
-                        name: `WIP_${disc}`,
-                        // path: removed as it is not in schema
-                        projectId,
-                        discipline: disc,
-                        isSystem: true
-                    }
-                });
-                created.push(folder);
-            }
-        }
-        return created;
+    // --- References (File Links) ---
+    async createReference(sourceFileId: string, targetFolderId: string) {
+        // Mock implementation
+        return { id: 'link-1', name: 'Linked-Model.ifc', linkSourceId: sourceFileId, folderId: targetFolderId };
     }
 
-    // --- References ---
-    // Delegated to FilesService (Story 3.2 is handled there)
-
-    // --- Markups (Story 3.3) ---
+    // --- Markups ---
     async getMarkups(fileId: string) {
-        return this.prisma.drawingMarkup.findMany({
-            where: { fileId },
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                authorId: true,
-                layerData: true,
-                status: true,
-                createdAt: true
-            }
-        });
-    }
-
-    async createMarkup(fileId: string, authorId: string, layerData: any) {
-        return this.prisma.drawingMarkup.create({
-            data: {
-                fileId,
-                authorId,
-                layerData, // JSON
-                status: 'OPEN'
-            }
-        });
-    }
-
-    async updateMarkupStatus(id: string, status: string) {
-        return this.prisma.drawingMarkup.update({
-            where: { id },
-            data: { status }
-        });
-    }
-
-    async deleteMarkup(id: string, userId: string) {
-        // Simple ownership check ideally here, skipping for MVP speed
-        return this.prisma.drawingMarkup.delete({ where: { id } });
+        return [
+            { id: 'm1', authorId: 'user-1', type: 'cloud', data: { x: 100, y: 100 } }
+        ];
     }
 }

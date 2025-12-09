@@ -1,0 +1,79 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+interface CobieField {
+    fieldName: string;
+    required: boolean;
+    category: string;
+}
+
+const REQUIRED_COBIE_FIELDS: CobieField[] = [
+    { fieldName: 'Name', required: true, category: 'Component' },
+    { fieldName: 'TypeName', required: true, category: 'Component' },
+    { fieldName: 'Space', required: true, category: 'Component' },
+    { fieldName: 'SerialNumber', required: false, category: 'Component' },
+    { fieldName: 'InstallationDate', required: false, category: 'Component' },
+    { fieldName: 'WarrantyStartDate', required: false, category: 'Component' },
+    { fieldName: 'TagNumber', required: false, category: 'Component' },
+    { fieldName: 'BarCode', required: false, category: 'Component' },
+];
+
+@Injectable()
+export class CobieService {
+    constructor(private prisma: PrismaService) { }
+
+    async validateFile(data: {
+        projectId: string;
+        fileId: string;
+        fileName: string;
+        elements: Array<{ [key: string]: any }>;
+    }) {
+        let compliantElements = 0;
+        const missingFields: Array<{ elementId: string; missingFields: string[] }> = [];
+
+        for (const element of data.elements) {
+            const missing = REQUIRED_COBIE_FIELDS
+                .filter(field => field.required && !element[field.fieldName])
+                .map(field => field.fieldName);
+
+            if (missing.length === 0) {
+                compliantElements++;
+            } else {
+                missingFields.push({
+                    elementId: element.id || element.Name || 'Unknown',
+                    missingFields: missing,
+                });
+            }
+        }
+
+        const complianceScore = data.elements.length > 0
+            ? (compliantElements / data.elements.length) * 100
+            : 0;
+
+        return this.prisma.cobieValidation.create({
+            data: {
+                projectId: data.projectId,
+                fileId: data.fileId,
+                fileName: data.fileName,
+                totalElements: data.elements.length,
+                compliantElements,
+                complianceScore: parseFloat(complianceScore.toFixed(2)),
+                missingFields: missingFields,
+            },
+        });
+    }
+
+    async getValidations(projectId: string) {
+        return this.prisma.cobieValidation.findMany({
+            where: { projectId },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    async getLatestValidation(projectId: string) {
+        return this.prisma.cobieValidation.findFirst({
+            where: { projectId },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+}

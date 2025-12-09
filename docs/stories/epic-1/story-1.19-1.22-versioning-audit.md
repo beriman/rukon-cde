@@ -66,11 +66,11 @@ async uploadFile(file: File) {
 **As a** project member, **I want to** view version history dan rollback ke previous version jika diperlukan, **so that** saya dapat recover dari mistakes.
 
 ### Acceptance Criteria
-- [x] User dapat view all versions dengan metadata (Implemented getVersions)
-- [x] Show diff: file size, uploader, timestamp, CDE state changes (Frontend feature)
-- [x] INFORMATION_MANAGER dapat rollback ke previous version (Backend restore implemented)
-- [x] Rollback creates new version (tidak delete current) (Implemented)
-- [x] Rollback logged di audit trail (Implicit in version creation)
+- [ ] User dapat view all versions dengan metadata
+- [ ] Show diff: file size, uploader, timestamp, CDE state changes
+- [ ] INFORMATION_MANAGER dapat rollback ke previous version
+- [ ] Rollback creates new version (tidak delete current)
+- [ ] Rollback logged di audit trail
 
 ### API
 ```json
@@ -113,11 +113,11 @@ POST /api/files/:id/restore/:version
 **As a** user browsing files, **I want** versions ditampilkan stacked under same file entry, **so that** file list tidak cluttered dengan multiple versions.
 
 ### Acceptance Criteria
-- [x] File list shows latest version only by default
-- [x] Expand/collapse untuk show all versions
-- [x] Visual indicator untuk version count (e.g., "V3" badge)
-- [x] Quick access ke download specific version
-- [x] Hover shows quick version metadata
+- [ ] File list shows latest version only by default
+- [ ] Expand/collapse untuk show all versions
+- [ ] Visual indicator untuk version count (e.g., "V3" badge)
+- [ ] Quick access ke download specific version
+- [ ] Hover shows quick version metadata
 
 ### Frontend Component
 ```tsx
@@ -148,13 +148,13 @@ POST /api/files/:id/restore/:version
 **As a** compliance officer, **I want** complete audit trail untuk all file operations, **so that** saya dapat track who did what and when untuk ISO 19650 compliance.
 
 ### Acceptance Criteria
-- [x] Log all file operations: UPLOAD, DOWNLOAD, DELETE, VIEW, STATE_CHANGE, RESTORE (AuditService)
-- [x] Log project operations: CREATE, UPDATE, ARCHIVE
-- [x] Log user operations: LOGIN, LOGOUT, PASSWORD_RESET
-- [x] Audit log immutable (append-only) (DB Constraint)
-- [x] Search & filter audit logs by: user, action, entity, date range (Prisma Query)
-- [x] Export audit logs sebagai CSV/Excel (ExportService can handle this)
-- [x] Retention policy: keep logs ≥ 7 years (Infra concern)
+- [ ] Log all file operations: UPLOAD, DOWNLOAD, DELETE, VIEW, STATE_CHANGE, RESTORE
+- [ ] Log project operations: CREATE, UPDATE, ARCHIVE
+- [ ] Log user operations: LOGIN, LOGOUT, PASSWORD_RESET
+- [ ] Audit log immutable (append-only)
+- [ ] Search & filter audit logs by: user, action, entity, date range
+- [ ] Export audit logs sebagai CSV/Excel
+- [ ] Retention policy: keep logs ≥ 7 years
 
 ### Database Model (Already in Epic Schema)
 ```prisma

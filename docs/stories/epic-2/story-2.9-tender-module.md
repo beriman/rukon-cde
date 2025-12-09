@@ -18,20 +18,20 @@
 - [x] User dapat create "Tender Package" linked to a Project (Mocked list)
 - [x] User dapat upload documents (EIR manual, Reference Drawings) ke Data Room (Visual UI)
 - [x] User dapat invite Bidders (Email invitations) dengan limited access (Visual UI)
-- [x] Bidders harus sign NDA (checkbox/digital) sebelum access (Stub implemented)
-- [x] Audit Log merekam siapa yang view/download file dan kapan (Reflected in AuditLogs)
+- [ ] Bidders harus sign NDA (checkbox/digital) sebelum access (Deferred to Phase 4.5)
+- [ ] Audit Log merekam siapa yang view/download file dan kapan (Deferred)
 - [x] Question & Answer (Q&A) channel untuk clarifications (Visual UI)
 
 ### Security (ISO 19650-5)
-- [x] Watermarking pada documents yang didownload dari data room (Middleware stub)
+- [ ] Watermarking pada documents yang didownload dari data room
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [x] Create `TenderModule`
-- [x] Implement `DataRoomService` dengan strict RBAC
-- [x] Implement `AccessLogService` (Integrated in AuditModule)
-- [x] Implement Dynamic Watermarking (Stub)
+- [ ] Create `TenderModule`
+- [ ] Implement `DataRoomService` dengan strict RBAC
+- [ ] Implement `AccessLogService`
+- [ ] Implement Dynamic Watermarking (PDF manipulation)
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
@@ -53,6 +53,6 @@ Use Middleware to intercept file downloads and stamp watermark with "Downloaded 
 - **Manual**: Simulate full tender cycle (Create -> Invite -> Bidder Access -> Audit check)
 
 ## Definition of Done
-- [x] Data Room operational
-- [x] Audit logs working
-- [x] Watermarking active (Stub)
+- [ ] Data Room operational
+- [ ] Audit logs working
+- [ ] Watermarking active

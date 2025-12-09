@@ -18,26 +18,26 @@
 ### Functional
 - [x] TIDP/MIDP editor memiliki toggle view "Gantt" (Standalone page implemented for MVP)
 - [x] Gantt chart menampilkan tasks berdasarkan Planned Date dan Duration
-- [x] User dapat resize timeframe (drag bars) untuk update dates secara otomatis (MVP Implemented)
-- [x] Support dependencies (Finish-to-Start) antar deliverables (Data model ready)
-- [x] Show Critical Path (optional highlighted) (Deferred to Phase 4)
-- [x] Import from MS Project (.mpp) or Primavera P6 (.xml) (Stub service handles basic metadata)
+- [ ] User dapat resize timeframe (drag bars) untuk update dates secara otomatis (Deferred to Phase 4.5)
+- [ ] Support dependencies (Finish-to-Start) antar deliverables
+- [ ] Show Critical Path (optional highlighted)
+- [ ] Import from MS Project (.mpp) or Primavera P6 (.xml)
 
 ### Non-Functional
-- [x] Smooth scrolling dan rendering untuk > 1000 tasks (Virtualization required) (Optimized DOM)
+- [ ] Smooth scrolling dan rendering untuk > 1000 tasks (Virtualization required)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [x] Update `TaskDeliverable` model dengan `startDate`, `duration`, `dependencies`
-- [x] Create `ScheduleImportService` (Stub created)
-- [x] Implement Validation untuk circular dependencies (Basic check)
+- [ ] Update `TaskDeliverable` model dengan `startDate`, `duration`, `dependencies`
+- [ ] Create `ScheduleImportService` (parse MPP/XML)
+- [ ] Implement Validation untuk circular dependencies
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
 - [x] Integrate Gantt library (Implemented custom SVG/CSS for lightweight performance)
-- [x] Implement Drag-and-Drop update logic (MVP)
-- [x] Build Import Wizard UI (Basic upload form)
+- [ ] Implement Drag-and-Drop update logic
+- [ ] Build Import Wizard UI
 
 ## Technical Implementation Notes
 
@@ -53,6 +53,6 @@ Consider using a performant React Gantt component. If commercial license is an i
 - **Manual**: Verify import from sample MS Project file
 
 ## Definition of Done
-- [x] Gantt view operational
-- [x] Date updates sync to database
-- [x] Import works for standard formats (Stub)
+- [ ] Gantt view operational
+- [ ] Date updates sync to database
+- [ ] Import works for standard formats

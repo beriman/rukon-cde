@@ -10,7 +10,7 @@
 - [x] User dapat view list projects dalam organizationnya
 - [x] Pagination support (50 projects per page)
 - [x] Search by project name atau description
-- [x] Filter by status (ACTIVE | ARCHIVED) - Status field not in schema yet (Deferred)
+- [ ] Filter by status (ACTIVE | ARCHIVED) - Status field not in schema yet
 - [x] Sort by name, createdAt, updatedAt
 
 ### API: `GET /api/projects?search=MRT&status=ACTIVE&page=1&limit=50`
@@ -24,10 +24,10 @@
 **As a** project member, **I want to** view dan update project details, **so that** project information tetap up-to-date.
 
 ### Acceptance Criteria
-- [x] User dapat view project details (name, description, members, file count, etc.) (Implemented in GET /projects/:id)
-- [x] User dengan role ≥ INFORMATION_MANAGER dapat update project (RBAC enforced)
-- [x] Updatable fields: name, description (Implemented in PATCH)
-- [x] Updates logged di audit trail (AuditService ready)
+- [ ] User dapat view project details (name, description, members, file count, etc.)
+- [ ] User dengan role ≥ INFORMATION_MANAGER dapat update project
+- [ ] Updatable fields: name, description
+- [ ] Updates logged di audit trail
 
 ### API: `GET /api/projects/:id`, `PATCH /api/projects/:id`
 

@@ -38,6 +38,8 @@ export default function DashboardLayout({
         { name: 'Projects', href: '/dashboard/projects', icon: FolderOpen },
         { name: 'Users', href: '/dashboard/users', icon: Users, adminOnly: true },
         { name: 'Audit Trail', href: '/dashboard/audit', icon: FileText, adminOnly: true },
+        { name: 'Construction', href: '/dashboard/construction', icon: FileText },
+        { name: 'HSE', href: '/dashboard/hse', icon: FileText },
         { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ];
 

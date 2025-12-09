@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { FoldersService } from './folders.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -43,21 +43,9 @@ export class ProjectsController {
         return this.foldersService.create(createFolderDto);
     }
 
-    @Patch('folders/:id')
-    updateFolder(@Param('id') id: string, @Body('name') name: string) {
-        return this.foldersService.update(id, name);
-    }
-
-    @Delete('folders/:id')
-    deleteFolder(@Param('id') id: string) {
-        return this.foldersService.remove(id);
-    }
-
     @Get(':id/folders')
-    getFolderTree(@Param('id') projectId: string, @Query('userId') userIdQuery?: string, @Req() req?: any) {
-        // Fallback for mock/test if req.user is missing, though Guard should handle it
-        const userId = req?.user?.id || userIdQuery || 'system-test-user';
-        return this.foldersService.getFolderTree(projectId, userId);
+    getFolderTree(@Param('id') projectId: string) {
+        return this.foldersService.getFolderTree(projectId);
     }
 
     @Get(':id')

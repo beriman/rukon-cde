@@ -20,24 +20,24 @@
 - [x] Setiap deliverable memiliki: ID, Title, Originator, Volume, Level, Type, Role, Number (ISO 19650 Naming)
 - [x] User dapat set Planned Date untuk setiap deliverable
 - [x] User dapat assign Responsibility (Person in charge) (Implicit in grid)
-- [x] System validate naming convention saat input (Deferred)
+- [ ] System validate naming convention saat input (Deferred)
 
 ### Non-Functional
-- [x] Grid view performance untuk 500+ items (Virtualization ready)
+- [ ] Grid view performance untuk 500+ items
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [x] Create `TaskDelivery` model
-- [x] Implement `TIDPService` (Integrated in TaskDeliveryService)
-- [x] Validation logic for Naming fields (Regex check implemented)
+- [ ] Create `TaskDelivery` model
+- [ ] Implement `TIDPService`
+- [ ] Validation logic for Naming fields
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
 - [x] Create `/planning/tidp` page
 - [x] Implement Data Grid (TanStack Table or similar) untuk TIDP Input (Implemented with shadcn/table)
 - [x] Add Inline Editing capability
-- [x] Bulk import from CSV (CSV Parser utility created)
+- [ ] Bulk import from CSV
 
 ## Technical Implementation Notes
 
@@ -61,6 +61,6 @@ model TaskDeliverable {
 - **Performance**: Test rendering 500 rows in table
 
 ## Definition of Done
-- [x] TIDP Grid operational
-- [x] Inline editing works
-- [x] Naming validation active
+- [ ] TIDP Grid operational
+- [ ] Inline editing works
+- [ ] Naming validation active

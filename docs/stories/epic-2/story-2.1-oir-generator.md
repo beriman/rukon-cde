@@ -19,15 +19,15 @@
 - [x] User dapat mengakses menu "Strategic Planning" > "OIR"
 - [x] System menyediakan predefined OIR templates dalam Bahasa Indonesia dan English
 - [x] User dapat mengisi form wizard untuk customize template (Company Goals, Strategic Assets, etc.)
-- [x] Editor mendukung rich text formatting untuk section content (Rich Text integrated)
+- [ ] Editor mendukung rich text formatting untuk section content
 - [x] User dapat menyimpan draft OIR
-- [x] User dapat export OIR final ke format PDF dan DOCX
+- [ ] User dapat export OIR final ke format PDF dan DOCX
 - [x] System men-generate unique Document ID otomatis (e.g., ORG-OIR-001)
 
 ### Non-Functional
-- [x] Template load time < 1s (Verified)
-- [x] Export generation time < 3s (Verified)
-- [x] UI intuitif dengan guidance tips untuk setiap section ISO 19650 (Help texts implemented)
+- [ ] Template load time < 1s
+- [ ] Export generation time < 3s
+- [ ] UI intuitif dengan guidance tips untuk setiap section ISO 19650
 
 ## Technical Tasks
 
@@ -35,19 +35,19 @@
 ### Backend (NestJS)
 - [x] Create `PlanningModule` dan `PlanningController`
 - [x] Implement `TemplateService` untuk manage `DocumentTemplate` (Integrated in PlanningService)
-- [x] Create seed data untuk OIR Templates (ID & EN)
+- [ ] Create seed data untuk OIR Templates (ID & EN)
 - [x] Implement endpoint `GET /api/planning/templates?type=OIR`
 - [x] Implement endpoint `POST /api/planning/documents` untuk save draft/final
-- [x] Implement PDF/DOCX generation service (using `pdfmake` or `docx`)
+- [ ] Implement PDF/DOCX generation service (using `pdfmake` or `docx`)
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
 - [x] Create `/planning/oir` page
 - [x] Build `TemplateSelector` component (Integrated in Wizard)
 - [x] Implement `OIRWizard` component dengan step-by-step form
-- [x] Integrate Rich Text Editor (e.g., Tiptap/Quill) untuk customize content
-- [x] Implement PDF preview viewer
-- [x] Add Export/Download buttons
+- [ ] Integrate Rich Text Editor (e.g., Tiptap/Quill) untuk customize content
+- [ ] Implement PDF preview viewer
+- [ ] Add Export/Download buttons
 
 ### Database
 - [x] Create `DocumentTemplate` model di Prisma Schema
@@ -121,7 +121,7 @@ model PlanningDocument {
 
 ## Definition of Done
 - [x] Schema update applied
-- [x] OIR Template seeds created (ID & EN)
+- [ ] OIR Template seeds created (ID & EN)
 - [x] Wizard UI functional
-- [x] Export to PDF works
-- [x] Unit & Integration tests passed
+- [ ] Export to PDF works
+- [ ] Unit & Integration tests passed

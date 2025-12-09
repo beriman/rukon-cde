@@ -24,7 +24,7 @@
 ### Validation
 - [x] Validate file type (configurable allowed extensions)
 - [x] Validate naming convention (Story 1.14)
-- [x] Check available storage quota (future/deferred)
+- [ ] Check available storage quota (future)
 
 ## Technical Tasks
 
@@ -43,7 +43,7 @@
 - [x] File upload component dengan drag-and-drop - Phase 3
 - [x] Multiple file selection - Phase 3
 - [x] Upload progress bar (per file) - Phase 3
-- [x] Chunk upload implementation (Basic multipart implemented, full chunking Phase 3)
+- [ ] Chunk upload implementation (for files >100MB)
 - [x] Error handling & retry logic - Phase 3
 
 ## API Contract

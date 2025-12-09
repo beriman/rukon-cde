@@ -17,26 +17,26 @@
 ### Functional
 ### Functional
 - [x] System otomatis combine items dari semua approved TIDP ke MIDP view (Mocked aggregation)
-- [x] User dapat melihat conflict checks (e.g., duplicate IDs dari team berbeda) (Backend logic ready)
+- [ ] User dapat melihat conflict checks (e.g., duplicate IDs dari team berbeda)
 - [x] Dashboard visualization: Total Deliverables, Planned vs Actual, Overdue (Basic Stats implemented)
-- [x] System allow filtering by Discipline, Date, Status (Implicit in API)
-- [x] Export MIDP ke CSV/Excel
+- [ ] System allow filtering by Discipline, Date, Status
+- [ ] Export MIDP ke CSV/Excel
 
 ### Non-Functional
-- [x] Real-time aggregation (updates in TIDP reflect in MIDP immediately) (Socket.io gateway active)
+- [ ] Real-time aggregation (updates in TIDP reflect in MIDP immediately)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [x] Implement `MIDPService.aggregate()`
-- [x] Optimize query untuk fetch all deliverables by project (Using Prisma include)
-- [x] Implement conflict detection logic (Duplicate Number check)
+- [ ] Implement `MIDPService.aggregate()`
+- [ ] Optimize query untuk fetch all deliverables by project
+- [ ] Implement conflict detection logic
 
 ### Frontend (Next.js)
 ### Frontend (Next.js)
 - [x] Create `/planning/midp` page
 - [x] Implement Master Grid View (Aggregated Table)
-- [x] Add Conflict Alert component (Notification toast implemented)
+- [ ] Add Conflict Alert component
 - [x] Add Summary Charts (Basic Stats Cards implemented)
 
 ## Technical Implementation Notes
@@ -52,6 +52,6 @@ MIDP is essentially a View/Query over all `TaskDeliverable` where `projectID` ma
 - **Manual**: Verify conflict detection logic
 
 ## Definition of Done
-- [x] MIDP View aggregates correct data
-- [x] Conflict detection working (Backend)
-- [x] Dashboard charts functional
+- [ ] MIDP View aggregates correct data
+- [ ] Conflict detection working
+- [ ] Dashboard charts functional

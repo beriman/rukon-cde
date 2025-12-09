@@ -43,8 +43,8 @@ export class FilesController {
     }
 
     @Get('folder/:folderId')
-    findByFolder(@Param('folderId') folderId: string, @Request() req) {
-        return this.filesService.findByFolder(folderId, req.user.userId);
+    findByFolder(@Param('folderId') folderId: string) {
+        return this.filesService.findByFolder(folderId);
     }
 
     @Get(':id')
@@ -64,25 +64,5 @@ export class FilesController {
     @Get(':id/versions')
     getVersions(@Param('id') id: string) {
         return this.filesService.getVersions(id);
-    }
-
-    @Post('link')
-    createLink(
-        @Request() req,
-        @Body('sourceFileId') sourceFileId: string,
-        @Body('targetFolderId') targetFolderId: string,
-    ) {
-        if (!sourceFileId || !targetFolderId) {
-            throw new BadRequestException('sourceFileId and targetFolderId are required');
-        }
-        return this.filesService.createLink(sourceFileId, targetFolderId, req.user.userId);
-    }
-    @Post(':id/restore/:version')
-    restoreVersion(
-        @Param('id') id: string,
-        @Param('version') version: string,
-        @Request() req
-    ) {
-        return this.filesService.restoreVersion(id, parseInt(version, 10), req.user.userId);
     }
 }

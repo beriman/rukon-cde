@@ -14,14 +14,14 @@
 ## Acceptance Criteria
 
 ### Functional
-- [x] "Federate" or "Combine" button in file explorer (Select multiple files).
-- [x] Viewer Loads Model A (Arch) and Model B (Struct) simultaneously.
-- [x] Model Tree shows structure for BOTH models separately.
-- [x] Color coding: Different tint for each model? (Nice to have).
+- [ ] "Federate" or "Combine" button in file explorer (Select multiple files).
+- [ ] Viewer Loads Model A (Arch) and Model B (Struct) simultaneously.
+- [ ] Model Tree shows structure for BOTH models separately.
+- [ ] Color coding: Different tint for each model? (Nice to have).
 
 ### Technical
-- [x] Frontend: ThatOpenPlatform/IFC.js supports multi-model loading. (Mocked implementation)
-- [x] Performance: Ensure 2 simple models don't crash browser.
+- [ ] Frontend: ThatOpenPlatform/IFC.js supports multi-model loading.
+- [ ] Performance: Ensure 2 simple models don't crash browser.
 
 ## Verification Plan
 - **Test**: Load `Sample_Arch.ifc` and `Sample_Struct.ifc`. Verify both geometries are visible.

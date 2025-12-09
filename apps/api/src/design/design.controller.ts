@@ -10,19 +10,13 @@ export class DesignController {
         return this.designService.getWorkspaces(projectId);
     }
 
-    @Post('workspaces/init/:projectId')
-    async initWorkspaces(@Param('projectId') projectId: string) {
-        return this.designService.initializeWorkspaces(projectId);
+    @Post('references')
+    async createReference(@Body() body: { sourceFileId: string; targetFolderId: string }) {
+        return this.designService.createReference(body.sourceFileId, body.targetFolderId);
     }
 
     @Get('markups/:fileId')
     async getMarkups(@Param('fileId') fileId: string) {
         return this.designService.getMarkups(fileId);
-    }
-
-    @Post('markups')
-    async createMarkup(@Body() body: { fileId: string; authorId: string; layerData: any }) {
-        // In real app, authorId comes from JWT @Request
-        return this.designService.createMarkup(body.fileId, body.authorId, body.layerData);
     }
 }

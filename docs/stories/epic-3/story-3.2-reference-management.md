@@ -14,15 +14,15 @@
 ## Acceptance Criteria
 
 ### Functional
-- [x] UI provides "Link Reference" button in File Browser.
-- [x] User can browse "Shared" folder to select a target.
-- [x] Linked file appears in current folder with a "Link/Shortcut" icon.
-- [x] Linked file is READ-ONLY in the destination.
-- [x] If original file is updated (new version), the Link points to the NEW version (Dynamic Linking) OR specific version (Static). *Decision: Dynamic for MVP*.
+- [ ] UI provides "Link Reference" button in File Browser.
+- [ ] User can browse "Shared" folder to select a target.
+- [ ] Linked file appears in current folder with a "Link/Shortcut" icon.
+- [ ] Linked file is READ-ONLY in the destination.
+- [ ] If original file is updated (new version), the Link points to the NEW version (Dynamic Linking) OR specific version (Static). *Decision: Dynamic for MVP*.
 
 ### Technical
-- [x] New Database Model `FileLink` or `ModelReference` (SourceID -> TargetFolderID).
-- [x] API `GET /files` must include Links.
+- [ ] New Database Model `FileLink` or `ModelReference` (SourceID -> TargetFolderID).
+- [ ] API `GET /files` must include Links.
 
 ## Verification Plan
 - **Test**: Link "Struct_Model.ifc" from Shared to Arch WIP. Check if Architect can see it. Check if Architect can delete the *link* but not the *source*.

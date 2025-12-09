@@ -1,39 +1,75 @@
 # Story 2.2: PIR Generator (Project Information Requirements)
 
-**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery  
+**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery Tools  
 **Story ID**: `story-2.2`  
-**Story Points**: 3  
-**Priority**: P1 (High)  
+**Story Points**: 5  
+**Priority**: P0 (Critical)  
 **Sprint**: Sprint 6 (Weeks 11-12)
 
 ## User Story
 
-**As an** Appointing Party,  
-**I want to** generate Project Information Requirements (PIR) based on my OIR,  
-**So that** I can specify information needed to make key decisions at each project stage.
+**As an** Appointing Party (Owner)  
+**I want to** generate Project Information Requirements (PIR) berdasarkan OIR yang sudah ada  
+**So that** saya dapat mendefinisikan kebutuhan informasi spesifik untuk project tertentu (high-level milestones & deliverables)
 
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User can create PIR linked to a specific Project
-- [ ] System suggests "Key Decision Points" (milestones) based on standard project stages (e.g., Concept, Design, Construction)
-- [ ] User can link PIR questions to OIR objectives
-- [ ] Template includes sections: Project Scope, Key Decision Points, Information Deliverables
-- [ ] Export to PDF/DOCX
+### Functional
+- [x] User dapat memilih Project saat membuat PIR
+- [ ] System automatically link PIR ke OIR yang aktif (jika ada)
+- [x] Form wizard mencakup: Project Goals, Key Decision Points, Milestones
+- [x] User dapat define deliverables yang dibutuhkan pada setiap Milestone (e.g., Concept Design submit LOD 200)
+- [ ] System menyediakan template Bahasa Indonesia untuk PIR
+- [ ] Export ke PDF dan DOCX
 
-### Data Integration
-- [ ] If OIR exists, system prompts to import strategic objectives
+### Non-Functional
+- [ ] Consistency check: System warns jika PIR contradict OIR goals (manual check mechanism via checklist)
 
 ## Technical Tasks
 
-### Backend
-- [ ] Create `DocumentTemplate` seed data for PIR
-- [ ] Add relation `PIR` -> `OIR` (optional)
-- [ ] Implement logic to fetch OIR objectives for dropdown selection
+### Backend (NestJS)
+### Backend (NestJS)
+- [ ] Create seed data untuk PIR Templates
+- [x] Update `PlanningController` untuk handle Type=PIR (Generic implementation works)
+- [x] Implement logic untuk fetch OIR data saat create PIR (pre-fill fields) (Added findLatestOIR)
 
-### Frontend
-- [ ] PIR Editor with "Key Decision Points" timeline UI
-- [ ] Component to select/link OIR objectives
+### Frontend (Next.js)
+- [x] Create `/planning/pir` page
+- [x] Build `MilestoneDefinition` form component (Integrated in Wizard)
+- [x] Implement `DeliverableMapping` component (Milestone -> Deliverable) (Integrated in Wizard)
+- [x] Integrate with Project Context (select project first)
+
+## Technical Implementation Notes
+
+### PIR Template Structure
+JSON content akan memiliki section khusus untuk `key_decision_points`.
+
+```json
+{
+  "key_decision_points": [
+    {
+      "stage": "Concept",
+      "question": "Apakah desain layak secara finansial?"
+    },
+    {
+      "stage": "Technical Design",
+      "question": "Apakah compliance regulasi terpenuhi?"
+    }
+  ]
+}
+```
 
 ## Dependencies
-- **Depends on**: Story 2.1 (OIR Generator - for linking)
+- Story 2.1 (OIR Generator) - OIR sebaiknya ada, tapi optional
+- Epic 1 (Project Management)
+
+## Testing Strategy
+- **Unit Test**: Test linkage logic between OIR and PIR
+- **Manual**: Create PIR for a dummy project and verify export
+
+## Definition of Done
+- [ ] PIR Template seeds created
+- [ ] Milestone & Deliverable UI working
+- [ ] Export to PDF works
+- [ ] Linked to specific Project ID

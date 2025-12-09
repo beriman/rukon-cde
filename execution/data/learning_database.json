@@ -1,0 +1,202 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2025-12-09T15:09:00Z",
+    "error_patterns": [
+        {
+            "id": "ERR-001",
+            "error_type": "PrismaClientKnownRequestError",
+            "error_code": "P2002",
+            "description": "Unique constraint violation",
+            "common_causes": [
+                "Attempting to create duplicate record",
+                "Missing uniqueness validation in DTO",
+                "Concurrent requests creating same resource"
+            ],
+            "automated_fix": "Add @IsUnique() validator or check existence before insert",
+            "directive_update": "Always validate uniqueness before database insert operations",
+            "confidence_score": 0.90,
+            "success_count": 0,
+            "failure_count": 0,
+            "example_fix": "// Add validation\nconst existing = await this.prisma.user.findUnique({ where: { email } });\nif (existing) throw new ConflictException('Email already exists');"
+        },
+        {
+            "id": "ERR-002",
+            "error_type": "PrismaClientKnownRequestError",
+            "error_code": "P2025",
+            "description": "Record not found for update/delete",
+            "common_causes": [
+                "Invalid ID provided",
+                "Record already deleted",
+                "Cross-organization access attempt"
+            ],
+            "automated_fix": "Check if record exists before operation",
+            "directive_update": "Always verify record existence and ownership before update/delete",
+            "confidence_score": 0.95,
+            "success_count": 0,
+            "failure_count": 0,
+            "example_fix": "const record = await this.prisma.model.findUnique({ where: { id } });\nif (!record) throw new NotFoundException('Record not found');"
+        },
+        {
+            "id": "ERR-003",
+            "error_type": "UnauthorizedException",
+            "error_code": "AUTH_FAILED",
+            "description": "Authentication failure",
+            "common_causes": [
+                "Invalid or expired JWT token",
+                "Missing Authorization header",
+                "Token signature verification failed"
+            ],
+            "automated_fix": "Ensure JwtAuthGuard is applied and token is valid",
+            "directive_update": "All protected endpoints must have @UseGuards(JwtAuthGuard)",
+            "confidence_score": 0.85,
+            "success_count": 0,
+            "failure_count": 0,
+            "example_fix": "@Controller('protected')\n@UseGuards(JwtAuthGuard)\nexport class ProtectedController { ... }"
+        },
+        {
+            "id": "ERR-004",
+            "error_type": "ForbiddenException",
+            "error_code": "INSUFFICIENT_PERMISSIONS",
+            "description": "Authorization failure - insufficient permissions",
+            "common_causes": [
+                "User role doesn't have required permissions",
+                "Cross-organization access attempt",
+                "Missing RolesGuard"
+            ],
+            "automated_fix": "Add proper @Roles() decorator and RolesGuard",
+            "directive_update": "Use @Roles() for all endpoints with role-based access control",
+            "confidence_score": 0.88,
+            "success_count": 0,
+            "failure_count": 0,
+            "example_fix": "@Roles(UserRole.ORG_ADMIN, UserRole.SYSTEM_ADMIN)\n@UseGuards(JwtAuthGuard, RolesGuard)\nasync adminOnlyEndpoint() { ... }"
+        },
+        {
+            "id": "ERR-005",
+            "error_type": "ValidationError",
+            "error_code": "VALIDATION_FAILED",
+            "description": "DTO validation failure",
+            "common_causes": [
+                "Invalid input data format",
+                "Missing required fields",
+                "Data type mismatch",
+                "Failed custom validation"
+            ],
+            "automated_fix": "Add proper class-validator decorators to DTO",
+            "directive_update": "All DTOs must use class-validator decorators for validation",
+            "confidence_score": 0.92,
+            "success_count": 0,
+            "failure_count": 0,
+            "example_fix": "export class CreateDto {\n  @IsString()\n  @MinLength(2)\n  name: string;\n\n  @IsEmail()\n  email: string;\n}"
+        }
+    ],
+    "success_patterns": [
+        {
+            "id": "SUCCESS-001",
+            "pattern": "Multi-tenancy isolation",
+            "description": "Properly enforced organization-level data isolation",
+            "implementation": "Always filter by organizationId for non-SYSTEM_ADMIN users",
+            "confidence_score": 0.95,
+            "usage_count": 0
+        },
+        {
+            "id": "SUCCESS-002",
+            "pattern": "Pagination",
+            "description": "Consistent pagination implementation",
+            "implementation": "Use QueryDto with page, limit, skip/take pattern",
+            "confidence_score": 0.90,
+            "usage_count": 0
+        }
+    ],
+    "metrics": {
+        "total_errors_logged": 0,
+        "total_automated_fixes": 0,
+        "automated_fix_success_rate": 0.0,
+        "average_resolution_time_minutes": 0.0,
+        "most_common_error_types": [],
+        "last_updated": "2025-12-09T15:09:00Z"
+    },
+    "bmad_integration": {
+        "checklists": {
+            "story_draft": {
+                "source": ".bmad-core/checklists/story-draft-checklist.md",
+                "compliance_score": 0.95,
+                "checked_items": [
+                    "User story follows format (As a... I want... So that...)",
+                    "Acceptance criteria are clear and testable",
+                    "Technical tasks are well-defined",
+                    "Dependencies documented",
+                    "Story points estimated"
+                ]
+            },
+            "story_dod": {
+                "source": ".bmad-core/checklists/story-dod-checklist.md",
+                "compliance_score": 0.90,
+                "checked_items": [
+                    "All tasks marked [x] completed",
+                    "All acceptance criteria met",
+                    "Tests written and passing",
+                    "Code reviewed (BMad QA or peer)",
+                    "Documentation updated",
+                    "No regression test failures"
+                ]
+            },
+            "architect": {
+                "source": ".bmad-core/checklists/architect-checklist.md",
+                "compliance_score": 0.92,
+                "checked_items": [
+                    "Architecture aligns with PRD",
+                    "Tech stack decisions documented",
+                    "Scalability considered",
+                    "Security patterns defined",
+                    "Data model designed"
+                ]
+            }
+        },
+        "qa_patterns": {
+            "risk_assessment": {
+                "thresholds": {
+                    "fail": 9,
+                    "concerns": 6,
+                    "pass": 5
+                },
+                "categories": [
+                    "technical",
+                    "security",
+                    "performance",
+                    "data",
+                    "business",
+                    "operational"
+                ]
+            },
+            "nfr_categories": [
+                "security",
+                "performance",
+                "reliability",
+                "maintainability"
+            ],
+            "test_levels": [
+                "unit",
+                "integration",
+                "e2e"
+            ],
+            "test_priorities": [
+                "P0",
+                "P1",
+                "P2"
+            ],
+            "quality_gates": {
+                "PASS": "All critical requirements met, no blocking issues",
+                "CONCERNS": "Non-critical issues found, team should review",
+                "FAIL": "Critical issues that should be addressed",
+                "WAIVED": "Issues acknowledged but explicitly accepted by team"
+            }
+        },
+        "combined_quality_criteria": {
+            "bmad_gate": "PASS",
+            "doe_qa_score": 90,
+            "doe_code_quality": 85,
+            "doe_test_coverage": 80,
+            "bmad_risk_score": 5
+        }
+    }
+}

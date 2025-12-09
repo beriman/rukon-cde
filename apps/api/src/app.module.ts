@@ -12,6 +12,7 @@ import { FilesModule } from './files/files.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuditModule } from './common/audit/audit.module';
+import { PlanningModule } from './planning/planning.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { AuditModule } from './common/audit/audit.module';
         FilesModule,
         NotificationsModule,
         AuditModule,
+        PlanningModule,
     ],
     controllers: [AppController],
     providers: [

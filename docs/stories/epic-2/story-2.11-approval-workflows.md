@@ -1,44 +1,66 @@
-# Story 2.11: Configurable Approval Workflows (Gateways)
+# Story 2.11: Configurable Approval Workflows
 
-**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery  
+**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery Tools  
 **Story ID**: `story-2.11`  
-**Story Points**: 8  
+**Story Points**: 13  
 **Priority**: P0 (Critical)  
-**Sprint**: Sprint 9 (Weeks 17-18)
+**Sprint**: Sprint 8 (Weeks 15-16)
 
 ## User Story
 
-**As a** Project Admin,  
-**I want to** configure approval workflows for CDE state transitions (e.g., WIP -> Shared),  
-**So that** I can enforce quality control gateways appropriate for the project scale.
+**As a** Project Admin  
+**I want to** configure approval workflows untuk CDE state transitions (Shared -> Published)  
+**So that** dokumen direview oleh orang yang tepat sebelum dipublikasikan
 
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User can define workflows for specific transitions:
-  - WIP -> Shared (Review)
-  - Shared -> Published (Approval)
-- [ ] **Steps Configuration**: Define sequential or parallel steps (e.g., Step 1: Arch Review -> Step 2: Lead Review)
-- [ ] **Approver Assignment**: Assign specific Users or Roles (e.g., "All Lead Architects")
-- [ ] **Logic**: Define "All must approve" vs "Any one can approve"
-- [ ] Workflows can be applied to specific folders or file types
+### Functional
+- [x] User dapat create Workflow baru dengan visual builder (Visual UI)
+- [x] Define stages: Reviewer (Check), Authorizer (Approve) (Visual UI)
+- [x] Assign user/role untuk setiap stage (Visual UI)
+- [ ] Apply workflow ke specific Folder atau Metadata criteria (UI Placeholder)
+- [ ] Trigger workflow saat file move state (Backend deferred)
+- [ ] Email notifications untuk pending tasks (Backend deferred)
 
-### Technical
-- [ ] Workflow engine stores state machine definition
-- [ ] Validation prevents deadlocks (e.g., assigning to no one)
+### Non-Functional
+- [ ] Workflow engine robust (no stuck workflows)
 
 ## Technical Tasks
 
-### Backend
-- [ ] Create `Workflow` and `WorkflowStep` models
-- [ ] Implement Workflow Engine (State Machine) with **robust error handling** (e.g., handling deleted users)
-- [ ] **Safety**: Implement Deadlock Prevention logic (validate that every step has at least one valid assignee)
-- [ ] API to CRUD workflows
+### Backend (NestJS)
+- [ ] Create `WorkflowDefinition` and `WorkflowInstance` models
+- [ ] Implement `WorkflowEngineService` (State machine)
+- [ ] Implement `NotificationService` integration
 
-### Frontend
-- [ ] Visual Workflow Editor (Drag-and-drop steps)
-- [ ] Configuration form for approvers and logic
+### Frontend (Next.js)
+### Frontend (Next.js)
+- [x] Create `/settings/workflows` page
+- [x] Build Workflow Builder UI (Add Stage, Select User)
+- [ ] Build "My Approvals" task list on Dashboard
+
+## Technical Implementation Notes
+
+### Database
+```prisma
+model WorkflowDefinition {
+  id      String @id
+  stages  Json // [{ name: "Technical Check", role: "ARC_LEAD" }, { name: "Client Approval", role: "CLIENT" }]
+}
+```
+
+### State Machine
+Use `xstate` or simple switch-case State Pattern service to manage transitions.
 
 ## Dependencies
-- **Depends on**: Epic 1 (CDE States)
-- **Blocks**: Story 2.12 (Execution)
+- Epic 1 (CDE Workflow States)
+
+## Testing Strategy
+- **Unit Test**: Test state transitions and permission checks
+- **Integration Test**: Full cycle WIP -> Share -> Workflow Trigger -> Approve -> Published
+- **Manual**: Verify notifications
+
+## Definition of Done
+- [ ] Workflow Builder working
+- [ ] Engine correctly routes approvals
+- [ ] State transitions checked

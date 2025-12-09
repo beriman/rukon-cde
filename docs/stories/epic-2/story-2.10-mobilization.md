@@ -1,36 +1,47 @@
-# Story 2.10: Team Mobilization & Capability Assessment
+# Story 2.10: Team Mobilization Tools
 
-**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery  
+**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery Tools  
 **Story ID**: `story-2.10`  
-**Story Points**: 3  
+**Story Points**: 5  
 **Priority**: P2 (Medium)  
-**Sprint**: Sprint 8 (Weeks 15-16)
+**Sprint**: Sprint 10 (Weeks 19-20)
 
 ## User Story
 
-**As a** Lead Appointed Party,  
-**I want to** manage team mobilization and capability assessments,  
-**So that** I can confirm all task teams are ready before starting work.
+**As a** Lead Appointed Party  
+**I want to** monitor team mobilization status (IT setup, training, access)  
+**So that** saya yakin tim siap bekerja sebelum project dimulai
 
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User can create Mobilization Checklist (e.g., IT Setup, Training, Access)
-- [ ] User can send Capability Assessment forms to Task Teams
-- [ ] Task Teams can submit assessment responses (IT capacity, BIM experience)
-- [ ] Dashboard showing "Mobilization Status" per team (Ready / Pending)
-- [ ] Block access to WIP folders until Mobilization is "Complete" (Optional config)
-- [ ] **Flexibility**: Admin can "Bypass" mobilization requirements for specific teams or small projects
+### Functional
+- [x] User dapat create Mobilization Checklist (Standardized) (Visual UI)
+- [ ] Assign items ke specific members (Visual UI implies assignments)
+- [x] Member dapat update status (Done/Issue) (Interactive UI)
+- [ ] Capability Assessment form untuk new members (Software skills, BIM knowledge) (Button placeholder)
+- [x] Dashboard readiness percentage (Visual Progress bar)
+
+### Non-Functional
+- [ ] Simple mobile-friendly UI untuk update status
 
 ## Technical Tasks
 
-### Backend
-- [ ] Create `Mobilization` and `Assessment` models
-- [ ] Implement logic to track status
+### Backend (NestJS)
+- [ ] Create `MobilizationModule`
+- [ ] Implement `ChecklistService`
 
-### Frontend
-- [ ] Mobilization Dashboard
-- [ ] Assessment Form Builder (simple questionnaire)
+### Frontend (Next.js)
+### Frontend (Next.js)
+- [x] Create `/mobilization` page
+- [x] Build Checklist UI
+- [ ] Build Assessment Form component
 
 ## Dependencies
-- **Depends on**: Story 2.5 (BEP - defines teams)
+- Epic 1 (User Management)
+
+## Testing Strategy
+- **Manual**: Create checklist and assign to user, verify update
+
+## Definition of Done
+- [ ] Mobilization features operational

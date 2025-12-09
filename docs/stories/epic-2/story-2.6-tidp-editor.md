@@ -1,6 +1,6 @@
-# Story 2.6: TIDP Editor with Gantt Chart
+# Story 2.6: TIDP Editor (Task Information Delivery Plan)
 
-**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery  
+**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery Tools  
 **Story ID**: `story-2.6`  
 **Story Points**: 8  
 **Priority**: P0 (Critical)  
@@ -8,34 +8,59 @@
 
 ## User Story
 
-**As a** Task Team Manager (Subcontractor/Specialist),  
-**I want to** create a Task Information Delivery Plan (TIDP) using a Gantt chart interface,  
-**So that** I can plan my team's deliverables and timelines.
+**As a** Task Team Manager (Lokal discipline lead)  
+**I want to** define Task Information Delivery Plan (TIDP) yang berisi list deliverable tim saya  
+**So that** Lead Appointed Party dapat melihat rencana pengiriman informasi dari disiplin saya
 
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User can add "Information Deliverables" (Documents, Models, Drawings)
-- [ ] For each deliverable: define Name, Responsibility, Due Date, Format, Level of Information Need
-- [ ] **Gantt View**: Visualize deliverables on a timeline
-- [ ] Drag-and-drop to adjust dates
-- [ ] Import tasks from Excel/CSV template
-- [ ] Validation: Check for missing required fields
+### Functional
+- [x] User dapat input list deliverable (Drawings, Models, Documents) (Grid implemented)
+- [x] Setiap deliverable memiliki: ID, Title, Originator, Volume, Level, Type, Role, Number (ISO 19650 Naming)
+- [x] User dapat set Planned Date untuk setiap deliverable
+- [x] User dapat assign Responsibility (Person in charge) (Implicit in grid)
+- [ ] System validate naming convention saat input (Deferred)
 
-### Performance
-- [ ] Gantt chart handles 500+ tasks smoothly
+### Non-Functional
+- [ ] Grid view performance untuk 500+ items
 
 ## Technical Tasks
 
-### Backend
-- [ ] Create `TIDP` and `Task` models
-- [ ] Implement `POST /api/tidp/tasks/import` (CSV handler)
+### Backend (NestJS)
+- [ ] Create `TaskDelivery` model
+- [ ] Implement `TIDPService`
+- [ ] Validation logic for Naming fields
 
-### Frontend
-- [ ] Integrate Gantt Chart library (e.g., `dhtmlx-gantt` or `react-gantt-task`)
-- [ ] Build Task Form modal
-- [ ] **Performance**: Implement virtual scrolling and lazy loading to handle 500+ tasks
+### Frontend (Next.js)
+### Frontend (Next.js)
+- [x] Create `/planning/tidp` page
+- [x] Implement Data Grid (TanStack Table or similar) untuk TIDP Input (Implemented with shadcn/table)
+- [x] Add Inline Editing capability
+- [ ] Bulk import from CSV
+
+## Technical Implementation Notes
+
+### Database
+```prisma
+model TaskDeliverable {
+  id        String @id @default(uuid())
+  tidpId    String
+  docId     String // Project-Originator-Volume...
+  title     String
+  plannedDate DateTime
+  status    String // PLANNED
+}
+```
 
 ## Dependencies
-- **Depends on**: Story 2.5 (BEP)
-- **Blocks**: Story 2.7 (MIDP)
+- Epic 1 (Naming Validation Story 1.14)
+
+## Testing Strategy
+- **Unit Test**: Test naming validation regex integration
+- **Performance**: Test rendering 500 rows in table
+
+## Definition of Done
+- [ ] TIDP Grid operational
+- [ ] Inline editing works
+- [ ] Naming validation active

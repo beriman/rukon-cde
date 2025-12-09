@@ -1,0 +1,150 @@
+{
+    "version": "1.0.0",
+    "agent_automation": {
+        "enabled": true,
+        "self_annealing": {
+            "enabled": true,
+            "auto_fix_confidence_threshold": 0.85,
+            "max_retry_attempts": 3,
+            "learning_database_path": "execution/data/learning_database.json",
+            "error_log_path": "execution/data/error_log.json"
+        },
+        "turbo_mode": {
+            "enabled": true,
+            "description": "Auto-approve safe commands marked with // turbo annotation",
+            "workflows_with_turbo": [
+                "epic-implementation",
+                "story-dev-qa",
+                "database-migration",
+                "testing-deployment",
+                "error-recovery"
+            ],
+            "auto_approve_commands": [
+                "npm test",
+                "npm run test:api",
+                "npm run test:web",
+                "npm run test:coverage",
+                "npm run build",
+                "npm run lint",
+                "npx prisma validate",
+                "npx prisma format",
+                "npx prisma migrate status",
+                "npx prisma generate",
+                "npx shadcn@latest init",
+                "npx shadcn@latest add",
+                "npx vitest run",
+                "npm install",
+                "python execution/project_health_check.py",
+                "python execution/story_progress_tracker.py",
+                "python execution/db_migration_auto.py --validate",
+                "python execution/error_logger.py --stats"
+            ]
+        },
+        "execution_scripts": {
+            "python_path": "python",
+            "env_file": ".env",
+            "scripts": {
+                "db_migration": "execution/db_migration_auto.py",
+                "story_tracker": "execution/story_progress_tracker.py",
+                "error_logger": "execution/error_logger.py",
+                "project_health": "execution/project_health_check.py"
+            }
+        },
+        "workflows": {
+            "workflow_directory": ".agent/workflows",
+            "available_workflows": [
+                "epic-implementation.md",
+                "story-dev-qa.md",
+                "database-migration.md",
+                "testing-deployment.md",
+                "error-recovery.md"
+            ]
+        },
+        "directives": {
+            "directive_directory": "directives",
+            "available_directives": [
+                "architecture.md",
+                "code_review.md",
+                "project_management.md",
+                "story_implementation_cycle.md",
+                "database-operations.md",
+                "api-development.md",
+                "frontend-development.md",
+                "testing-strategy.md"
+            ]
+        }
+    },
+    "bmad_integration": {
+        "enabled": true,
+        "mode": "hybrid",
+        "description": "Integration between BMad Method and DOE Framework",
+        "bmad_agents": {
+            "enabled": true,
+            "core_dir": ".bmad-core",
+            "agents_dir": ".bmad-core/agents",
+            "tasks_dir": ".bmad-core/tasks",
+            "active_agents": [
+                "sm",
+                "dev",
+                "qa"
+            ],
+            "active_tasks": [
+                "create-next-story.md",
+                "risk-profile.md",
+                "test-design.md",
+                "trace-requirements.md",
+                "nfr-assess.md",
+                "review-story.md",
+                "qa-gate.md"
+            ]
+        },
+        "hybrid_workflows": {
+            "enabled": true,
+            "workflows": [
+                "bmad-story-cycle.md",
+                "bmad-epic-completion.md",
+                "bmad-qa-review.md"
+            ],
+            "use_bmad_for": [
+                "story_creation",
+                "risk_assessment",
+                "test_planning",
+                "qa_review",
+                "quality_gates"
+            ],
+            "use_doe_for": [
+                "database_migration",
+                "code_execution",
+                "automated_testing",
+                "error_recovery",
+                "progress_tracking"
+            ]
+        },
+        "quality_integration": {
+            "use_bmad_gates": true,
+            "use_doe_scoring": true,
+            "combined_threshold": {
+                "bmad_gate": "PASS",
+                "doe_qa_score": 90,
+                "doe_code_quality": 85,
+                "doe_test_coverage": 80
+            }
+        },
+        "learning_integration": {
+            "merge_bmad_checklists": true,
+            "capture_bmad_qa_findings": true,
+            "update_doe_patterns_from_bmad": true
+        }
+    },
+    "quality_standards": {
+        "test_coverage_minimum": 80,
+        "code_quality_minimum": 85,
+        "qa_score_minimum": 90
+    },
+    "monitoring": {
+        "track_story_progress": true,
+        "track_error_patterns": true,
+        "track_fix_success_rate": true,
+        "generate_metrics": true
+    }
+}

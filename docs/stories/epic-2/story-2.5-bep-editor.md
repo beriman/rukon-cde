@@ -1,6 +1,6 @@
 # Story 2.5: BEP Editor (BIM Execution Plan)
 
-**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery  
+**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery Tools  
 **Story ID**: `story-2.5`  
 **Story Points**: 8  
 **Priority**: P0 (Critical)  
@@ -8,36 +8,64 @@
 
 ## User Story
 
-**As a** Lead Appointed Party (Main Contractor/Lead Consultant),  
-**I want to** create and edit a BIM Execution Plan (BEP) online,  
-**So that** I can demonstrate how my team will meet the EIR requirements.
+**As a** Lead Appointed Party (PM/BIM Manager)  
+**I want to** create BIM Execution Plan (BEP) secara online menggunakan template yang sesuai EIR  
+**So that** saya dapat menjelaskan bagaimana tim saya akan memenuhi kebutuhan informasi owner (EIR)
 
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User can create Pre-appointment BEP (response to tender) and Post-appointment BEP (confirmed plan)
-- [ ] Editor supports standard BEP sections: Project Goals, Roles & Responsibilities, CDE Strategy, Collaboration Procedures
-- [ ] **Indonesian Template**: Default template follows ISO 19650-2 with Indonesian terminology
-- [ ] User can invite other team members to collaborate on BEP drafting
-- [ ] Version control for BEP revisions
-- [ ] Export to PDF
+### Functional
+- [x] User dapat access BEP editor yang terstruktur (Pre-contract & Post-contract templates)
+- [ ] System pre-fill Project Information dari database
+- [x] Editor support rich text, tables, dan image uploads (Basic Textarea implemented)
+- [ ] User dapat assign specific sections ke anggota tim lain untuk diisi
+- [ ] Revision history tracked (Who changed what)
+- [ ] Export to PDF dengan generated Table of Contents
 
-### Integration
-- [ ] Link to EIR (to show compliance)
-- [ ] Auto-populate Project Information
+### Non-Functional
+- [ ] Collaborative editing (lock section saat diedit orang lain) untuk mencegah conflict
 
 ## Technical Tasks
 
-### Backend
-- [ ] Create `BEP` data model
-- [ ] Implement collaborative editing support (optional: WebSocket for real-time, or just locking) -> *MVP: Optimistic locking*
-- [ ] Implement `POST /api/bep/publish` (creates immutable version)
-- [ ] **Export**: Implement PDF generation using `docx` or `pdfmake` (ensure table formatting works)
+### Backend (NestJS)
+- [ ] Implement `BEPService`
+- [ ] Create `SectionAssignment` logic
+- [ ] Implement optimistic locking mechanism
 
-### Frontend
-- [ ] BEP Editor with section navigation
-- [ ] "Comment" feature on specific sections for review
+### Frontend (Next.js)
+- [x] Create `/planning/bep` page
+- [x] Implement `SectionNavigator` (Sidebar navigation for document sections)
+- [ ] Implement `CollaborativeEditor` (using basic lock / websocket if needed, or simple optimistic UI first)
+
+## Technical Implementation Notes
+
+### BEP Structure
+```json
+{
+  "sections": [
+    {
+      "id": "project_info",
+      "title": "1. Project Information",
+      "content": "..."
+    },
+    {
+      "id": "responsibilities",
+      "title": "2. Roles & Responsibilities",
+      "content": "..."
+    }
+  ]
+}
+```
 
 ## Dependencies
-- **Depends on**: Story 2.4 (EIR)
-- **Blocks**: Story 2.10 (Mobilization)
+- Epic 1 (Permissions - only Lead Appointed Party can create)
+- Story 2.4 (EIR - BEP responds to EIR)
+
+## Testing Strategy
+- **Manual**: Simulate multi-user editing (User A edits Section 1, User B edits Section 2) verification
+
+## Definition of Done
+- [ ] BEP Editor operational
+- [ ] Section locking works
+- [ ] Export PDF works

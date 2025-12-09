@@ -1,67 +1,127 @@
 # Story 2.1: OIR Generator (Organizational Information Requirements)
 
-**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery  
+**Epic**: Epic 2 - ISO 19650-2 Strategic Planning & Delivery Tools  
 **Story ID**: `story-2.1`  
 **Story Points**: 5  
-**Priority**: P1 (High)  
+**Priority**: P0 (Critical)  
 **Sprint**: Sprint 6 (Weeks 11-12)
 
 ## User Story
 
-**As an** Appointing Party (Owner),  
-**I want to** generate Organizational Information Requirements (OIR) document using a standard template,  
-**So that** I can define my organization's high-level information needs for asset management and compliance.
+**As an** Appointing Party (Client/Owner)  
+**I want to** generate Organizational Information Requirements (OIR) menggunakan standardized templates  
+**So that** saya dapat mendefinisikan kebutuhan informasi level organisasi sesuai ISO 19650-1 tanpa memulai dari nol
 
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User can select "Create OIR" from Strategic Planning menu
-- [ ] System provides a pre-filled OIR template based on ISO 19650-1/2
-- [ ] **Indonesian Context**: Template aligns with **SNI ISO 19650-1:2019** and **PUPR Regulation No. 9/2021**
-- [ ] Template includes standard sections: Strategic Objectives, Asset Management Policy, Regulatory Requirements
-- [ ] User can edit text content, add/remove sections
-- [ ] User can save draft OIR
-- [ ] User can export OIR to PDF and DOCX
-- [ ] **Localization**: Template available in Indonesian language (default) and English
+### Functional
+- [x] User dapat mengakses menu "Strategic Planning" > "OIR"
+- [x] System menyediakan predefined OIR templates dalam Bahasa Indonesia dan English
+- [x] User dapat mengisi form wizard untuk customize template (Company Goals, Strategic Assets, etc.)
+- [ ] Editor mendukung rich text formatting untuk section content
+- [x] User dapat menyimpan draft OIR
+- [ ] User dapat export OIR final ke format PDF dan DOCX
+- [x] System men-generate unique Document ID otomatis (e.g., ORG-OIR-001)
 
 ### Non-Functional
-- [ ] Editor supports rich text (bold, lists, tables)
-- [ ] Auto-save every 30 seconds
+- [ ] Template load time < 1s
+- [ ] Export generation time < 3s
+- [ ] UI intuitif dengan guidance tips untuk setiap section ISO 19650
 
 ## Technical Tasks
 
-### Backend
-- [ ] Create `DocumentTemplate` seed data for OIR (Indonesian & English)
-- [ ] Implement `POST /api/documents/generate` (from template)
-- [ ] Implement `GET /api/documents/:id` (retrieve content)
-- [ ] Implement `PATCH /api/documents/:id` (save content)
-- [ ] Implement PDF/DOCX export service using **robust library** (e.g., `docx` or `pdfmake`) to handle complex formatting
-- [ ] **Testing**: Implement validation test to parse generated PDF and verify structure
+### Backend (NestJS)
+### Backend (NestJS)
+- [x] Create `PlanningModule` dan `PlanningController`
+- [x] Implement `TemplateService` untuk manage `DocumentTemplate` (Integrated in PlanningService)
+- [ ] Create seed data untuk OIR Templates (ID & EN)
+- [x] Implement endpoint `GET /api/planning/templates?type=OIR`
+- [x] Implement endpoint `POST /api/planning/documents` untuk save draft/final
+- [ ] Implement PDF/DOCX generation service (using `pdfmake` or `docx`)
 
-### Frontend
-- [ ] Create Rich Text Editor component (e.g., using Tiptap or Quill)
-- [ ] Build OIR creation wizard (Select Template -> Edit -> Export)
-- [ ] Implement Auto-save hook
+### Frontend (Next.js)
+### Frontend (Next.js)
+- [x] Create `/planning/oir` page
+- [x] Build `TemplateSelector` component (Integrated in Wizard)
+- [x] Implement `OIRWizard` component dengan step-by-step form
+- [ ] Integrate Rich Text Editor (e.g., Tiptap/Quill) untuk customize content
+- [ ] Implement PDF preview viewer
+- [ ] Add Export/Download buttons
 
-## API Contract
+### Database
+- [x] Create `DocumentTemplate` model di Prisma Schema
+- [x] Create `PlanningDocument` model untuk menyimpan instance documents
 
-```json
-POST /api/documents
-{
-  "type": "OIR",
-  "projectId": "uuid", // Optional if OIR is org-level
-  "templateId": "template-uuid",
-  "name": "OIR PT Waskita Karya 2025"
+## Technical Implementation Notes
+
+### Database Schema (Prisma)
+```prisma
+enum TemplateType {
+  OIR
+  PIR
+  AIR
+  EIR
+  BEP
+  TIDP
+  MIDP
 }
 
-Response:
+model DocumentTemplate {
+  id        String       @id @default(uuid())
+  type      TemplateType
+  language  String       @default("id") // 'id' | 'en'
+  name      String
+  content   Json         // Structure with default texts
+  version   String       @default("1.0")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model PlanningDocument {
+  id             String           @id @default(uuid())
+  projectId      String?
+  organizationId String
+  type           TemplateType
+  title          String
+  content        Json             // User answers/customized content
+  status         String           // DRAFT, FINAL
+  createdBy      String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+```
+
+### JSON Structure for Template Content
+```json
 {
-  "id": "doc-uuid",
-  "content": { ...json_content... },
-  "status": "DRAFT"
+  "sections": [
+    {
+      "id": "strategic_objectives",
+      "title": "Tujuan Strategis Organisasi",
+      "helpText": "Jelaskan tujuan bisnis jangka panjang...",
+      "defaultContent": "Organisasi bertujuan untuk..."
+    },
+    {
+      "id": "asset_management_policy",
+      "title": "Kebijakan Manajemen Aset",
+      "defaultContent": "Sesuai dengan ISO 55000..."
+    }
+  ]
 }
 ```
 
 ## Dependencies
-- **Depends on**: Epic 1 (Auth & Project context)
-- **Blocks**: Story 2.2 (PIR often references OIR)
+- Epic 1 (Organization Management)
+
+## Testing Strategy
+- **Unit Test**: Test template parsing dan PDF generation logic
+- **Integration Test**: Test flow save dan retrieve document
+- **Manual**: Verify template content correctness (Indonesian context)
+
+## Definition of Done
+- [ ] Schema update applied
+- [ ] OIR Template seeds created (ID & EN)
+- [ ] Wizard UI functional
+- [ ] Export to PDF works
+- [ ] Unit & Integration tests passed

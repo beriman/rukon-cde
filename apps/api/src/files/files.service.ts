@@ -384,4 +384,45 @@ export class FilesService {
             expiresIn: 300, // 5 minutes
         };
     }
+    async restoreVersion(id: string, version: number, userId: string) { // Story 1.20 Check
+        const file = await this.prisma.file.findUnique({
+            where: { id },
+            include: { versions: true }
+        });
+        if (!file) throw new NotFoundException('File not found');
+
+        const targetVersion = file.versions.find(v => v.version === version);
+        if (!targetVersion) throw new NotFoundException('Version not found');
+
+        // Restore creates a NEW version that is a copy of the target version
+        // This ensures linear history (e.g., V4 is a copy of V2)
+        // In a real S3 system, we'd copy the S3 object. 
+        // Here we just point to the same S3 Key or duplicate logic.
+
+        const newVersion = file.currentVersion + 1;
+
+        // Log "restore" as a new version creation
+        await this.prisma.file.update({
+            where: { id },
+            data: {
+                currentVersion: newVersion,
+                // We don't change S3 key for this audit-only implementation unless we copy bytes.
+                // Assuming we re-use the S3 key of the target version for this "Revert" representation 
+                // OR better, we acknowledge it's a semantic restore.
+                // For MVP, we will duplicate the version record pointing to same blob.
+                versions: {
+                    create: {
+                        version: newVersion,
+                        s3Key: targetVersion.s3Key, // Point to old content
+                        size: targetVersion.size,
+                        uploadedBy: userId,
+                        cdeState: targetVersion.cdeState, // Restore state too? Or WIP? Usually WIP.
+                        // Let's say restoring brings it back as WIP
+                    }
+                }
+            }
+        });
+
+        return { message: `Restored version ${version} as new version ${newVersion}` };
+    }
 }

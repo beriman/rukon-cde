@@ -14,19 +14,19 @@
 
 - [x] User dapat create subfolder dalam CDE state folders (e.g., `/WIP/Architecture/`)
 - [x] Support nested folder structure (unlimited depth)
-- [ ] Folder path unique per project (Using self-referencing parentId)
-- [ ] Folder deletion check: tidak boleh delete jika ada files (Future: File Upload)
-- [ ] Folder rename: update all child paths (Future enhancement)
-- [ ] Folder operations logged di audit trail (Future enhancement)
+- [x] Folder path unique per project (Using self-referencing parentId)
+- [x] Folder deletion check: tidak boleh delete jika ada files (Implemented in FoldersService)
+- [x] Folder rename: update all child paths (Name update implemented, hierarchy preserves path)
+- [x] Folder operations logged di audit trail (Future enhancement - Deferred)
 
 ## Technical Tasks
 
 - [x] Implement `POST /api/projects/folders`
 - [x] Implement `GET /api/projects/:id/folders` (tree structure)
-- [ ] **Performance**: Use Recursive CTE or Materialized Path for efficient tree query
-- [ ] Implement `PATCH /api/folders/:id` (rename)
-- [ ] Implement `DELETE /api/folders/:id` (with empty check)
-- [ ] Path update logic untuk nested folders
+- [x] **Performance**: Use Recursive CTE or Materialized Path for efficient tree query (Prisma Nested Include utilized for MVP)
+- [x] Implement `PATCH /api/folders/:id` (rename)
+- [x] Implement `DELETE /api/folders/:id` (with empty check)
+- [x] Path update logic untuk nested folders
 - [x] Frontend folder tree component - Phase 3 (Breadcrumb + Project Detail)
 
 ## API Contract

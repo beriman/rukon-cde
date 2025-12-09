@@ -114,4 +114,30 @@ export class FoldersService {
 
         return filterFolders(rootFolders);
     }
+    async update(id: string, name: string) {
+        // Verify folder exists
+        const folder = await this.prisma.folder.findUnique({ where: { id } });
+        if (!folder) throw new NotFoundException('Folder not found');
+
+        // Update name only (Path is dynamic based on hierarchy)
+        return this.prisma.folder.update({
+            where: { id },
+            data: { name },
+        });
+    }
+
+    async remove(id: string) {
+        const folder = await this.prisma.folder.findUnique({
+            where: { id },
+            include: { children: true, files: true }
+        });
+
+        if (!folder) throw new NotFoundException('Folder not found');
+
+        if (folder.children.length > 0 || folder.files.length > 0) {
+            throw new BadRequestException('Cannot delete folder: It contains files or subfolders.');
+        }
+
+        return this.prisma.folder.delete({ where: { id } });
+    }
 }

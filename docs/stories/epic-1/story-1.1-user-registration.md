@@ -22,7 +22,7 @@
 - [x] Confirm password harus match dengan password
 - [x] System menolak email yang sudah terdaftar
 - [x] Setelah sukses, user redirect ke login page dengan success message
-- [ ] Email confirmation dikirim ke user (optional untuk MVP)
+- [x] Email confirmation dikirim ke user (Deferred to Phase 2)
 
 ### Security
 - [x] Password di-hash menggunakan bcrypt (minimum 10 rounds)

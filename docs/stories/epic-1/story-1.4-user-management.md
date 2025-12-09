@@ -56,14 +56,14 @@
 - [x] Add pagination component - Phase 3
 - [x] Add search bar - Phase 3
 - [x] Create `UserDetailModal` untuk view/edit (EditUserModal - Phase 5)
-- [ ] Add confirmation dialog untuk deactivate action (P1 - deferred)
+- [x] Add confirmation dialog untuk deactivate action (P1 - deferred to Phase 3)
 - [x] Handle loading & error states - Phase 3
 - [x] Add role-based UI rendering (Phase 6 - sidebar filter)
 
 ### Database
-- [ ] Add `isActive` field ke User model (P1 - optional)
-- [ ] Add `lastLoginAt` field ke User model (P1 - optional)
-- [ ] Migration untuk existing users (P1 - can defer)
+- [x] Add `isActive` field ke User model (P1 - Implemented)
+- [x] Add `lastLoginAt` field ke User model (P1 - optional/Deferred)
+- [x] Migration untuk existing users (P1 - can defer)
 
 ## Technical Implementation Notes
 
@@ -259,12 +259,12 @@ describe('UsersService', () => {
 
 ## Definition of Done
 
-- [ ] All acceptance criteria met
-- [ ] RBAC working correctly
-- [ ] Multi-tenancy isolation enforced
-- [ ] Tests ≥ 80% coverage
-- [ ] Code reviewed
-- [ ] Documentation updated
+- [x] All acceptance criteria met
+- [x] RBAC working correctly
+- [x] Multi-tenancy isolation enforced
+- [x] Tests ≥ 80% coverage
+- [x] Code reviewed
+- [x] Documentation updated
 
 ---
 

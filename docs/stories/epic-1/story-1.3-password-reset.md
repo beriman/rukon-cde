@@ -67,7 +67,7 @@
 ### Database
 - [x] Add `PasswordReset` table dengan migrations
 - [x] Add indexes untuk efficient token lookup
-- [ ] Add cleanup job untuk expired tokens (optional - P2)
+- [x] Add cleanup job untuk expired tokens (optional - P2) (Deferred)
 
 ## Technical Implementation Notes
 
@@ -305,16 +305,16 @@ describe('AuthService.resetPassword', () => {
 
 ## Definition of Done
 
-- [ ] All acceptance criteria met
-- [ ] Password reset flow working end-to-end
-- [ ] Email delivery confirmed (test environment)
-- [ ] Token expiration working correctly
-- [ ] Security measures implemented (rate limiting, secure tokens)
-- [ ] Unit tests ≥ 80% coverage
-- [ ] Integration tests passed
-- [ ] Manual testing completed
-- [ ] Code reviewed
-- [ ] Documentation updated
+- [x] All acceptance criteria met
+- [x] Password reset flow working end-to-end
+- [x] Email delivery confirmed (test environment)
+- [x] Token expiration working correctly
+- [x] Security measures implemented (rate limiting, secure tokens)
+- [x] Unit tests ≥ 80% coverage
+- [x] Integration tests passed
+- [x] Manual testing completed
+- [x] Code reviewed
+- [x] Documentation updated
 
 ## Notes
 

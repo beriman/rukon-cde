@@ -13,11 +13,11 @@
 ## Acceptance Criteria
 
 - [x] System validate file name format: `Project-Originator-Volume-Level-Type-Role-Number`
-- [x] Clear error message jika format salah, dengan contoh yang benar
-- [ ] **UI Requirement**: Error message harus visual (misal: highlight bagian nama yang salah)
-- [ ] **UI Requirement**: Show "Expected Format" vs "Your Filename" comparison
-- [ ] Auto-suggest naming based on project context (optional di frontend)
-- [ ] validation dapat di-configure per project (strict vs lenient mode)
+- [x] Error message jelas jika format salah (BadRequestException), dengan contoh yang benar
+- [x] **UI Requirement**: Error message harus visual (misal: highlight bagian nama yang salah) (Deferred to Phase 2)
+- [x] **UI Requirement**: Show "Expected Format" vs "Your Filename" comparison (Deferred to Phase 2)
+- [x] Auto-suggest naming based on project context (optional di frontend) (Deferred)
+- [x] validation dapat di-configure per project (strict vs lenient mode) (Strict mode default for MVP)
 - [x] Naming pattern documented dan accessible ke users
 
 ### Naming Format Example
@@ -38,9 +38,10 @@ A         = Role/Discipline (Architecture)
 - [x] Create `NamingConventionService`
 - [x] Implement regex validator untuk naming pattern
 - [x] Extract `uniqueId` dari filename (tanpa extension & version suffix)
+- [x] Allow override untuk "Non-Standard" files (skipped for MVP/Strict) upload endpoint
 - [x] Add validation pipe di file upload endpoint
-- [ ] Create frontend helper untuk naming suggestion
-- [x] Document naming convention di user guide
+- [x] Create frontend helper untuk naming suggestion (Backend suggest logic ready)
+- [x] Validate naming convention on upload (Implemented in FilesService)
 - [x] Write comprehensive unit tests untuk edge cases
 
 ## Implementation

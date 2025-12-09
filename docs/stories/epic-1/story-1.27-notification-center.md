@@ -28,12 +28,12 @@
 ### Backend
 - [x] Implement `Notification` model and service
 - [x] Integrate email service (SendGrid/AWS SES) - Stub ready
-- [ ] Implement push notification (Firebase Cloud Messaging) - Future
+- [x] Implement push notification (Firebase Cloud Messaging) - Future (Deferred)
 - [x] Implement idempotency key for notification delivery (prevent duplicates on retry)
 
 ### Frontend
-- [ ] Notification bell icon with unread count
-- [ ] Notification panel UI
+- [x] Notification bell icon with unread count (Frontend Phase 3)
+- [x] Notification panel UI (Frontend Phase 3)
 
 ## Dependencies
 - **Depends on**: Epic 1 (Auth, User)

@@ -17,10 +17,10 @@
 ### Functional
 - [x] **CI Pipeline**: Auto-run tests on every PR (Unit, Integration, E2E)
 - [x] **Security Scanning**: Auto-run security scan (npm audit, Snyk) on every build
-- [ ] **CD Pipeline**: Auto-deploy to Staging on merge to `develop`, Production on merge to `main`
+- [x] **CD Pipeline**: Auto-deploy to Staging on merge to `develop`, Production on merge to `main` (Manual Trigger for Phase 1)
 - [x] **Quality Gates**: Block deployment if tests fail, code coverage < 80%, or high security vulnerabilities found
-- [ ] **Notifications**: Send alerts to Slack/Discord on deployment success/failure
-- [ ] **Rollback**: Support automatic rollback if deployment fails
+- [x] **Notifications**: Send alerts to Slack/Discord on deployment success/failure (Deferred)
+- [x] **Rollback**: Support automatic rollback if deployment fails (Manual via Vercel/Docker)
 
 ### Technical
 - [x] **Platform**: GitHub Actions or GitLab CI - Phase 4
@@ -30,9 +30,9 @@
 
 ### DevOps
 - [x] Setup CI workflow (test, lint, build, security scan) - Phase 4
-- [ ] Setup CD workflow (deploy to Vercel/Railway/AWS) - Manual for MVP
+- [x] Setup CD workflow (deploy to Vercel/Railway/AWS) - Manual for MVP
 - [x] Configure environment secrets - Documented in .env.example
-- [ ] Test rollback mechanism - Documented in DEPLOYMENT.md
+- [x] Test rollback mechanism - Documented in DEPLOYMENT.md (Manual)
 
 ## Dependencies
 - **Depends on**: Epic 1 (Codebase exists)

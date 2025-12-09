@@ -77,4 +77,12 @@ export class FilesController {
         }
         return this.filesService.createLink(sourceFileId, targetFolderId, req.user.userId);
     }
+    @Post(':id/restore/:version')
+    restoreVersion(
+        @Param('id') id: string,
+        @Param('version') version: string,
+        @Request() req
+    ) {
+        return this.filesService.restoreVersion(id, parseInt(version, 10), req.user.userId);
+    }
 }

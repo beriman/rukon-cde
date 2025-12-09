@@ -19,7 +19,7 @@
 - [x] User dapat combine outputs dari OIR, PIR, dan AIR ke dalam EIR (Mocked aggregation selection)
 - [x] Form wizard mencakup sections: Information Standards, Production Methods, Software, CDE
 - [x] User dapat define submission frequency dan file formats (RVT, IFC, PDF)
-- [ ] System generated PDF document yang professional dan siap untuk tender
+- [x] System generated PDF document yang professional dan siap untuk tender
 
 ### Non-Functional
 - [ ] Generated document format complies with branding guidelines
@@ -28,9 +28,9 @@
 
 ### Backend (NestJS)
 ### Backend (NestJS)
-- [ ] Create `EIRTemplate` seed
+- [x] Create `EIRTemplate` seed
 - [x] Implement aggregation logic (Merge content from OIR/PIR/AIR if selected) (Frontend Logic)
-- [ ] Add `TechnicalStandards` entity relation
+- [x] Add `TechnicalStandards` entity relation
 
 ### Frontend (Next.js)
 - [x] Create `/planning/eir` page
@@ -50,6 +50,6 @@ If User selects "Include OIR Technical Policy", the system fetches the OIR docum
 - **Manual**: Check output PDF untuk completeness
 
 ## Definition of Done
-- [ ] EIR Generation Wizard complete
-- [ ] Aggregation logic working
-- [ ] Professional PDF output verified
+- [x] EIR Generation Wizard complete
+- [x] Aggregation logic working
+- [x] Professional PDF output verified

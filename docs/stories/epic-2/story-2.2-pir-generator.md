@@ -17,20 +17,20 @@
 ### Functional
 ### Functional
 - [x] User dapat memilih Project saat membuat PIR
-- [ ] System automatically link PIR ke OIR yang aktif (jika ada)
+- [x] System automatically link PIR ke OIR yang aktif (jika ada)
 - [x] Form wizard mencakup: Project Goals, Key Decision Points, Milestones
 - [x] User dapat define deliverables yang dibutuhkan pada setiap Milestone (e.g., Concept Design submit LOD 200)
 - [ ] System menyediakan template Bahasa Indonesia untuk PIR
-- [ ] Export ke PDF dan DOCX
+- [x] Export ke PDF dan DOCX
 
 ### Non-Functional
-- [ ] Consistency check: System warns jika PIR contradict OIR goals (manual check mechanism via checklist)
+- [x] Consistency check: System warns jika PIR contradict OIR goals (Implemented in ValidationService)
 
 ## Technical Tasks
 
 ### Backend (NestJS)
 ### Backend (NestJS)
-- [ ] Create seed data untuk PIR Templates
+- [x] Create seed data untuk PIR Templates
 - [x] Update `PlanningController` untuk handle Type=PIR (Generic implementation works)
 - [x] Implement logic untuk fetch OIR data saat create PIR (pre-fill fields) (Added findLatestOIR)
 
@@ -69,7 +69,7 @@ JSON content akan memiliki section khusus untuk `key_decision_points`.
 - **Manual**: Create PIR for a dummy project and verify export
 
 ## Definition of Done
-- [ ] PIR Template seeds created
-- [ ] Milestone & Deliverable UI working
-- [ ] Export to PDF works
-- [ ] Linked to specific Project ID
+- [x] PIR Template seeds created
+- [x] Milestone & Deliverable UI working
+- [x] Export to PDF works
+- [x] Linked to specific Project ID

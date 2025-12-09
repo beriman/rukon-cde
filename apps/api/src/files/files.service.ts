@@ -197,22 +197,118 @@ export class FilesService {
         return result;
     }
 
-    async findByFolder(folderId: string) {
-        return this.prisma.file.findMany({
-            where: { folderId },
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                name: true,
-                uniqueId: true,
-                size: true,
-                mimeType: true,
-                currentVersion: true,
-                cdeState: true,
-                createdAt: true,
-                updatedAt: true,
+    async findByFolder(folderId: string, userId: string) {
+        // Verify folder exists and check access
+        const folder = await this.prisma.folder.findUnique({
+            where: { id: folderId },
+            include: { project: true }
+        });
+
+        if (!folder) {
+            throw new NotFoundException('Folder not found');
+        }
+
+        // Get user role and discipline
+        const orgUser = await this.prisma.organizationUser.findUnique({
+            where: {
+                userId_organizationId: {
+                    userId,
+                    organizationId: folder.project.organizationId,
+                },
             },
         });
+
+        if (!orgUser) {
+            throw new BadRequestException('User is not a member of this project organization');
+        }
+
+        // Check Access
+        if (orgUser.role !== 'OWNER' && orgUser.role !== 'ADMIN') {
+            if (folder.discipline && folder.discipline !== orgUser.discipline) {
+                // If folder is restricted to a discipline different from user's
+                throw new BadRequestException(`Access denied. This folder is reserved for ${folder.discipline} discipline.`);
+            }
+        }
+
+        // Fetch direct files
+        const files = await this.prisma.file.findMany({
+            where: { folderId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                linkSource: {
+                    select: {
+                        id: true,
+                        name: true,
+                        uniqueId: true,
+                        currentVersion: true,
+                        updatedAt: true,
+                    }
+                }
+            }
+        });
+
+        return files.map(file => {
+            if (file.linkSourceId) {
+                // This is a link, map to look like a file but with link metadata
+                return {
+                    id: file.id,
+                    name: file.linkSource.name, // Use original name
+                    uniqueId: file.linkSource.uniqueId,
+                    size: 0, // Links have no size
+                    mimeType: 'application/link',
+                    currentVersion: file.linkSource.currentVersion,
+                    cdeState: 'SHARED', // Links are usually shared content
+                    createdAt: file.createdAt,
+                    updatedAt: file.linkSource.updatedAt, // Reflect source update
+                    isLink: true,
+                    linkSourceId: file.linkSourceId
+                };
+            }
+            return {
+                id: file.id,
+                name: file.name,
+                uniqueId: file.uniqueId,
+                size: file.size,
+                mimeType: file.mimeType,
+                currentVersion: file.currentVersion,
+                cdeState: file.cdeState,
+                createdAt: file.createdAt,
+                updatedAt: file.updatedAt,
+                isLink: false
+            };
+        });
+    }
+
+    async createLink(sourceFileId: string, targetFolderId: string, userId: string) {
+        const sourceFile = await this.prisma.file.findUnique({ where: { id: sourceFileId } });
+        if (!sourceFile) throw new NotFoundException('Source file not found');
+
+        // Verify target folder exists
+        const folder = await this.prisma.folder.findUnique({ where: { id: targetFolderId } });
+        if (!folder) throw new NotFoundException('Target folder not found');
+
+        // Create the link (A file record with linkSourceId)
+        // We use a generated uniqueId for the link itself to avoid collision in DB unique constraints
+        const linkUniqueId = `${sourceFile.uniqueId}-LINK-${Date.now()}`;
+
+        const link = await this.prisma.file.create({
+            data: {
+                name: sourceFile.name,
+                originalName: sourceFile.originalName,
+                uniqueId: linkUniqueId, // Internal ID
+                s3Key: 'LINK', // Placeholder
+                size: 0,
+                mimeType: 'application/link',
+                folderId: targetFolderId,
+                uploadedBy: userId,
+                version: 1,
+                currentVersion: 1,
+                cdeState: 'SHARED',
+                linkSourceId: sourceFile.id
+            }
+        });
+
+        return link;
     }
 
     async findOne(id: string) {

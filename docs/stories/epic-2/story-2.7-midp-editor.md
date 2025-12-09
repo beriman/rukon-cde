@@ -20,7 +20,7 @@
 - [ ] User dapat melihat conflict checks (e.g., duplicate IDs dari team berbeda)
 - [x] Dashboard visualization: Total Deliverables, Planned vs Actual, Overdue (Basic Stats implemented)
 - [ ] System allow filtering by Discipline, Date, Status
-- [ ] Export MIDP ke CSV/Excel
+- [x] Export MIDP ke CSV/Excel
 
 ### Non-Functional
 - [ ] Real-time aggregation (updates in TIDP reflect in MIDP immediately)
@@ -52,6 +52,6 @@ MIDP is essentially a View/Query over all `TaskDeliverable` where `projectID` ma
 - **Manual**: Verify conflict detection logic
 
 ## Definition of Done
-- [ ] MIDP View aggregates correct data
+- [x] MIDP View aggregates correct data
 - [ ] Conflict detection working
-- [ ] Dashboard charts functional
+- [x] Dashboard charts functional

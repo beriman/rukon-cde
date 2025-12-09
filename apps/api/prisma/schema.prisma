@@ -49,6 +49,7 @@ model OrganizationUser {
   userId         String
   organizationId String
   role           OrgRole      @default(MEMBER)
+  discipline     String?      // e.g. "ARCH", "STRUCT", "MEP"
   
   user           User         @relation(fields: [userId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id])
@@ -100,7 +101,11 @@ model Folder {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  
+  // Epic 3: Design Collaboration
+  discipline String? // e.g. "ARCH", "STRUCT", "MEP"
+  isSystem   Boolean @default(false)
+  
   @@map("folders")
 }
 
@@ -141,6 +146,13 @@ model File {
   currentVersion Int         @default(1)
   cdeState     String        @default("WIP")
   versions     FileVersion[]
+  
+  // Epic 3: References
+  linkSourceId String?
+  linkSource   File?   @relation("FileLinks", fields: [linkSourceId], references: [id])
+  linkedFiles  File[]  @relation("FileLinks")
+  markups      DrawingMarkup[]
+  
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   
@@ -385,4 +397,17 @@ model ApprovalWorkflow {
   updatedAt      DateTime @updatedAt
 
   @@map("approval_workflows")
+}
+
+model DrawingMarkup {
+  id        String   @id @default(uuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  authorId  String
+  layerData Json
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("drawing_markups")
 }

@@ -53,6 +53,6 @@ Use Middleware to intercept file downloads and stamp watermark with "Downloaded 
 - **Manual**: Simulate full tender cycle (Create -> Invite -> Bidder Access -> Audit check)
 
 ## Definition of Done
-- [ ] Data Room operational
+- [x] Data Room operational
 - [ ] Audit logs working
 - [ ] Watermarking active

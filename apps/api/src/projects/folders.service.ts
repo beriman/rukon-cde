@@ -42,7 +42,7 @@ export class FoldersService {
         });
     }
 
-    async getFolderTree(projectId: string) {
+    async getFolderTree(projectId: string, userId: string) {
         // Verify project exists
         const project = await this.prisma.project.findUnique({
             where: { id: projectId },
@@ -50,6 +50,20 @@ export class FoldersService {
 
         if (!project) {
             throw new NotFoundException('Project not found');
+        }
+
+        // Get user role and discipline in this organization
+        const orgUser = await this.prisma.organizationUser.findUnique({
+            where: {
+                userId_organizationId: {
+                    userId,
+                    organizationId: project.organizationId,
+                },
+            },
+        });
+
+        if (!orgUser) {
+            throw new BadRequestException('User is not a member of this project organization');
         }
 
         // Get root folders first
@@ -71,6 +85,33 @@ export class FoldersService {
             },
         });
 
-        return rootFolders;
+        // If Admin or Owner, return all
+        if (orgUser.role === 'OWNER' || orgUser.role === 'ADMIN') {
+            return rootFolders;
+        }
+
+        // Filter based on discipline
+        const userDiscipline = orgUser.discipline;
+
+        const filterFolders = (folders: any[]) => {
+            return folders.filter(folder => {
+                // If folder has specific discipline
+                if (folder.discipline) {
+                    // Must match user discipline or be accessible
+                    if (folder.discipline !== userDiscipline) {
+                        return false;
+                    }
+                }
+
+                // Recursively filter children
+                if (folder.children && folder.children.length > 0) {
+                    folder.children = filterFolders(folder.children);
+                }
+
+                return true;
+            });
+        };
+
+        return filterFolders(rootFolders);
     }
 }

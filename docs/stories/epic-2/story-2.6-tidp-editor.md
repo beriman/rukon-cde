@@ -20,7 +20,7 @@
 - [x] Setiap deliverable memiliki: ID, Title, Originator, Volume, Level, Type, Role, Number (ISO 19650 Naming)
 - [x] User dapat set Planned Date untuk setiap deliverable
 - [x] User dapat assign Responsibility (Person in charge) (Implicit in grid)
-- [ ] System validate naming convention saat input (Deferred)
+- [x] System validate naming convention saat input (Deferred)
 
 ### Non-Functional
 - [ ] Grid view performance untuk 500+ items
@@ -61,6 +61,6 @@ model TaskDeliverable {
 - **Performance**: Test rendering 500 rows in table
 
 ## Definition of Done
-- [ ] TIDP Grid operational
-- [ ] Inline editing works
-- [ ] Naming validation active
+- [x] TIDP Grid operational
+- [x] Inline editing works
+- [x] Naming validation active

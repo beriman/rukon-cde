@@ -17,11 +17,11 @@
 ### Functional
 ### Functional
 - [x] User dapat access BEP editor yang terstruktur (Pre-contract & Post-contract templates)
-- [ ] System pre-fill Project Information dari database
+- [x] System pre-fill Project Information dari database
 - [x] Editor support rich text, tables, dan image uploads (Basic Textarea implemented)
 - [ ] User dapat assign specific sections ke anggota tim lain untuk diisi
 - [ ] Revision history tracked (Who changed what)
-- [ ] Export to PDF dengan generated Table of Contents
+- [x] Export to PDF dengan generated Table of Contents
 
 ### Non-Functional
 - [ ] Collaborative editing (lock section saat diedit orang lain) untuk mencegah conflict
@@ -29,14 +29,14 @@
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [ ] Implement `BEPService`
+- [x] Implement `BEPService`
 - [ ] Create `SectionAssignment` logic
 - [ ] Implement optimistic locking mechanism
 
 ### Frontend (Next.js)
 - [x] Create `/planning/bep` page
 - [x] Implement `SectionNavigator` (Sidebar navigation for document sections)
-- [ ] Implement `CollaborativeEditor` (using basic lock / websocket if needed, or simple optimistic UI first)
+- [x] Implement `CollaborativeEditor` (CollaborationGateway implemented)
 
 ## Technical Implementation Notes
 
@@ -66,6 +66,6 @@
 - **Manual**: Simulate multi-user editing (User A edits Section 1, User B edits Section 2) verification
 
 ## Definition of Done
-- [ ] BEP Editor operational
+- [x] BEP Editor operational
 - [ ] Section locking works
-- [ ] Export PDF works
+- [x] Export PDF works

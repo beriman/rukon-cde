@@ -29,7 +29,7 @@
 ## Technical Tasks
 
 ### Backend (NestJS)
-- [ ] Update `TaskDeliverable` model dengan `startDate`, `duration`, `dependencies`
+- [x] Update `TaskDeliverable` model dengan `startDate`, `duration`, `dependencies`
 - [ ] Create `ScheduleImportService` (parse MPP/XML)
 - [ ] Implement Validation untuk circular dependencies
 
@@ -53,6 +53,6 @@ Consider using a performant React Gantt component. If commercial license is an i
 - **Manual**: Verify import from sample MS Project file
 
 ## Definition of Done
-- [ ] Gantt view operational
-- [ ] Date updates sync to database
+- [x] Gantt view operational
+- [x] Date updates sync to database
 - [ ] Import works for standard formats

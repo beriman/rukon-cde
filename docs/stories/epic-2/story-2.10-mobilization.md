@@ -44,4 +44,4 @@
 - **Manual**: Create checklist and assign to user, verify update
 
 ## Definition of Done
-- [ ] Mobilization features operational
+- [x] Mobilization features operational

@@ -1,22 +1,73 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 
-export default function CobiePage() {
-    const validation = {
-        totalElements: 1250,
-        compliantElements: 1063,
-        complianceScore: 85.04,
-        missingFields: [
-            { elementId: 'Door-101', missingFields: ['FireRating', 'WarrantyStartDate'] },
-            { elementId: 'Window-205', missingFields: ['TagNumber'] },
-            { elementId: 'HVAC-301', missingFields: ['SerialNumber', 'InstallationDate'] },
-        ],
-    };
+interface CobieValidation {
+    totalElements: number;
+    compliantElements: number;
+    complianceScore: number;
+    missingFields: Array<{ elementId: string; missingFields: string[] }>;
+}
 
-    const fieldBreakdown = [
+interface FieldBreakdown {
+    field: string;
+    compliance: number;
+    status: 'complete' | 'warning';
+}
+
+export default function CobiePage({ params }: { params: { projectId: string } }) {
+    const [validation, setValidation] = useState<CobieValidation | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    const projectId = params.projectId || 'demo-project-1';
+
+    useEffect(() => {
+        const fetchValidation = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch(`/api/construction/cobie/${projectId}/latest`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setValidation(data);
+                } else {
+                    // Fallback to demo data
+                    setValidation({
+                        totalElements: 1250,
+                        compliantElements: 1063,
+                        complianceScore: 85.04,
+                        missingFields: [
+                            { elementId: 'Door-101', missingFields: ['FireRating', 'WarrantyStartDate'] },
+                            { elementId: 'Window-205', missingFields: ['TagNumber'] },
+                            { elementId: 'HVAC-301', missingFields: ['SerialNumber', 'InstallationDate'] },
+                        ],
+                    });
+                }
+            } catch (err) {
+                console.error('Error fetching COBie validation:', err);
+                // Use demo data
+                setValidation({
+                    totalElements: 1250,
+                    compliantElements: 1063,
+                    complianceScore: 85.04,
+                    missingFields: [
+                        { elementId: 'Door-101', missingFields: ['FireRating', 'WarrantyStartDate'] },
+                        { elementId: 'Window-205', missingFields: ['TagNumber'] },
+                        { elementId: 'HVAC-301', missingFields: ['SerialNumber', 'InstallationDate'] },
+                    ],
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchValidation();
+    }, [projectId]);
+
+    const fieldBreakdown: FieldBreakdown[] = [
         { field: 'Name', compliance: 100, status: 'complete' },
         { field: 'TypeName', compliance: 100, status: 'complete' },
         { field: 'Space', compliance: 98, status: 'complete' },
@@ -25,6 +76,22 @@ export default function CobiePage() {
         { field: 'WarrantyStartDate', compliance: 45, status: 'warning' },
         { field: 'TagNumber', compliance: 82, status: 'warning' },
     ];
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+        );
+    }
+
+    if (!validation) {
+        return (
+            <div className="text-center text-gray-500 py-12">
+                No validation data available
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

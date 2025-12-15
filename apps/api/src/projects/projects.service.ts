@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 
@@ -7,30 +7,43 @@ export class ProjectsService {
     constructor(private prisma: PrismaService) { }
 
     async create(createProjectDto: CreateProjectDto) {
-        // Transaction ensures both project and default folders are created or fails together
-        return this.prisma.$transaction(async (tx) => {
-            // 1. Create Project
-            const project = await tx.project.create({
-                data: {
-                    name: createProjectDto.name,
-                    code: createProjectDto.code,
-                    organizationId: createProjectDto.organizationId,
-                },
+        try {
+            // Transaction ensures both project and default folders are created or fails together
+            return await this.prisma.$transaction(async (tx) => {
+                // 1. Create Project
+                const project = await tx.project.create({
+                    data: {
+                        name: createProjectDto.name,
+                        code: createProjectDto.code,
+                        organizationId: createProjectDto.organizationId,
+                    },
+                });
+
+                // 2. Create Default CDE Folders (ISO 19650 standard containers)
+                const defaultFolders = ['WIP', 'SHARED', 'PUBLISHED', 'ARCHIVED'];
+
+                await tx.folder.createMany({
+                    data: defaultFolders.map((name) => ({
+                        name,
+                        projectId: project.id,
+                        parentId: null, // Root folders
+                    })),
+                });
+
+                return project;
             });
+        } catch (error) {
+            // Handle Prisma errors
+            if (error.code === 'P2002') {
+                throw new BadRequestException('Project with this code already exists');
+            }
+            if (error.code === 'P2003') {
+                throw new BadRequestException('Invalid organization reference');
+            }
 
-            // 2. Create Default CDE Folders (ISO 19650 standard containers)
-            const defaultFolders = ['WIP', 'SHARED', 'PUBLISHED', 'ARCHIVED'];
-
-            await tx.folder.createMany({
-                data: defaultFolders.map((name) => ({
-                    name,
-                    projectId: project.id,
-                    parentId: null, // Root folders
-                })),
-            });
-
-            return project;
-        });
+            // Unexpected errors
+            throw new InternalServerErrorException('Failed to create project');
+        }
     }
 
     async findAll(
@@ -44,54 +57,58 @@ export class ProjectsService {
             sortOrder?: 'asc' | 'desc';
         }
     ) {
-        const {
-            search,
-            status,
-            page = 1,
-            limit = 50,
-            sortBy = 'createdAt',
-            sortOrder = 'desc'
-        } = options || {};
+        try {
+            const {
+                search,
+                status,
+                page = 1,
+                limit = 50,
+                sortBy = 'createdAt',
+                sortOrder = 'desc'
+            } = options || {};
 
-        const skip = (page - 1) * limit;
+            const skip = (page - 1) * limit;
 
-        const where: any = {
-            organizationId,
-        };
+            const where: any = {
+                organizationId,
+            };
 
-        if (search) {
-            where.OR = [
-                { name: { contains: search, mode: 'insensitive' } },
-                { code: { contains: search, mode: 'insensitive' } },
-            ];
-        }
+            if (search) {
+                where.OR = [
+                    { name: { contains: search, mode: 'insensitive' } },
+                    { code: { contains: search, mode: 'insensitive' } },
+                ];
+            }
 
-        const [projects, total] = await Promise.all([
-            this.prisma.project.findMany({
-                where,
-                include: {
-                    folders: {
-                        where: { parentId: null },
+            const [projects, total] = await Promise.all([
+                this.prisma.project.findMany({
+                    where,
+                    include: {
+                        folders: {
+                            where: { parentId: null },
+                        },
                     },
-                },
-                skip,
-                take: limit,
-                orderBy: {
-                    [sortBy]: sortOrder,
-                },
-            }),
-            this.prisma.project.count({ where }),
-        ]);
+                    skip,
+                    take: limit,
+                    orderBy: {
+                        [sortBy]: sortOrder,
+                    },
+                }),
+                this.prisma.project.count({ where }),
+            ]);
 
-        return {
-            data: projects,
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-            },
-        };
+            return {
+                data: projects,
+                meta: {
+                    total,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(total / limit),
+                },
+            };
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch projects');
+        }
     }
 
     async findOne(id: string) {
@@ -101,19 +118,36 @@ export class ProjectsService {
     }
 
     async update(id: string, data: { name?: string; code?: string }) {
-        return this.prisma.project.update({
-            where: { id },
-            data,
-        });
+        try {
+            return await this.prisma.project.update({
+                where: { id },
+                data,
+            });
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new NotFoundException('Project not found');
+            }
+            if (error.code === 'P2002') {
+                throw new BadRequestException('Project with this code already exists');
+            }
+            throw new InternalServerErrorException('Failed to update project');
+        }
     }
 
     async archive(id: string) {
-        return this.prisma.project.update({
-            where: { id },
-            data: {
-                status: 'ARCHIVED',
-            },
-        });
+        try {
+            return await this.prisma.project.update({
+                where: { id },
+                data: {
+                    status: 'ARCHIVED',
+                },
+            });
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new NotFoundException('Project not found');
+            }
+            throw new InternalServerErrorException('Failed to archive project');
+        }
     }
 
     async restore(id: string) {

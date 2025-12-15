@@ -80,14 +80,16 @@ model Project {
   approvalWorkflows ApprovalWorkflow[]
   
   // Epic 5: HSE
-  incidents      Incident[]
-  permits        PermitToWork[]
-  hseReports     HseDailyReport[]
-  inspections    InspectionForm[]
-  meetings       SafetyMeeting[]
-  personnel      HsePersonnel[]
-  emergencyContacts HseEmergencyContact[]
-  audits         HseAudit[]
+  incidents            Incident[]
+  permits              PermitToWork[]
+  hseReports           HseDailyReport[]
+  inspectionForms      InspectionForm[]
+  safetyMeetings       SafetyMeeting[]
+  hsePersonnel         HsePersonnel[]
+  emergencyContacts    HseEmergencyContact[]
+  hseAudits            HseAudit[]
+  inspectionTemplates  InspectionTemplate[]
+  emergencyDrills      EmergencyDrill[]
   
   // Epic 4: Construction Monitoring
   workPackages   WorkPackage[]
@@ -156,6 +158,32 @@ model Invitation {
   @@map("invitations")
 }
 
+model InspectionTemplate {
+    id          String          @id @default(cuid())
+    name        String
+    type        InspectionType
+    items       Json // Template questions
+    projectId   String?
+    isDefault   Boolean         @default(false)
+    createdAt   DateTime        @default(now())
+
+    project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model EmergencyDrill {
+    id            String   @id @default(cuid())
+    projectId     String
+    type          String // FIRE, EARTHQUAKE, EVACUATION, CHEMICAL_SPILL
+    date          DateTime
+    duration      Int // minutes
+    participants  String[] // Array of participant names
+    findings      String?
+    photos        String[]
+    conductedBy   String
+    createdAt     DateTime @default(now())
+
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
 model File {
   id           String        @id @default(uuid())
   name         String

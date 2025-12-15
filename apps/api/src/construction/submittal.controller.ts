@@ -37,15 +37,15 @@ export class SubmittalController {
 
     @Patch(':id/status')
     async updateStatus(@Param('id') id: string, @Body() dto: UpdateStatusDto) {
-        return this.submittalService.updateStatus(id, dto.status, dto.reviewComments);
+        return this.submittalService.updateStatus(id, dto.status);
     }
 
     @Get('project/:projectId')
     async getSubmittals(
         @Param('projectId') projectId: string,
-        @Query('status') status?: SubmittalStatus,
+        @Query('type') type?: SubmittalType,
     ) {
-        return this.submittalService.getSubmittals(projectId, status);
+        return this.submittalService.getSubmittals(projectId, type);
     }
 
     @Get(':id')

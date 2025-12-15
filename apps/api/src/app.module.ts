@@ -16,6 +16,7 @@ import { PlanningModule } from './planning/planning.module';
 import { DesignModule } from './design/design.module';
 import { HseModule } from './hse/hse.module';
 import { ConstructionModule } from './construction/construction.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
     imports: [
@@ -36,6 +37,7 @@ import { ConstructionModule } from './construction/construction.module';
         DesignModule,
         HseModule,
         ConstructionModule,
+        UploadModule,
     ],
     controllers: [AppController],
     providers: [

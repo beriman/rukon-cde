@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuditsService } from './audits.service';
 import { CreateAuditDto, UpdateFindingDto, CreateEmergencyContactDto } from './dto/audit.dto';
@@ -15,8 +15,12 @@ export class AuditsController {
     }
 
     @Get('projects/:projectId/audits')
-    findAllAudits(@Param('projectId') projectId: string) {
-        return this.auditsService.findAllAudits(projectId);
+    findAllAudits(
+        @Param('projectId') projectId: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    ) {
+        return this.auditsService.findAllAudits(projectId, page, limit);
     }
 
     @Patch('audits/findings/:id')

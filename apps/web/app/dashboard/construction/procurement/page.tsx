@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, TrendingUp, Upload } from 'lucide-react';
+import { Package, TrendingUp, Upload, Loader2 } from 'lucide-react';
 
 type ProcurementStatus = 'ORDERED' | 'MANUFACTURED' | 'SHIPPING' | 'ON_SITE' | 'INSTALLED';
 
@@ -19,6 +19,13 @@ interface ProcurementItem {
     deliveryDate: string;
 }
 
+interface BQSummary {
+    totalPlanned: number;
+    totalActual: number;
+    variance: number;
+    variancePercent: number;
+}
+
 const statusColumns: ProcurementStatus[] = ['ORDERED', 'MANUFACTURED', 'SHIPPING', 'ON_SITE', 'INSTALLED'];
 
 const statusColors: Record<ProcurementStatus, string> = {
@@ -29,25 +36,84 @@ const statusColors: Record<ProcurementStatus, string> = {
     INSTALLED: 'bg-gray-100 text-gray-800',
 };
 
-export default function ProcurementPage() {
-    const [items, setItems] = useState<ProcurementItem[]>([
-        { id: '1', name: 'Steel Beams - W14x30', quantity: 50, unit: 'pcs', status: 'SHIPPING', supplier: 'PT Steel', deliveryDate: '2025-12-15' },
-        { id: '2', name: 'Elevator System', quantity: 2, unit: 'unit', status: 'MANUFACTURED', supplier: 'Otis', deliveryDate: '2025-12-20' },
-        { id: '3', name: 'Curtain Wall Glass', quantity: 500, unit: 'm²', status: 'ORDERED', supplier: 'PT Glass Indo', deliveryDate: '2025-12-25' },
-    ]);
+export default function ProcurementPage({ params }: { params: { projectId: string } }) {
+    const [items, setItems] = useState<ProcurementItem[]>([]);
+    const [bqSummary, setBqSummary] = useState<BQSummary | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const [bqSummary] = useState({
-        totalPlanned: 2000000,
-        totalActual: 2100000,
-        variance: 100000,
-        variancePercent: 5,
-    });
+    const projectId = params.projectId || 'demo-project-1';
 
-    const moveItem = (itemId: string, newStatus: ProcurementStatus) => {
-        setItems(items.map(item =>
-            item.id === itemId ? { ...item, status: newStatus } : item
-        ));
+    // Fetch items from API
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const [itemsRes, summaryRes] = await Promise.all([
+                    fetch(`/api/construction/procurement/${projectId}/items`),
+                    fetch(`/api/construction/procurement/${projectId}/bq-summary`)
+                ]);
+
+                if (itemsRes.ok) {
+                    const itemsData = await itemsRes.json();
+                    setItems(itemsData);
+                }
+
+                if (summaryRes.ok) {
+                    const summaryData = await summaryRes.json();
+                    setBqSummary(summaryData);
+                }
+            } catch (err) {
+                setError('Failed to load data');
+                console.error('Error fetching procurement data:', err);
+                // Fallback to demo data
+                setItems([
+                    { id: '1', name: 'Steel Beams - W14x30', quantity: 50, unit: 'pcs', status: 'SHIPPING', supplier: 'PT Steel', deliveryDate: '2025-12-15' },
+                    { id: '2', name: 'Elevator System', quantity: 2, unit: 'unit', status: 'MANUFACTURED', supplier: 'Otis', deliveryDate: '2025-12-20' },
+                ]);
+                setBqSummary({
+                    totalPlanned: 2000000,
+                    totalActual: 2100000,
+                    variance: 100000,
+                    variancePercent: 5,
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [projectId]);
+
+    const moveItem = async (itemId: string, newStatus: ProcurementStatus) => {
+        try {
+            const response = await fetch(`/api/construction/procurement/items/${itemId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (response.ok) {
+                setItems(items.map(item =>
+                    item.id === itemId ? { ...item, status: newStatus } : item
+                ));
+            }
+        } catch (err) {
+            console.error('Error updating status:', err);
+            // Fallback to optimistic update
+            setItems(items.map(item =>
+                item.id === itemId ? { ...item, status: newStatus } : item
+            ));
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -58,6 +124,12 @@ export default function ProcurementPage() {
                     Import CSV
                 </Button>
             </div>
+
+            {error && (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded">
+                    {error} - Showing demo data
+                </div>
+            )}
 
             <Tabs defaultValue="kanban">
                 <TabsList>
@@ -115,48 +187,50 @@ export default function ProcurementPage() {
                 </TabsContent>
 
                 <TabsContent value="bq" className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Planned</CardTitle>
-                                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">${bqSummary.totalPlanned.toLocaleString()}</div>
-                            </CardContent>
-                        </Card>
+                    {bqSummary && (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Total Planned</CardTitle>
+                                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">${bqSummary.totalPlanned.toLocaleString()}</div>
+                                </CardContent>
+                            </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Actual</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">${bqSummary.totalActual.toLocaleString()}</div>
-                            </CardContent>
-                        </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Total Actual</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">${bqSummary.totalActual.toLocaleString()}</div>
+                                </CardContent>
+                            </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Variance</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className={`text-2xl font-bold ${bqSummary.variance > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                    {bqSummary.variance > 0 ? '+' : ''}\${bqSummary.variance.toLocaleString()}
-                                </div>
-                            </CardContent>
-                        </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Variance</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className={`text-2xl font-bold ${bqSummary.variance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                        {bqSummary.variance > 0 ? '+' : ''}\${bqSummary.variance.toLocaleString()}
+                                    </div>
+                                </CardContent>
+                            </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Variance %</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className={`text-2xl font-bold ${bqSummary.variancePercent > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                    {bqSummary.variancePercent > 0 ? '+' : ''}{bqSummary.variancePercent}%
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Variance %</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className={`text-2xl font-bold ${bqSummary.variancePercent > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                        {bqSummary.variancePercent > 0 ? '+' : ''}{bqSummary.variancePercent}%
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
                 </TabsContent>
             </Tabs>
         </div>

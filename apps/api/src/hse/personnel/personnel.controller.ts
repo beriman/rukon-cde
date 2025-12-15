@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PersonnelService } from './personnel.service';
 import { CreatePersonnelDto } from './dto/personnel.dto';
@@ -17,8 +17,12 @@ export class PersonnelController {
     }
 
     @Get('projects/:projectId/personnel')
-    findAll(@Param('projectId') projectId: string) {
-        return this.personnelService.findAll(projectId);
+    findAll(
+        @Param('projectId') projectId: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    ) {
+        return this.personnelService.findAll(projectId, page, limit);
     }
 
     @Get('personnel/:id')

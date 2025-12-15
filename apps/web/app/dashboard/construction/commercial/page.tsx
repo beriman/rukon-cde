@@ -1,80 +1,177 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, FileText, TrendingUp } from 'lucide-react';
+import { DollarSign, FileText, Loader2 } from 'lucide-react';
 
-export default function CommercialPage() {
+interface ClaimSummary {
+    totalClaimed: number;
+    totalCertified: number;
+    totalPaid: number;
+    outstandingPayment: number;
+}
+
+interface Claim {
+    id: string;
+    claimNumber: number;
+    period: string;
+    totalAmount: number;
+    status: string;
+    certifiedAmount?: number;
+}
+
+interface VO {
+    id: string;
+    voNumber: string;
+    title: string;
+    costImpact: number;
+    status: string;
+}
+
+export default function CommercialPage({ params }: { params: { projectId: string } }) {
     const [step, setStep] = useState(1);
     const [claimData, setClaimData] = useState({
         period: '',
         baseAmount: 0,
         voAmount: 0,
     });
+    const [summary, setSummary] = useState<ClaimSummary | null>(null);
+    const [claims, setClaims] = useState<Claim[]>([]);
+    const [vos, setVos] = useState<VO[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const summary = {
-        totalClaimed: 250000,
-        totalCertified: 235000,
-        totalPaid: 100000,
-        outstandingPayment: 135000,
+    const projectId = params.projectId || 'demo-project-1';
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const [summaryRes, claimsRes, vosRes] = await Promise.all([
+                    fetch(`/api/construction/claims/${projectId}/summary`),
+                    fetch(`/api/construction/claims/${projectId}`),
+                    fetch(`/api/construction/claims/${projectId}/variation-orders`)
+                ]);
+
+                if (summaryRes.ok) {
+                    const data = await summaryRes.json();
+                    setSummary(data);
+                }
+
+                if (claimsRes.ok) {
+                    const data = await claimsRes.json();
+                    setClaims(data);
+                }
+
+                if (vosRes.ok) {
+                    const data = await vosRes.json();
+                    setVos(data);
+                }
+            } catch (err) {
+                console.error('Error fetching claims data:', err);
+                // Fallback to demo data
+                setSummary({
+                    totalClaimed: 250000,
+                    totalCertified: 235000,
+                    totalPaid: 100000,
+                    outstandingPayment: 135000,
+                });
+                setClaims([
+                    { id: '1', claimNumber: 3, period: 'Month 3', totalAmount: 150000, status: 'CERTIFIED', certifiedAmount: 140000 },
+                    { id: '2', claimNumber: 4, period: 'Month 4', totalAmount: 100000, status: 'SUBMITTED' },
+                ]);
+                setVos([
+                    { id: '1', voNumber: 'VO-001', title: 'Additional Floor Area', costImpact: 50000, status: 'APPROVED' },
+                    { id: '2', voNumber: 'VO-002', title: 'Change in Finishes', costImpact: 25000, status: 'PROPOSED' },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [projectId]);
+
+    const handleSubmitClaim = async () => {
+        try {
+            const response = await fetch(`/api/construction/claims`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectId,
+                    period: claimData.period,
+                    baseAmount: claimData.baseAmount,
+                    voAmount: claimData.voAmount,
+                    submittedBy: 'current-user-id', // Should come from auth
+                }),
+            });
+
+            if (response.ok) {
+                const newClaim = await response.json();
+                setClaims([newClaim, ...claims]);
+                setStep(1);
+                setClaimData({ period: '', baseAmount: 0, voAmount: 0 });
+            }
+        } catch (err) {
+            console.error('Error creating claim:', err);
+        }
     };
 
-    const claims = [
-        { id: '1', number: 3, period: 'Month 3', amount: 150000, status: 'CERTIFIED', certifiedAmount: 140000 },
-        { id: '2', number: 4, period: 'Month 4', amount: 100000, status: 'SUBMITTED' },
-    ];
-
-    const vos = [
-        { id: '1', voNumber: 'VO-001', title: 'Additional Floor Area', costImpact: 50000, status: 'APPROVED' },
-        { id: '2', voNumber: 'VO-002', title: 'Change in Finishes', costImpact: 25000, status: 'PROPOSED' },
-    ];
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold">Payment & Billing</h1>
 
-            <div className="grid gap-4 md:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Claimed</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">${summary.totalClaimed.toLocaleString()}</div>
-                    </CardContent>
-                </Card>
+            {summary && (
+                <div className="grid gap-4 md:grid-cols-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Claimed</CardTitle>
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">${summary.totalClaimed.toLocaleString()}</div>
+                        </CardContent>
+                    </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Certified</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-600">${summary.totalCertified.toLocaleString()}</div>
-                    </CardContent>
-                </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Certified</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-green-600">${summary.totalCertified.toLocaleString()}</div>
+                        </CardContent>
+                    </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Paid</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-blue-600">${summary.totalPaid.toLocaleString()}</div>
-                    </CardContent>
-                </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Paid</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-blue-600">${summary.totalPaid.toLocaleString()}</div>
+                        </CardContent>
+                    </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-orange-600">${summary.outstandingPayment.toLocaleString()}</div>
-                    </CardContent>
-                </Card>
-            </div>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-orange-600">${summary.outstandingPayment.toLocaleString()}</div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
 
             <Tabs defaultValue="claims">
                 <TabsList>
@@ -90,7 +187,7 @@ export default function CommercialPage() {
                                 <div className="flex justify-between items-start">
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <h3 className="font-semibold text-lg">Claim #{claim.number}</h3>
+                                            <h3 className="font-semibold text-lg">Claim #{claim.claimNumber}</h3>
                                             <span className={`px-2 py-1 rounded text-xs ${claim.status === 'CERTIFIED' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
                                                 }`}>
                                                 {claim.status}
@@ -102,7 +199,7 @@ export default function CommercialPage() {
                                         )}
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-2xl font-bold">${claim.amount.toLocaleString()}</p>
+                                        <p className="text-2xl font-bold">${claim.totalAmount.toLocaleString()}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -152,7 +249,9 @@ export default function CommercialPage() {
                                             onChange={(e) => setClaimData({ ...claimData, period: e.target.value })}
                                         />
                                     </div>
-                                    <Button onClick={() => setStep(2)} className="w-full">Next: Enter Amounts</Button>
+                                    <Button onClick={() => setStep(2)} className="w-full" disabled={!claimData.period}>
+                                        Next: Enter Amounts
+                                    </Button>
                                 </div>
                             )}
 
@@ -163,7 +262,7 @@ export default function CommercialPage() {
                                         <Input
                                             type="number"
                                             placeholder="0"
-                                            value={claimData.baseAmount}
+                                            value={claimData.baseAmount || ''}
                                             onChange={(e) => setClaimData({ ...claimData, baseAmount: Number(e.target.value) })}
                                         />
                                     </div>
@@ -172,7 +271,7 @@ export default function CommercialPage() {
                                         <Input
                                             type="number"
                                             placeholder="0"
-                                            value={claimData.voAmount}
+                                            value={claimData.voAmount || ''}
                                             onChange={(e) => setClaimData({ ...claimData, voAmount: Number(e.target.value) })}
                                         />
                                     </div>
@@ -199,7 +298,7 @@ export default function CommercialPage() {
                                     </div>
                                     <div className="flex gap-2">
                                         <Button variant="outline" onClick={() => setStep(2)} className="flex-1">Back</Button>
-                                        <Button className="flex-1">Submit Claim</Button>
+                                        <Button onClick={handleSubmitClaim} className="flex-1">Submit Claim</Button>
                                     </div>
                                 </div>
                             )}

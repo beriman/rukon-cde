@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -17,94 +17,124 @@ export class AuthService {
     ) { }
 
     async register(dto: RegisterDto) {
-        const { email, password, confirmPassword, name } = dto;
+        try {
+            const { email, password, confirmPassword, name } = dto;
 
-        if (password !== confirmPassword) {
-            throw new BadRequestException('Passwords do not match');
+            if (password !== confirmPassword) {
+                throw new BadRequestException('Passwords do not match');
+            }
+
+            // Check if user exists
+            const existingUser = await this.usersService.findOneByEmail(email);
+
+            if (existingUser) {
+                throw new ConflictException('Email already in use');
+            }
+
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Create user
+            const user = await this.usersService.create({
+                email,
+                password: hashedPassword,
+                name,
+            });
+
+            // Audit Log
+            // Note: We might not log register if user not fully active, but good for security.
+            // However, userId is available now.
+            // For now, let's keep it simple.
+
+            return {
+                message: 'User registered successfully',
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                },
+            };
+        } catch (error) {
+            // Re-throw HTTP exceptions
+            if (error instanceof BadRequestException || error instanceof ConflictException) {
+                throw error;
+            }
+
+            // Handle Prisma errors
+            if (error.code === 'P2002') {
+                throw new ConflictException('Email already in use');
+            }
+
+            // Unexpected errors
+            throw new InternalServerErrorException('Registration failed');
         }
-
-        // Check if user exists
-        const existingUser = await this.usersService.findOneByEmail(email);
-
-        if (existingUser) {
-            throw new ConflictException('Email already in use');
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create user
-        const user = await this.usersService.create({
-            email,
-            password: hashedPassword,
-            name,
-        });
-
-        // Audit Log
-        // Note: We might not log register if user not fully active, but good for security.
-        // However, userId is available now.
-        // For now, let's keep it simple.
-
-        return {
-            message: 'User registered successfully',
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-            },
-        };
     }
 
     async login(dto: LoginDto) {
-        const { email, password } = dto;
+        try {
+            const { email, password } = dto;
 
-        // Find user
-        const user = await this.usersService.findOneByEmail(email);
+            // Find user
+            const user = await this.usersService.findOneByEmail(email);
 
-        if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
+            if (!user) {
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            // Check if user is active
+            if (user.isActive === false) {
+                throw new UnauthorizedException('Account has been deactivated');
+            }
+
+            // Check password
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordValid) {
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            // Update last login timestamp
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { lastLoginAt: new Date() },
+            });
+
+            // Generate tokens
+            const tokens = await this.generateTokens(user.id, user.email, user.role);
+            await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+            // Audit Log
+            await this.auditService.log(
+                user.id,
+                AuditAction.LOGIN,
+                undefined,
+                undefined,
+                { ip: 'captured-in-controller-ideally' }
+            );
+
+            return {
+                ...tokens,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                },
+            };
+        } catch (error) {
+            // Re-throw HTTP exceptions
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+
+            // Handle Prisma errors
+            if (error.code === 'P2025') {
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            // Unexpected errors
+            throw new InternalServerErrorException('Login failed');
         }
-
-        // Check if user is active
-        if (user.isActive === false) {
-            throw new UnauthorizedException('Account has been deactivated');
-        }
-
-        // Check password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        // Update last login timestamp
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { lastLoginAt: new Date() },
-        });
-
-        // Generate tokens
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
-        await this.updateRefreshToken(user.id, tokens.refresh_token);
-
-        // Audit Log
-        await this.auditService.log(
-            user.id,
-            AuditAction.LOGIN,
-            undefined,
-            undefined,
-            { ip: 'captured-in-controller-ideally' }
-        );
-
-        return {
-            ...tokens,
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            },
-        };
     }
 
     async refresh(userId: string, refreshToken: string) {

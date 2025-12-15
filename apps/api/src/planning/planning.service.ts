@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TemplateType, DocumentStatus } from '@prisma/client';
 import { CreateDocumentDto, UpdateDocumentDto } from './dto/document.dto';
@@ -7,92 +7,220 @@ import { CreateDocumentDto, UpdateDocumentDto } from './dto/document.dto';
 export class PlanningService {
     constructor(private prisma: PrismaService) { }
 
-    // --- MOCK DATA STORE ---
-    private mocks: any[] = [
-        {
-            id: 'mock-oir-1',
-            title: 'Corporate OIR 2025',
-            type: TemplateType.OIR,
-            content: { vision: 'Digital First', goals: ['Reduce Waste', 'Improve Safety'] },
-            status: DocumentStatus.PUBLISHED,
-            version: '1.0',
-            projectId: null,
-            organizationId: 'org-1',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            project: null
-        },
-        {
-            id: 'mock-pir-1',
-            title: 'Project Alpha PIR',
-            type: TemplateType.PIR,
-            content: { milestones: ['Planning', 'Design', 'Construct'] },
-            status: DocumentStatus.DRAFT,
-            version: '0.1',
-            projectId: 'proj-A',
-            organizationId: 'org-1',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            project: { name: 'Project Alpha', code: 'PRJ-A' }
-        }
-    ];
-
     // --- Templates ---
 
     async findAllTemplates(type?: TemplateType, organizationId?: string) {
-        // Mock Templates
-        return [
-            { id: 't1', type: TemplateType.OIR, name: 'ISO 19650-2 OIR Template', content: {}, isSystem: true },
-            { id: 't2', type: TemplateType.PIR, name: 'Standard PIR Questionaire', content: {}, isSystem: true },
-        ].filter(t => !type || t.type === type);
+        try {
+            const where: any = {};
+
+            if (type) {
+                where.type = type;
+            }
+
+            // System templates (isSystem=true) or organization-specific templates
+            if (organizationId) {
+                where.OR = [
+                    { isSystem: true },
+                    { organizationId }
+                ];
+            } else {
+                where.isSystem = true;
+            }
+
+            return await this.prisma.documentTemplate.findMany({
+                where,
+                orderBy: { createdAt: 'desc' }
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch templates');
+        }
     }
 
     async findTemplateById(id: string) {
-        return { id, type: TemplateType.BEP, name: 'Mock Template', content: {} };
+        try {
+            const template = await this.prisma.documentTemplate.findUnique({
+                where: { id }
+            });
+
+            if (!template) {
+                throw new NotFoundException(`Template with ID ${id} not found`);
+            }
+
+            return template;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Failed to fetch template');
+        }
     }
 
     // --- Documents ---
 
     async createDocument(userId: string, dto: CreateDocumentDto) {
-        const newDoc = {
-            id: `mock-${Date.now()}`,
-            ...dto,
-            status: DocumentStatus.DRAFT,
-            version: '0.1',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            project: { name: 'Mock Project', code: 'MP' }
-        };
-        this.mocks.push(newDoc);
-        return newDoc;
+        try {
+            const document = await this.prisma.planningDocument.create({
+                data: {
+                    title: dto.title,
+                    type: dto.type,
+                    content: dto.content,
+                    status: DocumentStatus.DRAFT,
+                    version: '1.0',
+                    organizationId: dto.organizationId,
+                    projectId: dto.projectId,
+                    createdBy: userId,
+                },
+                include: {
+                    project: {
+                        select: { name: true, code: true }
+                    }
+                }
+            });
+
+            return document;
+        } catch (error) {
+            if (error.code === 'P2003') {
+                // Foreign key constraint failed
+                throw new NotFoundException('Organization or Project not found');
+            }
+            if (error.code === 'P2002') {
+                // Unique constraint failed
+                throw new ConflictException('Document with this identifier already exists');
+            }
+            throw new InternalServerErrorException('Failed to create document');
+        }
     }
 
-    async findAllDocuments(organizationId: string, projectId?: string, type?: TemplateType) {
-        return this.mocks.filter(d =>
-            (!type || d.type === type)
-        );
+    async findAllDocuments(
+        organizationId: string,
+        projectId?: string,
+        type?: TemplateType,
+        page: number = 1,
+        limit: number = 20
+    ) {
+        try {
+            const where: any = { organizationId };
+
+            if (projectId) {
+                where.projectId = projectId;
+            }
+
+            if (type) {
+                where.type = type;
+            }
+
+            const skip = (page - 1) * limit;
+
+            const [data, total] = await Promise.all([
+                this.prisma.planningDocument.findMany({
+                    where,
+                    skip,
+                    take: limit,
+                    include: {
+                        project: {
+                            select: { name: true, code: true }
+                        }
+                    },
+                    orderBy: { updatedAt: 'desc' }
+                }),
+                this.prisma.planningDocument.count({ where })
+            ]);
+
+            return {
+                data,
+                meta: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
+            };
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch documents');
+        }
     }
 
     async findOneDocument(id: string) {
-        const doc = this.mocks.find(d => d.id === id);
-        if (!doc) throw new NotFoundException('Document not found (Mock)');
-        return doc;
+        try {
+            const document = await this.prisma.planningDocument.findUnique({
+                where: { id },
+                include: {
+                    project: {
+                        select: { name: true, code: true }
+                    }
+                }
+            });
+
+            if (!document) {
+                throw new NotFoundException(`Document with ID ${id} not found`);
+            }
+
+            return document;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Failed to fetch document');
+        }
     }
 
     async findLatestOIR(organizationId: string) {
-        return this.mocks.find(d => d.type === TemplateType.OIR && d.status === DocumentStatus.PUBLISHED);
+        try {
+            const latestOIR = await this.prisma.planningDocument.findFirst({
+                where: {
+                    organizationId,
+                    type: TemplateType.OIR,
+                    status: DocumentStatus.PUBLISHED
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            return latestOIR;
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch latest OIR');
+        }
     }
 
     async updateDocument(id: string, dto: UpdateDocumentDto) {
-        const idx = this.mocks.findIndex(d => d.id === id);
-        if (idx === -1) throw new NotFoundException('Document not found');
-        this.mocks[idx] = { ...this.mocks[idx], ...dto, updatedAt: new Date() };
-        return this.mocks[idx];
+        try {
+            const document = await this.prisma.planningDocument.update({
+                where: { id },
+                data: {
+                    ...(dto.title && { title: dto.title }),
+                    ...(dto.content && { content: dto.content }),
+                    ...(dto.status && { status: dto.status }),
+                },
+                include: {
+                    project: {
+                        select: { name: true, code: true }
+                    }
+                }
+            });
+
+            return document;
+        } catch (error) {
+            if (error.code === 'P2025') {
+                // Record not found
+                throw new NotFoundException(`Document with ID ${id} not found`);
+            }
+            throw new InternalServerErrorException('Failed to update document');
+        }
     }
 
     async deleteDocument(id: string) {
-        const idx = this.mocks.findIndex(d => d.id === id);
-        if (idx !== -1) this.mocks.splice(idx, 1);
-        return { success: true };
+        try {
+            // Soft delete - archive the document
+            await this.prisma.planningDocument.update({
+                where: { id },
+                data: { status: DocumentStatus.ARCHIVED }
+            });
+
+            return { success: true, message: 'Document archived successfully' };
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new NotFoundException(`Document with ID ${id} not found`);
+            }
+            throw new InternalServerErrorException('Failed to delete document');
+        }
     }
 }

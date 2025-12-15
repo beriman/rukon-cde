@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface CobieField {
@@ -28,52 +28,71 @@ export class CobieService {
         fileName: string;
         elements: Array<{ [key: string]: any }>;
     }) {
-        let compliantElements = 0;
-        const missingFields: Array<{ elementId: string; missingFields: string[] }> = [];
-
-        for (const element of data.elements) {
-            const missing = REQUIRED_COBIE_FIELDS
-                .filter(field => field.required && !element[field.fieldName])
-                .map(field => field.fieldName);
-
-            if (missing.length === 0) {
-                compliantElements++;
-            } else {
-                missingFields.push({
-                    elementId: element.id || element.Name || 'Unknown',
-                    missingFields: missing,
-                });
+        try {
+            if (!data.elements || data.elements.length === 0) {
+                throw new BadRequestException('No elements provided for validation');
             }
+
+            let compliantElements = 0;
+            const missingFields: Array<{ elementId: string; missingFields: string[] }> = [];
+
+            for (const element of data.elements) {
+                const missing = REQUIRED_COBIE_FIELDS
+                    .filter(field => field.required && !element[field.fieldName])
+                    .map(field => field.fieldName);
+
+                if (missing.length === 0) {
+                    compliantElements++;
+                } else {
+                    missingFields.push({
+                        elementId: element.id || element.Name || 'Unknown',
+                        missingFields: missing,
+                    });
+                }
+            }
+
+            const complianceScore = data.elements.length > 0
+                ? (compliantElements / data.elements.length) * 100
+                : 0;
+
+            return await this.prisma.cobieValidation.create({
+                data: {
+                    projectId: data.projectId,
+                    fileId: data.fileId,
+                    fileName: data.fileName,
+                    totalElements: data.elements.length,
+                    compliantElements,
+                    complianceScore: parseFloat(complianceScore.toFixed(2)),
+                    missingFields: missingFields,
+                },
+            });
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Failed to validate COBie data');
         }
-
-        const complianceScore = data.elements.length > 0
-            ? (compliantElements / data.elements.length) * 100
-            : 0;
-
-        return this.prisma.cobieValidation.create({
-            data: {
-                projectId: data.projectId,
-                fileId: data.fileId,
-                fileName: data.fileName,
-                totalElements: data.elements.length,
-                compliantElements,
-                complianceScore: parseFloat(complianceScore.toFixed(2)),
-                missingFields: missingFields,
-            },
-        });
     }
 
     async getValidations(projectId: string) {
-        return this.prisma.cobieValidation.findMany({
-            where: { projectId },
-            orderBy: { createdAt: 'desc' },
-        });
+        try {
+            return await this.prisma.cobieValidation.findMany({
+                where: { projectId },
+                orderBy: { createdAt: 'desc' },
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch validations');
+        }
     }
 
     async getLatestValidation(projectId: string) {
-        return this.prisma.cobieValidation.findFirst({
-            where: { projectId },
-            orderBy: { createdAt: 'desc' },
-        });
+        try {
+            return await this.prisma.cobieValidation.findFirst({
+                where: { projectId },
+                orderBy: { createdAt: 'desc' },
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch latest validation');
+        }
     }
 }

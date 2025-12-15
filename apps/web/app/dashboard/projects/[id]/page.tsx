@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Breadcrumb } from '@/components/files/breadcrumb';
 import { FileUpload } from '@/components/files/file-upload';
-import { FolderPlus, Upload, Folder, FileText, Loader2, Download, ArrowRight, CheckCircle } from 'lucide-react';
+import { FolderPlus, Upload, Folder, FileText, Loader2, Download, ArrowRight, CheckCircle, Eye } from 'lucide-react';
 import Link from 'next/link';
 
 interface FolderType {
@@ -247,6 +247,16 @@ export default function ProjectDetailPage() {
                                     <span className={`px-2 py-1 text-xs font-medium rounded ${getStateBadge(file.cdeState)}`}>
                                         {file.cdeState}
                                     </span>
+                                    {file.fileName.endsWith('.ifc') && (
+                                        <Link href={`/dashboard/projects/${projectId}/models/${file.id}`}>
+                                            <button
+                                                className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors mr-1"
+                                                title="View 3D Model"
+                                            >
+                                                <Eye className="w-4 h-4 text-blue-600" />
+                                            </button>
+                                        </Link>
+                                    )}
                                     <button
                                         onClick={() => handleDownload(file.id, file.fileName)}
                                         disabled={downloadingId === file.id}

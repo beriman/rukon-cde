@@ -17,6 +17,11 @@ import { DesignModule } from './design/design.module';
 import { HseModule } from './hse/hse.module';
 import { ConstructionModule } from './construction/construction.module';
 import { UploadModule } from './upload/upload.module';
+import { BimModule } from './bim/bim.module';
+import { BcfModule } from './bcf/bcf.module';
+import { SmartReviewModule } from './smart-review/smart-review.module';
+import { SimulationModule } from './simulation/simulation.module';
+import { CostModule } from './cost/cost.module';
 
 @Module({
     imports: [
@@ -38,6 +43,11 @@ import { UploadModule } from './upload/upload.module';
         HseModule,
         ConstructionModule,
         UploadModule,
+        BimModule,
+        BcfModule,
+        SmartReviewModule,
+        SimulationModule,
+        CostModule,
     ],
     controllers: [AppController],
     providers: [

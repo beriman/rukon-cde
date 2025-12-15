@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { IncidentsService } from './incidents.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
+import { NotificationService } from '../../notifications/notification.service';
 
 describe('IncidentsService', () => {
   let service: IncidentsService;
@@ -28,6 +29,14 @@ describe('IncidentsService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            sendIncidentNotification: jest.fn(),
+            sendCapaAssignmentNotification: jest.fn(),
+            sendCapaReminderNotification: jest.fn(),
+          },
         },
       ],
     }).compile();

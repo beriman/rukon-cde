@@ -9,6 +9,7 @@ describe('PersonnelService', () => {
     hsePersonnel: {
       create: jest.fn(),
       findMany: jest.fn(),
+      count: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -66,14 +67,18 @@ describe('PersonnelService', () => {
       ];
 
       mockPrismaService.hsePersonnel.findMany.mockResolvedValue(mockPersonnel);
+      mockPrismaService.hsePersonnel.count = jest.fn().mockResolvedValue(2);
 
       const result = await service.findAll('project-1');
 
-      expect(result).toEqual(mockPersonnel);
+      expect(result.data).toEqual(mockPersonnel);
       expect(mockPrismaService.hsePersonnel.findMany).toHaveBeenCalledWith({
         where: { projectId: 'project-1' },
         orderBy: { name: 'asc' },
+        skip: 0,
+        take: 20,
       });
+      expect(mockPrismaService.hsePersonnel.count).toHaveBeenCalledWith({ where: { projectId: 'project-1' } });
     });
   });
 

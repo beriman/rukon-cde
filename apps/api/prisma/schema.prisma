@@ -101,6 +101,11 @@ model Project {
   cobieValidations CobieValidation[]
   correspondences Correspondence[]
   
+  // Epic 6: BCF & Smart Review
+  bcfTopics      BcfTopic[]
+  validationReports ValidationReport[]
+  simulationLinks SimulationLink[]
+  
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   status         ProjectStatus @default(ACTIVE)
@@ -206,6 +211,8 @@ model File {
   linkedFiles  File[]  @relation("FileLinks")
   markups      DrawingMarkup[]
   submittals   Submittal[]
+  validationReports ValidationReport[]
+  simulationLinks SimulationLink[]
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -775,6 +782,7 @@ enum AuditStatus {
 
 // --- EPIC 4: Construction Monitoring ---
 
+
 enum Discipline {
   STRUCT
   ARCH
@@ -903,24 +911,59 @@ model ProcurementItem {
 }
 
 model BillOfQuantities {
-  id            String   @id @default(uuid())
-  projectId     String
-  project       Project  @relation(fields: [projectId], references: [id])
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  name        String
+  description String?
+  currency    String   @default("IDR")
   
-  itemCode      String
+  items       BoQItem[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([projectId])
+  @@map("bill_of_quantities")
+}
+
+model BoQItem {
+  id            String   @id @default(uuid())
+  boqId         String
+  boq           BillOfQuantities @relation(fields: [boqId], references: [id], onDelete: Cascade)
+  
+  itemCode      String?
   description   String
   unit          String
-  plannedQty    Float
+  quantity      Float
+  unitRate      Float
+  amount        Float
   actualQty     Float    @default(0)
-  unitPrice     Float
   
   workPackageId String?
+  
+  mappings      CostMapping[]
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
-  @@index([projectId])
-  @@map("bill_of_quantities")
+  @@index([boqId])
+  @@map("boq_items")
+}
+
+model CostMapping {
+  id          String   @id @default(uuid())
+  boqItemId   String
+  boqItem     BoQItem  @relation(fields: [boqItemId], references: [id], onDelete: Cascade)
+  
+  elementGuid String   // IFC GlobalId
+  modelId     String   // File ID
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([boqItemId])
+  @@index([elementGuid])
+  @@map("cost_mappings")
 }
 
 // Story 4.5: Payment & Billing
@@ -1021,4 +1064,153 @@ model Correspondence {
   
   @@index([projectId])
   @@map("correspondences")
+}
+// --- EPIC 6: BCF Issue Tracking ---
+
+enum BcfTopicStatus {
+  OPEN
+  IN_PROGRESS
+  SOLVED
+  CLOSED
+}
+
+enum BcfTopicPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum BcfTopicType {
+  ERROR
+  WARNING
+  INFO
+  REQUEST
+}
+
+model BcfTopic {
+  id             String           @id @default(uuid())
+  projectId      String
+  project        Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  guid           String           @unique @default(uuid()) // BCF GUID standard
+  title          String
+  description    String?
+  priority       BcfTopicPriority @default(NORMAL)
+  status         BcfTopicStatus   @default(OPEN)
+  type           BcfTopicType     @default(WARNING)
+  
+  assignedTo     String?
+  creationAuthor String
+  
+  comments       BcfComment[]
+  viewpoints     BcfViewpoint[]
+  
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  
+  @@index([projectId])
+  @@index([guid])
+  @@map("bcf_topics")
+}
+
+model BcfComment {
+  id             String   @id @default(uuid())
+  topicId        String
+  topic          BcfTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  
+  guid           String   @unique @default(uuid())
+  comment        String
+  author         String
+  date           DateTime @default(now())
+  
+  viewpointId    String?  // Optional link to a specific viewpoint
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([topicId])
+  @@map("bcf_comments")
+}
+
+model BcfViewpoint {
+  id             String   @id @default(uuid())
+  topicId        String
+  topic          BcfTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  
+  guid           String   @unique @default(uuid())
+  index          Int      @default(0) // Order of viewpoints
+  
+  // Camera Data (JSON for flexibility: perspective or orthogonal)
+  eyePosition    Json     // {x, y, z}
+  direction      Json     // {x, y, z}
+  upVector       Json     // {x, y, z}
+  
+  // Selection & Visibility
+  selection      Json?    // Array of IfcGuids
+  visibility     Json?    // Array of hidden IfcGuids (or exceptions)
+  
+  snapshot       String?  // S3 key or Base64 (prefer S3 for size)
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([topicId])
+  @@map("bcf_viewpoints")
+}
+
+// --- EPIC 6.3: Smart Review ---
+
+model ValidationRule {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String   // e.g., "Naming", "Property"
+  ruleType    String   // "REGEX", "EXISTS", "VALUE"
+  config      Json     // { property: "FireRating", regex: "^FR-\d+" }
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("validation_rules")
+}
+
+model ValidationReport {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  modelId     String   // File ID
+  file        File     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  
+  result      Json     // Summary of failures
+  score       Float    // e.g. 85.5% pass
+  
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+  @@index([modelId])
+  @@map("validation_reports")
+}
+
+// --- EPIC 6.4: 4D Simulation ---
+
+model SimulationLink {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  taskId      String   // ID from Schedule
+  elementId   String   // IFC GUID 
+  modelId     String   // File ID
+  file        File     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  
+  config      Json?    // { color, animation }
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([taskId])
+  @@map("simulation_links")
 }

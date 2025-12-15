@@ -27,42 +27,42 @@ Implementasi tools untuk Strategic Planning dan Delivery Phase sesuai ISO 19650-
 ## User Stories (High-Level)
 
 1. **OIR/PIR/AIR/EIR Generators**
-   - [ ] Appointing Party dapat generate Organizational Information Requirements (OIR)
-   - [ ] Appointing Party dapat generate Project Information Requirements (PIR)
-   - [ ] Appointing Party dapat generate Asset Information Requirements (AIR)
-   - [ ] Appointing Party dapat generate Exchange Information Requirements (EIR)
-   - [ ] System menyediakan template bahasa Indonesia untuk semua documents
-   - [ ] User dapat customize templates sesuai project needs
+   - [x] Appointing Party dapat generate Organizational Information Requirements (OIR)
+   - [x] Appointing Party dapat generate Project Information Requirements (PIR)
+   - [x] Appointing Party dapat generate Asset Information Requirements (AIR)
+   - [x] Appointing Party dapat generate Exchange Information Requirements (EIR)
+   - [x] System menyediakan template bahasa Indonesia untuk semua documents
+   - [x] User dapat customize templates sesuai project needs
 
 2. **BEP/TIDP/MIDP Editors**
-   - [ ] Lead Appointed Party dapat create BIM Execution Plan (BEP)
-   - [ ] Task team dapat create Task Information Delivery Plan (TIDP)
-   - [ ] Lead Appointed Party dapat create Master Information Delivery Plan (MIDP)
-   - [ ] Editors support rich text, tables, dan file attachments
-   - [ ] System dapat export ke PDF/DOCX format
+   - [x] Lead Appointed Party dapat create BIM Execution Plan (BEP)
+   - [x] Task team dapat create Task Information Delivery Plan (TIDP)
+   - [x] Lead Appointed Party dapat create Master Information Delivery Plan (MIDP)
+   - [x] Editors support rich text, tables, dan file attachments
+   - [x] System dapat export ke PDF/DOCX format
 
 3. **Gantt Chart Integration**
-   - [ ] TIDP/MIDP editors memiliki Gantt chart view untuk task timelines
-   - [ ] User dapat drag-drop tasks untuk reschedule
-   - [ ] System dapat import schedule dari MS Project atau Primavera P6
-   - [ ] Dependencies antar tasks dapat didefinisikan
+   - [x] TIDP/MIDP editors memiliki Gantt chart view untuk task timelines
+   - [x] User dapat drag-drop tasks untuk reschedule
+   - [x] System dapat import schedule dari MS Project atau Primavera P6
+   - [x] Dependencies antar tasks dapat didefinisikan
 
 4. **Tender Module**
-   - [ ] Appointing Party dapat create tender project
-   - [ ] System upload EIR ke secure data room
-   - [ ] Bidders dapat access data room dengan controlled permissions
-   - [ ] Activity logs untuk semua document access di data room
+   - [x] Appointing Party dapat create tender project
+   - [x] System upload EIR ke secure data room
+   - [x] Bidders dapat access data room dengan controlled permissions
+   - [x] Activity logs untuk semua document access di data room
 
 5. **Team Mobilization**
-   - [ ] Lead Appointed Party dapat create onboarding checklist
-   - [ ] Task team members dapat complete capability assessment forms
-   - [ ] System track completion status untuk mobilization requirements
+   - [x] Lead Appointed Party dapat create onboarding checklist
+   - [x] Task team members dapat complete capability assessment forms
+   - [x] System track completion status untuk mobilization requirements
 
 6. **Approval Workflows**
-   - [ ] Admin dapat configure approval workflows per project
-   - [ ] Workflows define: WIP → Shared (reviewers) → Published (approvers)
-   - [ ] Reviewers/Approvers dapat approve/reject with comments
-   - [ ] Notification sent ke stakeholders saat approval status berubah
+   - [x] Admin dapat configure approval workflows per project
+   - [x] Workflows define: WIP → Shared (reviewers) → Published (approvers)
+   - [x] Reviewers/Approvers dapat approve/reject with comments
+   - [x] Notification sent ke stakeholders saat approval status berubah
 
 ## Acceptance Criteria
 

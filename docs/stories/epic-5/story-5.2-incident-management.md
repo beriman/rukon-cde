@@ -34,27 +34,27 @@
 ## 3. Implementation Checklist
 
 ### Database (Prisma/Supabase)
-- [ ] Verify `incidents` table supports `photos[]`, `witnesses[]`.
-- [ ] Add `IncidentAction` model for Corrective Actions (One-to-Many).
+- [x] Verify `incidents` table supports `photos[]`, `witnesses[]`.
+- [x] Add `IncidentAction` model for Corrective Actions (One-to-Many).
     - `id`, `incidentId`, `description`, `assigneeId`, `dueDate`, `completedDate`, `status`.
 
 ### Backend (NestJS)
-- [ ] **Create Incident:** Endpoint `POST /projects/:id/incidents` handling file uploads (S3).
-- [ ] **Update Incident:** Endpoint to add RCA and change status.
-- [ ] **Manage Actions:** CRUD for Corrective Actions.
-- [ ] **Notifications:** Email/In-app alert to Safety Manager on new LTI/High severity.
+- [x] **Create Incident:** Endpoint `POST /projects/:id/incidents` handling file uploads (S3).
+- [x] **Update Incident:** Endpoint to add RCA and change status.
+- [x] **Manage Actions:** CRUD for Corrective Actions.
+- [x] **Notifications:** Email/In-app alert to Safety Manager on new LTI/High severity.
 
 ### Frontend (Next.js)
-- [ ] **Active Incidents List:** Table with Status Badges and Severity Colors.
-- [ ] **Report Form:** Wizard-style form:
+- [x] **Active Incidents List:** Table with Status Badges and Severity Colors.
+- [x] **Report Form:** Wizard-style form:
     1.  Basic Info (Type, Date, Location)
     2.  Description & Witnesses
     3.  Photo Upload (Drag & Drop)
-- [ ] **Investigation View:** Admin-only view to enter Root Cause and add Actions.
-- [ ] **Action Tracker:** Widget to see open corrective actions.
+- [x] **Investigation View:** Admin-only view to enter Root Cause and add Actions.
+- [x] **Action Tracker:** Widget to see open corrective actions.
 
 ## 4. Acceptance Criteria
-- [ ] User can submit a "Near Miss" with a photo.
-- [ ] Safety Officer receives notification.
-- [ ] Safety Officer can add 3 corrective actions to an incident.
-- [ ] Incident cannot be "Closed" if Corrective Actions are pending.
+- [x] User can submit a "Near Miss" with a photo.
+- [x] Safety Officer receives notification.
+- [x] Safety Officer can add 3 corrective actions to an incident.
+- [x] Incident cannot be "Closed" if Corrective Actions are pending.

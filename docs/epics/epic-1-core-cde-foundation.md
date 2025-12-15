@@ -38,48 +38,48 @@ Ini adalah Epic paling fundamental yang harus selesai terlebih dahulu karena sem
 ## User Stories (High-Level)
 
 1. **User Authentication & Management**
-   - [ ] User dapat register dengan email/password
-   - [ ] User dapat login dan menerima JWT token
-   - [ ] User dapat reset password
-   - [ ] Admin dapat manage users di organizationnya
+   - [x] User dapat register dengan email/password
+   - [x] User dapat login dan menerima JWT token
+   - [x] User dapat reset password
+   - [x] Admin dapat manage users di organizationnya
 
 2. **Organization Management (Multi-Tenancy)**
-   - [ ] System admin dapat create organization baru
-   - [ ] Organization admin dapat invite users ke organization
-   - [ ] Organization data terisolasi 100% dari organization lain
+   - [x] System admin dapat create organization baru
+   - [x] Organization admin dapat invite users ke organization
+   - [x] Organization data terisolasi 100% dari organization lain
 
 3. **Project Management**
-   - [ ] User dapat create project baru
-   - [ ] User dapat list semua projects di organizationnya
-   - [ ] User dapat view project details
-   - [ ] User dapat update project information
-   - [ ] User dapat archive project
+   - [x] User dapat create project baru
+   - [x] User dapat list semua projects di organizationnya
+   - [x] User dapat view project details
+   - [x] User dapat update project information
+   - [x] User dapat archive project
 
 4. **File Management Core**
-   - [ ] User dapat create folder structure di dalam project
-   - [ ] User dapat upload file ke folder (single & batch)
-   - [ ] System otomatis generate unique file ID dengan naming convention
-   - [ ] User dapat download file
-   - [ ] User dapat view file metadata
+   - [x] User dapat create folder structure di dalam project
+   - [x] User dapat upload file ke folder (single & batch)
+   - [x] System otomatis generate unique file ID dengan naming convention
+   - [x] User dapat download file
+   - [x] User dapat view file metadata
 
 5. **CDE Workflow States**
-   - [ ] File default status adalah WIP saat pertama upload
-   - [ ] User dapat promote file dari WIP → Shared (dengan approval)
-   - [ ] User dapat publish file dari Shared → Published (dengan approval)
-   - [ ] Published files otomatis archived saat ada version baru
-   - [ ] User dapat view file sesuai permission berdasarkan CDE state
+   - [x] File default status adalah WIP saat pertama upload
+   - [x] User dapat promote file dari WIP → Shared (dengan approval)
+   - [x] User dapat publish file dari Shared → Published (dengan approval)
+   - [x] Published files otomatis archived saat ada version baru
+   - [x] User dapat view file sesuai permission berdasarkan CDE state
 
 6. **Smart Versioning**
-   - [ ] Upload file dengan nama sama otomatis create version baru (V1, V2, V3...)
-   - [ ] File stacking: versions ditampilkan sebagai dropdown di file yang sama
-   - [ ] User dapat view version history
-   - [ ] User dapat restore/rollback ke version sebelumnya
-   - [ ] Version lama tetap accessible untuk audit
+   - [x] Upload file dengan nama sama otomatis create version baru (V1, V2, V3...)
+   - [x] File stacking: versions ditampilkan sebagai dropdown di file yang sama
+   - [x] User dapat view version history
+   - [x] User dapat restore/rollback ke version sebelumnya
+   - [x] Version lama tetap accessible untuk audit
 
 7. **Naming Convention Enforcement**
-   - [ ] System validasi format nama file: `Project-Originator-Volume-Level-Type-Role-Number`
-   - [ ] User mendapat error message jelas jika format salah
-   - [ ] Auto-suggest naming berdasarkan project context
+   - [x] System validasi format nama file: `Project-Originator-Volume-Level-Type-Role-Number`
+   - [x] User mendapat error message jelas jika format salah
+   - [x] Auto-suggest naming berdasarkan project context
 
 ## Acceptance Criteria
 

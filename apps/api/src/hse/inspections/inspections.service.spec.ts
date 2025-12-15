@@ -9,6 +9,7 @@ describe('InspectionsService', () => {
     inspectionForm: {
       create: jest.fn(),
       findMany: jest.fn(),
+      count: jest.fn(),
     },
   };
 
@@ -77,10 +78,11 @@ describe('InspectionsService', () => {
       ];
 
       mockPrismaService.inspectionForm.findMany.mockResolvedValue(mockInspections);
+      mockPrismaService.inspectionForm.count = jest.fn().mockResolvedValue(2);
 
       const result = await service.findAll('project-1');
 
-      expect(result).toEqual(mockInspections);
+      expect(result.data).toEqual(mockInspections);
       expect(mockPrismaService.inspectionForm.findMany).toHaveBeenCalledWith({
         where: { projectId: 'project-1' },
         include: {
@@ -88,7 +90,10 @@ describe('InspectionsService', () => {
           inspector: { select: { id: true, name: true, email: true } },
         },
         orderBy: { date: 'desc' },
+        skip: 0,
+        take: 20,
       });
+      expect(mockPrismaService.inspectionForm.count).toHaveBeenCalledWith({ where: { projectId: 'project-1' } });
     });
   });
 });

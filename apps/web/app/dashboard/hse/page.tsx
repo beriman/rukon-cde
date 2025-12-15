@@ -1,79 +1,36 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { apiClient } from "@/lib/api-client";
 import { HseStats } from "@/components/hse/HseStats";
 import { HseCharts } from "@/components/hse/HseCharts";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useHseStatsWithTrends } from "@/hooks/use-hse";
 
 interface Project {
     id: string;
     name: string;
 }
 
-interface HseStatsData {
-    totalManhours: number;
-    ltiFreeDays: number;
-    recordableFreeDays: number;
-    hurtFreeDays: number;
-    ltiRate: number;
-    triRate: number;
-    incidentsLastMonth: number;
-}
-
 export default function HseDashboardPage() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string>("");
-    const [stats, setStats] = useState<HseStatsData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [statsLoading, setStatsLoading] = useState(false);
 
-    // Fetch Projects on Load
+    // Fetch projects
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const res = await apiClient.get('/projects', { params: { status: 'ACTIVE' } });
+        apiClient.get('/projects', { params: { status: 'ACTIVE' } })
+            .then(res => {
                 setProjects(res.data || []);
-                if (res.data && res.data.length > 0) {
-                    setSelectedProjectId(res.data[0].id); // Auto-select first project
-                }
-            } catch (error) {
-                console.error("Failed to fetch projects", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProjects();
+                if (res.data?.length > 0) setSelectedProjectId(res.data[0].id);
+            })
+            .catch(err => console.error("Failed to fetch projects", err));
     }, []);
 
-    // Fetch Stats when Project Changes
-    useEffect(() => {
-        if (!selectedProjectId) return;
+    // Fetch Stats using React Query
+    const { data: stats, isLoading: statsLoading } = useHseStatsWithTrends(selectedProjectId);
 
-        const fetchStats = async () => {
-            setStatsLoading(true);
-            try {
-                const res = await apiClient.get(`/projects/${selectedProjectId}/hse/stats`);
-                setStats(res.data);
-            } catch (error) {
-                console.error("Failed to fetch stats", error);
-            } finally {
-                setStatsLoading(false);
-            }
-        };
-        fetchStats();
-    }, [selectedProjectId]);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        );
-    }
-
-    if (projects.length === 0) {
+    if (projects.length === 0 && !selectedProjectId) { // Simplistic check, acceptable for now
         return (
             <div className="p-8 text-center text-muted-foreground">
                 No active projects found. Please create a project to view HSE statistics.
@@ -115,7 +72,7 @@ export default function HseDashboardPage() {
                 <>
                     <HseStats stats={stats} />
                     <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
-                        <HseCharts />
+                        <HseCharts trends={stats.monthlyTrends} />
                         <Card className="col-span-3">
                             <CardContent className="p-6">
                                 <div className="space-y-4">
@@ -133,7 +90,7 @@ export default function HseDashboardPage() {
                 </>
             ) : (
                 <div className="p-8 text-center text-muted-foreground">
-                    No stats available.
+                    Select a project to view statistics.
                 </div>
             )}
         </div>

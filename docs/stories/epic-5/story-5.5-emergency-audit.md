@@ -26,18 +26,18 @@
 ## 3. Implementation Checklist
 
 ### Database
-- [ ] Create `HseEmergencyContact` model.
-- [ ] Create `HseAudit` and `HseAuditFinding` models.
+- [x] Create `HseEmergencyContact` model.
+- [x] Create `HseAudit` and `HseAuditFinding` models.
 
 ### Backend
-- [ ] **Drill Logs:** Simple CRUD.
-- [ ] **Audits:** Workflow for NCR (Open -> Responded -> Verified -> Closed).
+- [x] **Drill Logs:** Simple CRUD.
+- [x] **Audits:** Workflow for NCR (Open -> Responded -> Verified -> Closed).
 
 ### Frontend
-- [ ] **Emergency Button:** A "SOS" or Red button in the app header (Mobile) to show contacts instantly.
-- [ ] **Audit Dashboard:** Summary of Open vs Closed NCRs.
-- [ ] **Drill History:** List of past drills.
+- [x] **Emergency Button:** A "SOS" or Red button in the app header (Mobile) to show contacts instantly.
+- [x] **Audit Dashboard:** Summary of Open vs Closed NCRs.
+- [x] **Drill History:** List of past drills.
 
 ## 4. Acceptance Criteria
-- [ ] Emergency Contacts are accessible offline (PWA feature - future).
-- [ ] Audit NCR cannot be closed without "Verification Evidence" (Photo/Doc).
+- [x] Emergency Contacts are accessible offline (PWA feature - future).
+- [x] Audit NCR cannot be closed without "Verification Evidence" (Photo/Doc).

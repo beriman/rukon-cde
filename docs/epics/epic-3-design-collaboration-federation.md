@@ -29,41 +29,41 @@ Tools untuk design teams (Structure, Architecture, MEP) untuk mengelola engineer
 ## User Stories (High-Level)
 
 1. **WIP Privacy Workspaces**
-   - [ ] System otomatis create private folder untuk setiap discipline
-   - [ ] Files di WIP workspace hanya visible untuk discipline team
-   - [ ] User dapat promote file dari WIP → Shared untuk coordination
+   - [x] System otomatis create private folder untuk setiap discipline
+   - [x] Files di WIP workspace hanya visible untuk discipline team
+   - [x] User dapat promote file dari WIP → Shared untuk coordination
 
 2. **Reference Management**
-   - [ ] User dapat load model dari discipline lain sebagai background reference
-   - [ ] Reference models di-display dengan transparency/grayscale
-   - [ ] Changes di referenced model otomatis terdeteksi
+   - [x] User dapat load model dari discipline lain sebagai background reference
+   - [x] Reference models di-display dengan transparency/grayscale
+   - [x] Changes di referenced model otomatis terdeteksi
 
 3. **Design Review & Markup**
-   - [ ] User dapat add markup annotations di PDF drawings
-   - [ ] User dapat add comments dengan 3D viewpoint di IFC models
-   - [ ] Markup tools: pen, text, shapes, measurements
-   - [ ] Redline mode: overlay comments di atas drawings
+   - [x] User dapat add markup annotations di PDF drawings
+   - [x] User dapat add comments dengan 3D viewpoint di IFC models
+   - [x] Markup tools: pen, text, shapes, measurements
+   - [x] Redline mode: overlay comments di atas drawings
 
 4. **Multi-Format Support**
-   - [ ] System dapat upload dan preview RVT files
-   - [ ] System dapat upload dan preview DWG/DGN files
-   - [ ] System auto-detect file format dan assign correct viewer
+   - [x] System dapat upload dan preview RVT files
+   - [x] System dapat upload dan preview DWG/DGN files
+   - [x] System auto-detect file format dan assign correct viewer
 
 5. **Model Federation**
-   - [ ] User dapat select multiple models untuk merge (RVT, IFC, NWD, DWG)
-   - [ ] System creates federated model dengan all selected components
-   - [ ] Federated model dapat di-view di web-based 3D viewer
+   - [x] User dapat select multiple models untuk merge (RVT, IFC, NWD, DWG)
+   - [x] System creates federated model dengan all selected components
+   - [x] Federated model dapat di-view di web-based 3D viewer
 
 6. **Automated Conversion**
-   - [ ] Background worker converts RVT → IFC
-   - [ ] Background worker converts all 3D formats → GLTF untuk web viewing
-   - [ ] User notified saat conversion complete
+   - [x] Background worker converts RVT → IFC
+   - [x] Background worker converts all 3D formats → GLTF untuk web viewing
+   - [x] User notified saat conversion complete
 
 7. **Clash Detection**
-   - [ ] User dapat run clash detection pada federated model
-   - [ ] System detects geometric intersections between elements
-   - [ ] Clash results displayed dengan 3D viewpoint untuk each clash
-   - [ ] Clashes dapat di-export sebagai BCF format
+   - [x] User dapat run clash detection pada federated model
+   - [x] System detects geometric intersections between elements
+   - [x] Clash results displayed dengan 3D viewpoint untuk each clash
+   - [x] Clashes dapat di-export sebagai BCF format
 
 ## Acceptance Criteria
 

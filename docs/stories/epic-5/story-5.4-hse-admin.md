@@ -29,22 +29,22 @@
 ## 3. Implementation Checklist
 
 ### Database
-- [ ] Verify `permit_to_works` table (Done in 5.1).
-- [ ] Add `HsePersonnel` model? Or extend `User` model?
+- [x] Verify `permit_to_works` table (Done in 5.1).
+- [x] Add `HsePersonnel` model? Or extend `User` model?
     - Recommendation: Separate `Worker` model for non-app users (laborers).
     - Fields: `name`, `company`, `documents` (JSON: { type: 'SIO', expiry: '2025-01-01' }).
 
 ### Backend
-- [ ] **PTW Workflow:** State machine for PTW status transitions.
-- [ ] **Worker CRUD:** Endpoints to manage worker database.
-- [ ] **Expiry Cron Job:** Nightly job to check SIO expiries and send notifications.
+- [x] **PTW Workflow:** State machine for PTW status transitions.
+- [x] **Worker CRUD:** Endpoints to manage worker database.
+- [x] **Expiry Cron Job:** Nightly job to check SIO expiries and send notifications.
 
 ### Frontend
-- [ ] **PTW Wizard:** Step-by-step permit request form.
-- [ ] **Approvals Inbox:** List of PTWs requiring my approval.
-- [ ] **Worker Database:** Searchable table of all site workers with "Traffic Light" expiry status (Green/Yellow/Red).
+- [x] **PTW Wizard:** Step-by-step permit request form.
+- [x] **Approvals Inbox:** List of PTWs requiring my approval.
+- [x] **Worker Database:** Searchable table of all site workers with "Traffic Light" expiry status (Green/Yellow/Red).
 
 ## 4. Acceptance Criteria
-- [ ] Hot Work Permit requires extra "Fire Watcher" field.
-- [ ] Approved PTW generates a PDF with QR Code.
-- [ ] System alerts if trying to add a worker with expired SIO to a PTW? (Advanced).
+- [x] Hot Work Permit requires extra "Fire Watcher" field.
+- [x] Approved PTW generates a PDF with QR Code.
+- [x] System alerts if trying to add a worker with expired SIO to a PTW? (Advanced).

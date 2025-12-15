@@ -28,21 +28,21 @@
 ## 3. Implementation Checklist
 
 ### Database
-- [ ] Create `InspectionForm` model (Header).
-- [ ] Create `InspectionItem` model (Lines: Question, Result, Photo).
-- [ ] Create `SafetyMeeting` model.
+- [x] Create `InspectionForm` model (Header).
+- [x] Create `InspectionItem` model (Lines: Question, Result, Photo).
+- [x] Create `SafetyMeeting` model.
     - `id`, `project_id`, `type` (TBM/Induction), `topic`, `date`, `attendees` (JSON or Relation).
 
 ### Backend
-- [ ] **Inspections:** Endpoints to submit full checklist.
-- [ ] **Meetings:** Endpoint to log meeting and upload attendance sheet photo.
+- [x] **Inspections:** Endpoints to submit full checklist.
+- [x] **Meetings:** Endpoint to log meeting and upload attendance sheet photo.
 
 ### Frontend
-- [ ] **Inspection Library:** List of available templates (Excavator, Scaffolding, etc.).
-- [ ] **Mobile Inspection View:** Mobile-optimized form for ticking checkboxes.
-- [ ] **Meeting Log Form:** Simple form to record TBM topic and upload photo.
+- [x] **Inspection Library:** List of available templates (Excavator, Scaffolding, etc.).
+- [x] **Mobile Inspection View:** Mobile-optimized form for ticking checkboxes.
+- [x] **Meeting Log Form:** Simple form to record TBM topic and upload photo.
 
 ## 4. Acceptance Criteria
-- [ ] Inspector can select "Excavator Inspection" and submit a report.
-- [ ] Failed items require a comment or photo.
-- [ ] Supervisor can view a calendar of TBMs held this month.
+- [x] Inspector can select "Excavator Inspection" and submit a report.
+- [x] Failed items require a comment or photo.
+- [x] Supervisor can view a calendar of TBMs held this month.

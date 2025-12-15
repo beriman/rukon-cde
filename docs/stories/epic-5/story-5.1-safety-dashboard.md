@@ -27,11 +27,11 @@ Formulas (typically per 1,000,000 manhours):
 - **Pyramid:** Safety Triangle (Near Miss > First Aid > LTI > Fatality).
 
 ## 3. Acceptance Criteria
-- [ ] Dashboard page `/dashboard/hse` exists.
-- [ ] Displays 4 main KPI cards (Manhours, LTI Free, etc.).
-- [ ] "Previous Best" is stored and updated if current streak exceeds it.
-- [ ] Incident Rates are calculated automatically based on stored incident logs and manhours.
-- [ ] Charts are interactive (tooltip on hover).
+- [x] Dashboard page `/dashboard/hse` exists.
+- [x] Displays 4 main KPI cards (Manhours, LTI Free, etc.).
+- [x] "Previous Best" is stored and updated if current streak exceeds it.
+- [x] Incident Rates are calculated automatically based on stored incident logs and manhours.
+- [x] Charts are interactive (tooltip on hover).
 
 ## 4. Technical Approach
 ### Backend (NestJS)

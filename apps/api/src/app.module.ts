@@ -22,6 +22,8 @@ import { BcfModule } from './bcf/bcf.module';
 import { SmartReviewModule } from './smart-review/smart-review.module';
 import { SimulationModule } from './simulation/simulation.module';
 import { CostModule } from './cost/cost.module';
+import { LoinModule } from './loin/loin.module';
+import { SyncModule } from './sync/sync.module';
 
 @Module({
     imports: [
@@ -48,6 +50,8 @@ import { CostModule } from './cost/cost.module';
         SmartReviewModule,
         SimulationModule,
         CostModule,
+        LoinModule,
+        SyncModule,
     ],
     controllers: [AppController],
     providers: [

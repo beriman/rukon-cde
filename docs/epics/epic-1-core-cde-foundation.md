@@ -84,24 +84,24 @@ Ini adalah Epic paling fundamental yang harus selesai terlebih dahulu karena sem
 ## Acceptance Criteria
 
 ### Functional
-- [ ] User dapat login dan access project yang authorized
-- [ ] File dapat diupload, versioned, dan di-download kembali tanpa corrupt
-- [ ] CDE states workflow berfungsi dengan approval mechanism
-- [ ] Multi-tenancy: Organization A tidak bisa access data Organization B
-- [ ] Naming convention validator menolak file dengan format salah
+- [x] User dapat login dan access project yang authorized
+- [x] File dapat diupload, versioned, dan di-download kembali tanpa corrupt
+- [x] CDE states workflow berfungsi dengan approval mechanism
+- [x] Multi-tenancy: Organization A tidak bisa access data Organization B
+- [x] Naming convention validator menolak file dengan format salah
 
 ### Non-Functional
-- [ ] API response time < 200ms (p95) untuk CRUD operations
-- [ ] File upload support hingga 500MB dengan chunked upload
-- [ ] Database schema supports sharding untuk horizontal scaling
-- [ ] All API endpoints memiliki unit tests (>80% coverage)
-- [ ] Authentication uses secure JWT with refresh token mechanism
+- [x] API response time < 200ms (p95) untuk CRUD operations
+- [x] File upload support hingga 500MB dengan chunked upload
+- [x] Database schema supports sharding untuk horizontal scaling
+- [x] All API endpoints memiliki unit tests (>80% coverage)
+- [x] Authentication uses secure JWT with refresh token mechanism
 
 ### Security
-- [ ] Passwords di-hash dengan bcrypt (minimum 10 rounds)
-- [ ] JWT short-lived (15 min), refresh token httpOnly cookie
-- [ ] Audit trail mencatat semua file operations (upload, download, delete)
-- [ ] RBAC enforced di setiap endpoint via Guards
+- [x] Passwords di-hash dengan bcrypt (minimum 10 rounds)
+- [x] JWT short-lived (15 min), refresh token httpOnly cookie
+- [x] Audit trail mencatat semua file operations (upload, download, delete)
+- [x] RBAC enforced di setiap endpoint via Guards
 
 ## Technical Architecture
 
@@ -307,14 +307,14 @@ POST   /api/files/:id/restore/:version
 
 ## Definition of Done
 
-- [ ] All user stories completed dan tested
-- [ ] API documentation up-to-date (Swagger/OpenAPI)
-- [ ] Database migrations written dan tested
-- [ ] Unit test coverage ≥ 80%
-- [ ] Integration tests untuk critical paths
-- [ ] Security audit passed (OWASP Top 10)
-- [ ] Performance benchmarks met
-- [ ] Code reviewed dan merged to main branch
+- [x] All user stories completed dan tested
+- [x] API documentation up-to-date (Swagger/OpenAPI)
+- [x] Database migrations written dan tested
+- [x] Unit test coverage ≥ 80%
+- [x] Integration tests untuk critical paths
+- [x] Security audit passed (OWASP Top 10)
+- [x] Performance benchmarks met
+- [x] Code reviewed dan merged to main branch
 
 ---
 

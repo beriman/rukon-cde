@@ -105,6 +105,9 @@ model Project {
   bcfTopics      BcfTopic[]
   validationReports ValidationReport[]
   simulationLinks SimulationLink[]
+  schedules      Schedule[]
+  classifications ClassificationAssignment[]
+  idsSpecifications IdsSpecification[]
   
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -1195,12 +1198,52 @@ model ValidationReport {
 
 // --- EPIC 6.4: 4D Simulation ---
 
+model Schedule {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  name          String
+  type          String   // "CSV", "MS_PROJECT", "P6"
+  
+  tasks         ScheduleTask[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([projectId])
+  @@map("schedules")
+}
+
+model ScheduleTask {
+  id            String   @id @default(uuid())
+  scheduleId    String
+  schedule      Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  taskId        String   // The external ID (e.g. "1.1", "A100")
+  name          String
+  startDate     DateTime
+  endDate       DateTime
+  parentId      String? 
+  
+  simulationLinks SimulationLink[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([scheduleId, taskId])
+  @@map("schedule_tasks")
+}
+
 model SimulationLink {
   id          String   @id @default(uuid())
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
-  taskId      String   // ID from Schedule
+  // Link to internal ScheduleTask
+  scheduleTaskId String
+  scheduleTask   ScheduleTask @relation(fields: [scheduleTaskId], references: [id], onDelete: Cascade)
+
   elementId   String   // IFC GUID 
   modelId     String   // File ID
   file        File     @relation(fields: [modelId], references: [id], onDelete: Cascade)
@@ -1211,6 +1254,57 @@ model SimulationLink {
   updatedAt   DateTime @updatedAt
 
   @@index([projectId])
-  @@index([taskId])
+  @@index([scheduleTaskId])
   @@map("simulation_links")
+}
+
+model ClassificationAssignment {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  elementGuid String
+  system      String   // "Uniclass 2015", "OmniClass"
+  code        String
+  description String
+
+  assignedBy  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([projectId, elementGuid, system])
+  @@index([projectId])
+  @@index([code])
+  @@map("classification_assignments")
+}
+
+model IdsSpecification {
+  id          String    @id @default(uuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id])
+  name        String
+  description String?
+  
+  rules       IdsRule[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("ids_specifications")
+}
+
+model IdsRule {
+  id          String           @id @default(uuid())
+  specId      String
+  spec        IdsSpecification @relation(fields: [specId], references: [id], onDelete: Cascade)
+  
+  ifcEntity   String           // e.g., "IfcWall"
+  propertySet String           // e.g., "Pset_WallCommon"
+  property    String           // e.g., "FireRating"
+  requirement String           // e.g., "PRESENT", "MATCHES"
+  value       String?          // e.g., "120" if MATCHES
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("ids_rules")
 }

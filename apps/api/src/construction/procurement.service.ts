@@ -103,13 +103,36 @@ export class ProcurementService {
         workPackageId?: string;
     }) {
         try {
-            return await this.prisma.billOfQuantities.create({
+            // Find or create a default Bill of Quantities for the project
+            let boq = await this.prisma.billOfQuantities.findFirst({
+                where: { projectId: data.projectId }
+            });
+
+            if (!boq) {
+                boq = await this.prisma.billOfQuantities.create({
+                    data: {
+                        projectId: data.projectId,
+                        name: 'Main Bill of Quantities',
+                        description: 'Auto-generated BQ'
+                    }
+                });
+            }
+
+            return await this.prisma.boQItem.create({
                 data: {
-                    ...data,
+                    boqId: boq.id,
+                    itemCode: data.itemCode,
+                    description: data.description,
+                    unit: data.unit,
+                    quantity: data.plannedQty, // mapping plannedQty -> quantity
+                    unitRate: data.unitPrice,  // mapping unitPrice -> unitRate
+                    amount: data.plannedQty * data.unitPrice,
                     actualQty: 0,
+                    workPackageId: data.workPackageId
                 },
             });
         } catch (error) {
+            console.error(error); // Log error for debugging
             if (error.code === 'P2003') {
                 throw new NotFoundException('Project not found');
             }
@@ -119,7 +142,7 @@ export class ProcurementService {
 
     async updateActualQty(id: string, actualQty: number) {
         try {
-            return await this.prisma.billOfQuantities.update({
+            return await this.prisma.boQItem.update({
                 where: { id },
                 data: { actualQty },
             });
@@ -133,8 +156,10 @@ export class ProcurementService {
 
     async getBQItems(projectId: string) {
         try {
-            return await this.prisma.billOfQuantities.findMany({
-                where: { projectId },
+            return await this.prisma.boQItem.findMany({
+                where: {
+                    boq: { projectId }
+                },
                 orderBy: { itemCode: 'asc' },
             });
         } catch (error) {
@@ -146,8 +171,9 @@ export class ProcurementService {
         try {
             const items = await this.getBQItems(projectId);
 
-            const totalPlanned = items.reduce((sum, item) => sum + (item.plannedQty * item.unitPrice), 0);
-            const totalActual = items.reduce((sum, item) => sum + (item.actualQty * item.unitPrice), 0);
+            // Note: In BoQItem, quantity = planned quantity, unitRate = unit price
+            const totalPlanned = items.reduce((sum, item) => sum + (item.quantity * item.unitRate), 0);
+            const totalActual = items.reduce((sum, item) => sum + (item.actualQty * item.unitRate), 0);
             const variance = totalActual - totalPlanned;
             const variancePercent = totalPlanned > 0 ? (variance / totalPlanned) * 100 : 0;
 

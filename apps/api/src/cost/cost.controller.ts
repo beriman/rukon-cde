@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CostService } from './cost.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('projects/:projectId/cost')
 @UseGuards(JwtAuthGuard)
@@ -43,5 +44,20 @@ export class CostController {
     @Get('mappings')
     getMappings(@Param('projectId') projectId: string) {
         return this.costService.getProjectCostMappings(projectId);
+    }
+
+    @Get('boq/:boqId')
+    getBoqDetails(@Param('boqId') boqId: string) {
+        return this.costService.getBoqDetails(boqId);
+    }
+
+    @Post('boq/upload')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadBoq(
+        @Param('projectId') projectId: string,
+        @UploadedFile() file: Express.Multer.File,
+        @Body() body: { name: string },
+    ) {
+        return this.costService.importBoq(projectId, body.name, file.buffer);
     }
 }

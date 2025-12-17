@@ -210,12 +210,13 @@ Combined criteria:
     - Commit changes
     - Proceed to next story
 
-## Phase 7: Documentation
+## Phase 7: Documentation & Completion Updates
 
-21. Update story file:
-    - Mark all technical tasks `[x]`
-    - Mark all acceptance criteria `[x]`
-    - Add completion timestamp
+21. **CRITICAL: Update Story & Epic Files**:
+    - You MUST use `multi_replace_file_content` to mark checkboxes as completed.
+    - **Story File**: Mark all technical tasks `[x]` and Acceptance Criteria `[x]`.
+    - **Epic File**: Mark the corresponding User Story in the main Epic file as `[x]`.
+    - verification: Read the file back to ensure `[x]` is present.
 
 22. Generate QA report artifact:
 ```markdown
@@ -225,6 +226,23 @@ Combined criteria:
 **Test Coverage**: {percentage}%
 **Code Quality**: {score}/100
 ```
+
+## Phase 8: Completion Loop
+
+23. Check for "Next Steps" in the QA Report or current context.
+24. **IF "Next Steps" exist**:
+    - Execute the first item in "Next Steps" sequentially.
+    - **Verify** the result of the action.
+    - Update the QA Report (mark item as done or removed).
+    - **LOOP**: GOTO Step 23.
+25. **ELSE (All Next Steps Completed)**:
+    - **Identify Next Story**: Look for the next pending story in the current Epic (e.g., `story-X.X+1.md`).
+    - **Auto-Advance**: If found, print the command to start the next story immediately.
+      ```bash
+      # Auto-start next story
+      /bmad-story-cycle {next-story-file}
+      ```
+    - Proceed to Exit Criteria.
 
 ## Exit Criteria
 

@@ -1,7 +1,7 @@
 # Story 7.1: Mobile App - Offline Mode
 
 **Epic**: Epic 7: Mobile Field App & AI Assistant
-**Status**: Pending
+**Status**: Done
 **Priority**: High
 **Estimation**: 8 Points
 
@@ -19,11 +19,11 @@
 
 ## Technical Tasks
 - [x] **Backend**: Create API endpoints for bulk data sync (delta updates).
-- [ ] **Mobile**: Implement offline storage layer (SQLite/WatermelonDB).
-- [ ] **Mobile**: Build background sync worker/service.
-- [ ] **Mobile**: Build background sync worker/service.
-- [ ] **Mobile**: Create UI for "Offline Mode" status and Sync Progress.
-- [ ] **Mobile**: Implement file viewer integration for local files.
+- [x] **Mobile**: Implement offline storage layer (SQLite/WatermelonDB).
+- [x] **Mobile**: Build background sync worker/service.
+- [x] **Mobile**: Build background sync worker/service.
+- [x] **Mobile**: Create UI for "Offline Mode" status and Sync Progress.
+- [x] **Mobile**: Implement file viewer integration for local files.
 
 ## Dependencies
 - Epic 1 (Core CDE) - Auth & File Storage

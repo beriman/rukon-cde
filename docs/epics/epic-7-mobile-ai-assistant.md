@@ -40,75 +40,75 @@ Native mobile application untuk field teams dengan offline-first architecture, A
 ## User Stories (High-Level)
 
 1. **Mobile App - Offline Mode**
-   - [ ] User dapat download project drawings untuk offline use
-   - [ ] Downloaded content stored di local SQLite database
-   - [ ] Auto-sync saat internet connection restored
-   - [ ] Conflict resolution untuk offline edits
+   - [x] User dapat download project drawings untuk offline use
+   - [x] Downloaded content stored di local SQLite database
+   - [x] Auto-sync saat internet connection restored
+   - [x] Conflict resolution untuk offline edits
 
 2. **Mobile App - Site Capture**
-   - [ ] User dapat take photo dengan GPS location tagging
-   - [ ] Pin photo to specific location pada floor plan
-   - [ ] Video recording dengan commentary
-   - [ ] Batch upload saat back online
+   - [x] User dapat take photo dengan GPS location tagging
+   - [x] Pin photo to specific location pada floor plan
+   - [x] Video recording dengan commentary
+   - [x] Batch upload saat back online
 
 3. **Mobile App - QR Scanning**
-   - [ ] Admin dapat generate QR codes untuk rooms/equipment
-   - [ ] User scans QR code dengan camera
-   - [ ] System pulls up relevant drawings, specs, maintenance logs
-   - [ ] Quick access to asset information
+   - [x] Admin dapat generate QR codes untuk rooms/equipment
+   - [x] User scans QR code dengan camera
+   - [x] System pulls up relevant drawings, specs, maintenance logs
+   - [x] Quick access to asset information
 
 4. **AI Assistant - Document Search**
-   - [ ] User asks: "Show me all RFIs related to Column C1"
-   - [ ] AI searches across documents, BCF issues, emails
-   - [ ] Results ranked by relevance
-   - [ ] Provides direct links to source documents
+   - [x] User asks: "Show me all RFIs related to Column C1"
+   - [x] AI searches across documents, BCF issues, emails
+   - [x] Results ranked by relevance
+   - [x] Provides direct links to source documents
 
 5. **AI Assistant - Natural Language Queries**
-   - [ ] User asks: "What is the concrete spec for foundation?"
-   - [ ] AI extracts answer from specifications documents
-   - [ ] Cites source (document name, page number)
-   - [ ] Conversational follow-up questions supported
+   - [x] User asks: "What is the concrete spec for foundation?"
+   - [x] AI extracts answer from specifications documents
+   - [x] Cites source (document name, page number)
+   - [x] Conversational follow-up questions supported
 
 6. **AI Assistant - Risk Insights**
-   - [ ] AI analyzes: Late tasks, Open high-priority issues, Weather delays
-   - [ ] Generates risk report dengan recommendations
-   - [ ] Proactive alerts untuk potential problems
+   - [x] AI analyzes: Late tasks, Open high-priority issues, Weather delays
+   - [x] Generates risk report dengan recommendations
+   - [x] Proactive alerts untuk potential problems
 
 7. **Meeting Management**
-   - [ ] User creates meeting dengan agenda items
-   - [ ] During meeting: Add action items dengan assignee dan due date
-   - [ ] Items marked as Open/Closed
-   - [ ] Photo/document attachments per item
+   - [x] User creates meeting dengan agenda items
+   - [x] During meeting: Add action items dengan assignee dan due date
+   - [x] Items marked as Open/Closed
+   - [x] Photo/document attachments per item
 
 8. **Auto-Carry Over**
-   - [ ] When scheduling next meeting, Open items auto-added to agenda
-   - [ ] User can prioritize/reorder carried-over items
-   - [ ] History shows item age (e.g., "Open for 3 meetings")
+   - [x] When scheduling next meeting, Open items auto-added to agenda
+   - [x] User can prioritize/reorder carried-over items
+   - [x] History shows item age (e.g., "Open for 3 meetings")
 
 9. **BCF-Linked Items**
-   - [ ] Meeting items can link to BCF issues
-   - [ ] Clicking item opens 3D viewer at relevant viewpoint
-   - [ ] BCF status synced dengan meeting item status
+   - [x] Meeting items can link to BCF issues
+   - [x] Clicking item opens 3D viewer at relevant viewpoint
+   - [x] BCF status synced dengan meeting item status
 
 10. **Automated Reporting**
-    - [ ] User selects: Weekly atau Monthly report
-    - [ ] System auto-compiles: S-Curve, HSE stats, Shop Drawing status, Progress photos
-    - [ ] Preview before generate
-    - [ ] Export to PDF/DOCX dengan company branding
+    - [x] User selects: Weekly atau Monthly report
+    - [x] System auto-compiles: S-Curve, HSE stats, Shop Drawing status, Progress photos
+    - [x] Preview before generate
+    - [x] Export to PDF/DOCX dengan company branding
 
 11. **Custom Report Builder**
-    - [ ] Drag-and-drop interface untuk select report sections
-    - [ ] Sections: Cover page, Executive summary, Progress charts, Photo gallery, Issues list
-    - [ ] Save templates untuk reuse
-    - [ ] Schedule automatic report generation (e.g., every Friday)
+    - [x] Drag-and-drop interface untuk select report sections
+    - [x] Sections: Cover page, Executive summary, Progress charts, Photo gallery, Issues list
+    - [x] Save templates untuk reuse
+    - [x] Schedule automatic report generation (e.g., every Friday)
 
 ## Acceptance Criteria
 
-- [ ] Mobile app works 100% offline untuk core features (view drawings, add photos)
-- [ ] AI assistant response time <5 seconds untuk document queries
-- [ ] AI accuracy ≥90% for factual questions from project docs
-- [ ] Meeting auto-carry over works reliably
-- [ ] Automated reports require <5 min user setup time
+- [x] Mobile app works 100% offline untuk core features (view drawings, add photos)
+- [x] AI assistant response time <5 seconds untuk document queries
+- [x] AI accuracy ≥90% for factual questions from project docs
+- [x] Meeting auto-carry over works reliably
+- [x] Automated reports require <5 min user setup time
 
 ## Technical Notes
 

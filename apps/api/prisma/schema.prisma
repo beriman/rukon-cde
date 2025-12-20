@@ -109,6 +109,9 @@ model Project {
   classifications ClassificationAssignment[]
   idsSpecifications IdsSpecification[]
   
+  // Epic 7: Mobile Field App
+  siteCaptures   SiteCapture[]
+  
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   status         ProjectStatus @default(ACTIVE)
@@ -1307,4 +1310,60 @@ model IdsRule {
   updatedAt   DateTime         @updatedAt
 
   @@map("ids_rules")
+}
+
+// --- EPIC 7: Mobile Field App ---
+
+enum CaptureType {
+  PHOTO
+  VIDEO
+  VOICE_NOTE
+}
+
+model SiteCapture {
+  id            String      @id @default(uuid())
+  projectId     String
+  project       Project     @relation(fields: [projectId], references: [id])
+  
+  drawingId     String?     // Reference to floor plan for pin
+  capturedBy    String
+  
+  captureType   CaptureType
+  fileUrl       String      // S3 key for the media file
+  thumbnailUrl  String?     // S3 key for thumbnail
+  
+  // GPS Coordinates
+  latitude      Decimal?    @db.Decimal(10, 7)
+  longitude     Decimal?    @db.Decimal(10, 7)
+  altitude      Decimal?    @db.Decimal(10, 2)
+  gpsAccuracy   Decimal?    @db.Decimal(6, 2)
+  
+  // Pin on Plan coordinates
+  pinX          Decimal?    @db.Decimal(5, 2)
+  pinY          Decimal?    @db.Decimal(5, 2)
+  
+  // Commentary
+  commentary    String?
+  voiceNoteUrl  String?
+  voiceNoteDurationSec Int?
+  
+  // File info
+  fileSizeBytes BigInt      @default(0)
+  mimeType      String?
+  
+  // Sync status
+  synced        Boolean     @default(false)
+  uploadedAt    DateTime?
+  capturedAt    DateTime    @default(now())
+  
+  // Extra metadata (EXIF, device info, etc)
+  metadata      Json?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([projectId])
+  @@index([capturedBy])
+  @@index([synced])
+  @@map("site_captures")
 }

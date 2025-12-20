@@ -27,9 +27,9 @@ User onboarding experience dan self-service learning resources untuk meningkatka
 
 ## Acceptance Criteria
 
-- [ ] Product tour completes successfully for new users
-- [ ] 5+ help articles published
-- [ ] 5+ tutorial videos recorded
+- [x] Product tour completes successfully for new users
+- [x] 5+ help articles published
+- [x] 5+ tutorial videos recorded
 
 ## Dependencies
 

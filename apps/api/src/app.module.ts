@@ -24,6 +24,9 @@ import { SimulationModule } from './simulation/simulation.module';
 import { CostModule } from './cost/cost.module';
 import { LoinModule } from './loin/loin.module';
 import { SyncModule } from './sync/sync.module';
+import { SiteCaptureModule } from './site-capture/site-capture.module';
+import { QrModule } from './qr/qr.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
     imports: [
@@ -52,6 +55,9 @@ import { SyncModule } from './sync/sync.module';
         CostModule,
         LoinModule,
         SyncModule,
+        SiteCaptureModule,
+        QrModule,
+        AiModule,
     ],
     controllers: [AppController],
     providers: [

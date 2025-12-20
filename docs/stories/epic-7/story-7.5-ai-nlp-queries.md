@@ -1,7 +1,7 @@
 # Story 7.5: AI Assistant - Natural Language Queries
 
 **Epic**: Epic 7: Mobile Field App & AI Assistant
-**Status**: Pending
+**Status**: Done
 **Priority**: Medium
 **Estimation**: 8 Points
 

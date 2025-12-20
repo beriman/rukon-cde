@@ -1,7 +1,7 @@
 # Story 7.6: AI Assistant - Risk Insights
 
 **Epic**: Epic 7: Mobile Field App & AI Assistant
-**Status**: Pending
+**Status**: Done
 **Priority**: Low
 **Estimation**: 5 Points
 

@@ -40,78 +40,78 @@ Implementasi security features sesuai ISO 19650-5, operational phase tools (ISO 
 ## User Stories (High-Level)
 
 1. **Sensitivity Triage**
-   - [ ] Saat upload file, user prompted untuk classify sensitivity level
-   - [ ] Levels: Public, Internal, Confidential, Highly Confidential
-   - [ ] Access permissions auto-adjusted based on classification
-   - [ ] Audit log records classification decisions
+   - [x] Saat upload file, user prompted untuk classify sensitivity level
+   - [x] Levels: Public, Internal, Confidential, Highly Confidential
+   - [x] Access permissions auto-adjusted based on classification
+   - [x] Audit log records classification decisions
 
 2. **Redaction Tools**
-   - [ ] User dapat select elements di 3D viewer untuk redaction
-   - [ ] Redacted elements appear as bounding boxes (no geometry detail)
-   - [ ] Redacted 2D drawings blur specified areas
-   - [ ] Redacted versions exported for sharing
+   - [x] User dapat select elements di 3D viewer untuk redaction
+   - [x] Redacted elements appear as bounding boxes (no geometry detail)
+   - [x] Redacted 2D drawings blur specified areas
+   - [x] Redacted versions exported for sharing
 
 3. **Dynamic Watermarking**
-   - [ ] All document/model viewers display watermark overlay
-   - [ ] Watermark includes: User name, Date/Time, "Confidential"
-   - [ ] Screenshot detection: Watermark visible on captures
-   - [ ] Configurable per organization
+   - [x] All document/model viewers display watermark overlay
+   - [x] Watermark includes: User name, Date/Time, "Confidential"
+   - [x] Screenshot detection: Watermark visible on captures
+   - [x] Configurable per organization
 
 4. **Enhanced Audit Trail**
-   - [ ] Every user action logged: View, Download, Delete, Share, Edit
-   - [ ] Searchable by: User, Action type, Date range, Entity
-   - [ ] Export audit logs for compliance reporting
-   - [ ] Immutable storage (append-only database)
+   - [x] Every user action logged: View, Download, Delete, Share, Edit
+   - [x] Searchable by: User, Action type, Date range, Entity
+   - [x] Export audit logs for compliance reporting
+   - [x] Immutable storage (append-only database)
 
 5. **Asset Twin (AIM)**
-   - [ ] Import PIM (Project Information Model) to AIM at handover
-   - [ ] AIM includes: As-built drawings, O&M manuals, Warranty docs
-   - [ ] Live data integration: IoT sensors, BMS data
-   - [ ] Asset register dengan location, specs, maintenance history
+   - [x] Import PIM (Project Information Model) to AIM at handover
+   - [x] AIM includes: As-built drawings, O&M manuals, Warranty docs
+   - [x] Live data integration: IoT sensors, BMS data
+   - [x] Asset register dengan location, specs, maintenance history
 
 6. **Maintenance Scheduler**
-   - [ ] Define maintenance tasks per asset type (e.g., HVAC filter every 3 months)
-   - [ ] Auto-generate work orders based on schedule
-   - [ ] Trigger events: Time-based, condition-based, breakdown
-   - [ ] Track completion dengan technician sign-off
+   - [x] Define maintenance tasks per asset type (e.g., HVAC filter every 3 months)
+   - [x] Auto-generate work orders based on schedule
+   - [x] Trigger events: Time-based, condition-based, breakdown
+   - [x] Track completion dengan technician sign-off
 
 7. **Handover Wizard**
-   - [ ] Step-by-step process untuk migrate data PIM → AIM
-   - [ ] Checklist: As-built model, COBie data, O&M docs, Training records
-   - [ ] Validation checks before handover completion
-   - [ ] Generate Handover Report
+   - [x] Step-by-step process untuk migrate data PIM → AIM
+   - [x] Checklist: As-built model, COBie data, O&M docs, Training records
+   - [x] Validation checks before handover completion
+   - [x] Generate Handover Report
 
 8. **Risk Register (ISO 19650-6)**
-   - [ ] Database of project risks dengan severity ratings
-   - [ ] Risks linked to 3D model locations (e.g., confined space at Basement Level)
-   - [ ] Risk categories: Safety, Schedule, Cost, Quality
-   - [ ] Mitigation measures tracked
+   - [x] Database of project risks dengan severity ratings
+   - [x] Risks linked to 3D model locations (e.g., confined space at Basement Level)
+   - [x] Risk categories: Safety, Schedule, Cost, Quality
+   - [x] Mitigation measures tracked
 
 9. **Visual Safety Tagging**
-   - [ ] Tag hazardous areas di 3D viewer (Fall risk, Overhead load, etc.)
-   - [ ] Visual indicators: Red zones, Warning icons
-   - [ ] Safety information displayed on hover
-   - [ ] Export safety plan dengan tagged model
+   - [x] Tag hazardous areas di 3D viewer (Fall risk, Overhead load, etc.)
+   - [x] Visual indicators: Red zones, Warning icons
+   - [x] Safety information displayed on hover
+   - [x] Export safety plan dengan tagged model
 
 10. **HazMat Mapping (ISO 19650-7)**
-    - [ ] Tag elements containing hazardous materials (Asbestos, Lead paint)
-    - [ ] HazMat layer dapat toggled on/off di viewer
-    - [ ] Material Safety Data Sheets (MSDS) linked to elements
-    - [ ] Removal plan dengan sequencing
+    - [x] Tag elements containing hazardous materials (Asbestos, Lead paint)
+    - [x] HazMat layer dapat toggled on/off di viewer
+    - [x] Material Safety Data Sheets (MSDS) linked to elements
+    - [x] Removal plan dengan sequencing
 
 11. **Material Passport**
-    - [ ] Each element has metadata: Material type, Recyclability %, Salvage value
-    - [ ] Search elements by recyclability untuk deconstruction planning
-    - [ ] Generate Material Inventory report
-    - [ ] Export to Madaster platform (circular economy)
+    - [x] Each element has metadata: Material type, Recyclability %, Salvage value
+    - [x] Search elements by recyclability untuk deconstruction planning
+    - [x] Generate Material Inventory report
+    - [x] Export to Madaster platform (circular economy)
 
 ## Acceptance Criteria
 
-- [ ] Sensitivity classification enforced untuk all file uploads
-- [ ] Redaction tools preserve original file (non-destructive)
-- [ ] Audit trail tamper-proof (cryptographic hashing)
-- [ ] AIM database supports 10,000+ assets per project
-- [ ] Risk register accessible via mobile app untuk field teams
+- [x] Sensitivity classification enforced untuk all file uploads
+- [x] Redaction tools preserve original file (non-destructive)
+- [x] Audit trail tamper-proof (cryptographic hashing)
+- [x] AIM database supports 10,000+ assets per project
+- [x] Risk register accessible via mobile app untuk field teams
 
 ## Technical Notes
 

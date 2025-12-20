@@ -1,7 +1,7 @@
 # Story 7.2: Mobile App - Site Capture
 
 **Epic**: Epic 7: Mobile Field App & AI Assistant
-**Status**: Pending
+**Status**: Done
 **Priority**: High
 **Estimation**: 5 Points
 
@@ -18,11 +18,11 @@
 - [ ] Media is queued for batch upload when online.
 
 ## Technical Tasks
-- [ ] **Mobile**: Integrate Camera API (Expo Camera / Native).
-- [ ] **Mobile**: Implement Geolocation tagging.
-- [ ] **Mobile**: Build "Pin on Plan" UI overlay.
-- [ ] **Backend**: Create API for receiving batch media uploads.
-- [ ] **Backend**: Link media metadata to Project/Location/Drawing.
+- [x] **Mobile**: Integrate Camera API (Expo Camera / Native).
+- [x] **Mobile**: Implement Geolocation tagging.
+- [x] **Mobile**: Build "Pin on Plan" UI overlay.
+- [x] **Backend**: Create API for receiving batch media uploads.
+- [x] **Backend**: Link media metadata to Project/Location/Drawing.
 
 ## Dependencies
 - Story 7.1 (Offline Mode - for queuing uploads)

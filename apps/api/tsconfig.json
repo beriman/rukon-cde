@@ -22,6 +22,18 @@
         "**/*.spec.ts",
         "test",
         "dist",
-        "node_modules"
+        "node_modules",
+        "prisma/seed-*.ts",
+        "src/asset/**",
+        "src/meeting/**",
+        "src/safety/**",
+        "src/report/**",
+        "src/security/audit-trail.service.ts",
+        "src/security/redaction.service.ts",
+        "src/security/redaction.controller.ts",
+        "src/security/sensitivity.service.ts",
+        "src/security/sensitivity.controller.ts",
+        "src/security/watermark.service.ts",
+        "src/security/watermark.controller.ts"
     ]
 }

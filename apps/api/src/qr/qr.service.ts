@@ -87,8 +87,7 @@ export class QrService {
                 type: 'asset',
                 id: asset.id,
                 name: asset.name,
-                code: asset.code,
-                description: asset.description || undefined,
+                code: asset.category,  // Using category as code since 'code' field doesn't exist
                 projectId: asset.project.id,
                 projectName: asset.project.name,
                 metadata: {

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditAction as PrismaAuditAction } from '@prisma/client';
 
+// Extended audit actions for planning documents
 export enum AuditAction {
     CREATE = 'CREATE',
     UPDATE = 'UPDATE',
@@ -11,6 +13,18 @@ export enum AuditAction {
     PUBLISH = 'PUBLISH',
     ARCHIVE = 'ARCHIVE'
 }
+
+// Mapping from planning audit actions to Prisma enum
+const actionMapping: Record<AuditAction, PrismaAuditAction> = {
+    [AuditAction.CREATE]: 'PROJECT_CREATE',
+    [AuditAction.UPDATE]: 'PROJECT_UPDATE',
+    [AuditAction.DELETE]: 'FILE_DELETE',
+    [AuditAction.EXPORT_PDF]: 'FILE_DOWNLOAD',
+    [AuditAction.EXPORT_DOCX]: 'FILE_DOWNLOAD',
+    [AuditAction.VIEW]: 'FILE_DOWNLOAD',
+    [AuditAction.PUBLISH]: 'FILE_PUBLISH',
+    [AuditAction.ARCHIVE]: 'FILE_ARCHIVE'
+};
 
 export interface AuditLogEntry {
     userId: string;
@@ -28,36 +42,34 @@ export class AuditService {
     constructor(private prisma: PrismaService) { }
 
     /**
-     * Log an audit event
+     * Log an audit event - NOW WITH DATABASE PERSISTENCE
      */
     async log(entry: AuditLogEntry): Promise<void> {
         try {
-            // Store in audit log table (assuming AuditLog model exists)
-            // If model doesn't exist, we can log to console for now
+            // Console log for debugging
             console.log('[AUDIT]', {
                 timestamp: new Date().toISOString(),
                 userId: entry.userId,
                 action: entry.action,
                 entity: `${entry.entityType}:${entry.entityId}`,
-                changes: entry.changes ? JSON.stringify(entry.changes) : null,
-                metadata: entry.metadata,
-                ipAddress: entry.ipAddress,
-                userAgent: entry.userAgent
             });
 
-            // TODO: Implement actual database persistence when AuditLog model is added to Prisma schema
-            // await this.prisma.auditLog.create({
-            //     data: {
-            //         userId: entry.userId,
-            //         action: entry.action,
-            //         entityType: entry.entityType,
-            //         entityId: entry.entityId,
-            //         changes: entry.changes,
-            //         metadata: entry.metadata,
-            //         ipAddress: entry.ipAddress,
-            //         userAgent: entry.userAgent
-            //     }
-            // });
+            // Database persistence using Prisma AuditLog model
+            await this.prisma.auditLog.create({
+                data: {
+                    userId: entry.userId,
+                    action: actionMapping[entry.action] || 'PROJECT_UPDATE',
+                    resourceType: entry.entityType,
+                    resourceId: entry.entityId,
+                    details: {
+                        changes: entry.changes,
+                        metadata: entry.metadata,
+                        originalAction: entry.action,
+                    },
+                    ipAddress: entry.ipAddress,
+                    userAgent: entry.userAgent,
+                }
+            });
 
         } catch (error) {
             // Audit logging should never crash the application
@@ -153,35 +165,61 @@ export class AuditService {
     }
 
     /**
-     * Get audit trail for a document
+     * Get audit trail for a document - NOW WITH DATABASE QUERY
      */
     async getDocumentAuditTrail(documentId: string, limit: number = 50): Promise<any[]> {
-        // TODO: Implement when AuditLog model exists
-        // return await this.prisma.auditLog.findMany({
-        //     where: {
-        //         entityType: 'PlanningDocument',
-        //         entityId: documentId
-        //     },
-        //     orderBy: { createdAt: 'desc' },
-        //     take: limit
-        // });
+        try {
+            const logs = await this.prisma.auditLog.findMany({
+                where: {
+                    resourceType: 'PlanningDocument',
+                    resourceId: documentId
+                },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+                include: {
+                    user: {
+                        select: { id: true, name: true, email: true }
+                    }
+                }
+            });
 
-        console.log(`[AUDIT] Getting audit trail for document ${documentId} (not implemented yet)`);
-        return [];
+            return logs.map(log => ({
+                id: log.id,
+                userId: log.userId,
+                userName: log.user?.name || log.user?.email,
+                action: (log.details as any)?.originalAction || log.action,
+                timestamp: log.createdAt,
+                details: log.details,
+                ipAddress: log.ipAddress,
+            }));
+        } catch (error) {
+            console.error('[AUDIT ERROR] getDocumentAuditTrail:', error);
+            return [];
+        }
     }
 
     /**
-     * Get user activity log
+     * Get user activity log - NOW WITH DATABASE QUERY
      */
     async getUserActivity(userId: string, limit: number = 100): Promise<any[]> {
-        // TODO: Implement when AuditLog model exists
-        // return await this.prisma.auditLog.findMany({
-        //     where: { userId },
-        //     orderBy: { createdAt: 'desc' },
-        //     take: limit
-        // });
+        try {
+            const logs = await this.prisma.auditLog.findMany({
+                where: { userId },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+            });
 
-        console.log(`[AUDIT] Getting activity for user ${userId} (not implemented yet)`);
-        return [];
+            return logs.map(log => ({
+                id: log.id,
+                action: (log.details as any)?.originalAction || log.action,
+                resourceType: log.resourceType,
+                resourceId: log.resourceId,
+                timestamp: log.createdAt,
+                details: log.details,
+            }));
+        } catch (error) {
+            console.error('[AUDIT ERROR] getUserActivity:', error);
+            return [];
+        }
     }
 }

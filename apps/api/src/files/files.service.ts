@@ -3,14 +3,29 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NamingConventionService } from '../common/services/naming-convention.service';
 import { AuditService } from '../common/services/audit.service';
 import { AuditAction } from '@prisma/client';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Injectable()
 export class FilesService {
+    private s3Client: S3Client;
+    private bucket: string;
+
     constructor(
         private prisma: PrismaService,
         private namingService: NamingConventionService,
         private auditService: AuditService,
-    ) { }
+    ) {
+        // Initialize S3 client
+        this.s3Client = new S3Client({
+            region: process.env.AWS_REGION || 'ap-southeast-1',
+            credentials: process.env.AWS_ACCESS_KEY_ID ? {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+            } : undefined,
+        });
+        this.bucket = process.env.AWS_S3_BUCKET || 'rukon-cde-uploads';
+    }
 
     async upload(
         folderId: string,
@@ -64,8 +79,19 @@ export class FilesService {
                 const s3Key = `org-${organizationId}/project-${projectId}/files/${uniqueId}-v${newVersion}`;
 
                 if (process.env.AWS_S3_BUCKET) {
-                    // TODO: Upload to S3
-                    console.log(`[FILE UPLOAD] Uploading to S3: ${s3Key}`);
+                    // Upload to S3 (version update)
+                    await this.s3Client.send(new PutObjectCommand({
+                        Bucket: this.bucket,
+                        Key: s3Key,
+                        Body: file.buffer,
+                        ContentType: file.mimetype,
+                        Metadata: {
+                            'original-name': file.originalname,
+                            'unique-id': uniqueId,
+                            'version': String(newVersion),
+                        },
+                    }));
+                    console.log(`[FILE UPLOAD] Uploaded to S3: ${s3Key}`);
                 } else {
                     // Local Fallback
                     const fs = require('fs');
@@ -125,8 +151,19 @@ export class FilesService {
                 const s3Key = `org-${organizationId}/project-${projectId}/files/${uniqueId}-v1`;
 
                 if (process.env.AWS_S3_BUCKET) {
-                    // TODO: Upload to S3
-                    console.log(`[FILE UPLOAD] Uploading to S3: ${s3Key}`);
+                    // Upload to S3 (new file)
+                    await this.s3Client.send(new PutObjectCommand({
+                        Bucket: this.bucket,
+                        Key: s3Key,
+                        Body: file.buffer,
+                        ContentType: file.mimetype,
+                        Metadata: {
+                            'original-name': file.originalname,
+                            'unique-id': uniqueId,
+                            'version': '1',
+                        },
+                    }));
+                    console.log(`[FILE UPLOAD] Uploaded to S3: ${s3Key}`);
                 } else {
                     // Local Fallback
                     const fs = require('fs');

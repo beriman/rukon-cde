@@ -127,9 +127,28 @@ export class SiteCaptureService {
     }
 
     async delete(id: string, userId: string) {
-        await this.findOne(id);
+        const capture = await this.findOne(id);
 
-        // TODO: Delete file from S3
+        // Delete file from S3
+        try {
+            const { DeleteObjectCommand } = await import('@aws-sdk/client-s3');
+            await this.s3Client.send(new DeleteObjectCommand({
+                Bucket: this.bucket,
+                Key: capture.fileUrl,
+            }));
+            console.log(`[SITE CAPTURE] Deleted from S3: ${capture.fileUrl}`);
+
+            // Also delete thumbnail if exists
+            if (capture.thumbnailUrl && capture.thumbnailUrl !== capture.fileUrl) {
+                await this.s3Client.send(new DeleteObjectCommand({
+                    Bucket: this.bucket,
+                    Key: capture.thumbnailUrl,
+                }));
+            }
+        } catch (error) {
+            console.error('[SITE CAPTURE] Failed to delete from S3:', error);
+            // Continue with database deletion even if S3 fails
+        }
 
         return this.prisma.siteCapture.delete({
             where: { id },

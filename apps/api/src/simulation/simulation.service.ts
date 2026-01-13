@@ -8,7 +8,7 @@ import * as csv from 'csv-parse/sync';
 export class SimulationService {
     constructor(private prisma: PrismaService) { }
 
-    async uploadSchedule(file: Express.Multer.File, dto: CreateScheduleDto) {
+    async uploadSchedule(file: any, dto: CreateScheduleDto) {
         if (!file) throw new BadRequestException('No file provided');
 
         const schedule = await this.prisma.schedule.create({

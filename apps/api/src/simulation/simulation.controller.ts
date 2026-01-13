@@ -16,7 +16,7 @@ export class SimulationController {
     @Post('schedule/upload')
     @UseInterceptors(FileInterceptor('file'))
     async uploadSchedule(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile() file: any,
         @Body() body: CreateScheduleDto
     ) {
         return this.simulationService.uploadSchedule(file, body);

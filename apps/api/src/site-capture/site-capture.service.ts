@@ -17,7 +17,7 @@ export class SiteCaptureService {
         this.bucket = process.env.S3_BUCKET || 'rukon-uploads';
     }
 
-    async create(dto: CreateSiteCaptureDto, file: Express.Multer.File, userId: string) {
+    async create(dto: CreateSiteCaptureDto, file: any, userId: string) {
         // Upload file to S3
         const fileKey = `site-captures/${dto.projectId}/${uuidv4()}-${file.originalname}`;
 

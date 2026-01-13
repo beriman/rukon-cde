@@ -26,7 +26,7 @@ export class SiteCaptureController {
     @Post()
     @UseInterceptors(FileInterceptor('file'))
     async create(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile() file: any,
         @Body() dto: CreateSiteCaptureDto,
         @CurrentUser() user: any,
     ) {

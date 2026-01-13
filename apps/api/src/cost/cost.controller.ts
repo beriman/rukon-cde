@@ -55,7 +55,7 @@ export class CostController {
     @UseInterceptors(FileInterceptor('file'))
     uploadBoq(
         @Param('projectId') projectId: string,
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile() file: any,
         @Body() body: { name: string },
     ) {
         return this.costService.importBoq(projectId, body.name, file.buffer);

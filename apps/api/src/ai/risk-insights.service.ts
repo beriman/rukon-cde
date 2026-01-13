@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-interface RiskInsight {
+export interface RiskInsight {
     id: string;
     type: 'schedule' | 'bcf' | 'weather' | 'general';
     severity: 'high' | 'medium' | 'low';
@@ -13,7 +13,7 @@ interface RiskInsight {
     createdAt: Date;
 }
 
-interface DailyInsightReport {
+export interface DailyInsightReport {
     projectId: string;
     projectName: string;
     date: Date;

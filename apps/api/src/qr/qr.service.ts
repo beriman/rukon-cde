@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-interface QrLookupResult {
+export interface QrLookupResult {
     type: 'asset' | 'room';
     id: string;
     name: string;

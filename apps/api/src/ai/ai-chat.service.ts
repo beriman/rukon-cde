@@ -4,7 +4,7 @@ import { EmbeddingService } from './embedding.service';
 import { ConversationService } from './conversation.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-interface SearchResult {
+export interface SearchResult {
     id: string;
     fileId: string;
     content: string;
@@ -13,14 +13,14 @@ interface SearchResult {
     similarity: number;
 }
 
-interface Citation {
+export interface Citation {
     fileId: string;
     fileName: string;
     pageNumber: number;
     snippet: string;
 }
 
-interface ChatResponse {
+export interface ChatResponse {
     answer: string;
     citations: Citation[];
     confidence: 'high' | 'medium' | 'low';

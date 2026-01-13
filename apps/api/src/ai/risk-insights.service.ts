@@ -114,7 +114,7 @@ export class RiskInsightsService {
                     createdAt: { gte: oneWeekAgo },
                 },
                 take: 10,
-                select: { id: true, title: true, severity: true, createdAt: true },
+                select: { id: true, description: true, severity: true, createdAt: true },
             });
         } catch {
             return [];

@@ -14,6 +14,13 @@ import {
     Folder,
     FolderOpen,
     ChevronDown,
+    Files,
+    CheckCircle2,
+    Box,
+    Calendar,
+    DollarSign,
+    ShieldAlert,
+    FileText,
 } from 'lucide-react';
 
 export default function SidebarPanel() {
@@ -50,9 +57,9 @@ export default function SidebarPanel() {
 
             {/* Scrollable Menu Area */}
             <div className="flex-1 overflow-y-auto hide-scrollbar -mx-2 px-2">
-                {/* Projects Group */}
+                {/* Main Navigation */}
                 <div className="mb-6">
-                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">Projects</p>
+                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">Main</p>
                     <ul className="space-y-1">
                         <li>
                             <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-b from-white/80 to-white/40 shadow-sm border border-white/60 text-slate-800 text-sm font-medium group transition-all">
@@ -60,73 +67,105 @@ export default function SidebarPanel() {
                                     <LayoutDashboard className="w-4 h-4 text-slate-900" />
                                     Dashboard
                                 </div>
-                                <span className="text-[10px] text-slate-400 bg-white/50 px-1.5 py-0.5 rounded-md border border-white/20">
-                                    0
-                                </span>
                             </button>
                         </li>
                         <li>
                             <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
-                                <Library className="w-4 h-4 text-slate-500" />
-                                Library
-                            </button>
-                        </li>
-                        <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
-                                <Share className="w-4 h-4 text-slate-500" />
-                                Shared Projects
+                                <Folder className="w-4 h-4 text-slate-500" />
+                                Projects
                             </button>
                         </li>
                     </ul>
                 </div>
 
-                {/* Status Group */}
+                {/* CDE Containers */}
                 <div className="mb-6">
-                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">Status</p>
+                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">CDE Containers</p>
                     <ul className="space-y-1">
                         <li>
                             <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
-                                    <CircleDot className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-                                    New
+                                    <Files className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                                    WIP (Work in Progress)
                                 </div>
-                                <span className="text-[10px] text-slate-400">3</span>
+                                <span className="text-[10px] text-slate-400">12</span>
                             </button>
                         </li>
                         <li>
                             <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
-                                    <RefreshCw className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-                                    Updates
+                                    <Share className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                                    Shared
                                 </div>
-                                <span className="text-[10px] text-slate-400">2</span>
+                                <span className="text-[10px] text-slate-400">8</span>
                             </button>
                         </li>
                         <li>
                             <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
-                                    <Users className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-                                    Team Review
+                                    <CheckCircle2 className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                                    Published
                                 </div>
+                                <span className="text-[10px] text-slate-400">24</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                                <div className="flex items-center gap-3">
+                                    <Archive className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                                    Archive
+                                </div>
+                                <span className="text-[10px] text-slate-400">156</span>
                             </button>
                         </li>
                     </ul>
                 </div>
 
-                {/* History Group */}
+                {/* Project Data */}
                 <div className="mb-6">
-                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">History</p>
+                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">Project Data</p>
                     <ul className="space-y-1">
                         <li>
                             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
-                                <Clock className="w-4 h-4 text-slate-400" />
-                                Recently Edited
+                                <Box className="w-4 h-4 text-slate-400" />
+                                BIM Models
                             </button>
                         </li>
                         <li>
                             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
-                                <Archive className="w-4 h-4 text-slate-400" />
-                                Archive
+                                <Calendar className="w-4 h-4 text-slate-400" />
+                                Schedule
+                            </button>
+                        </li>
+                        <li>
+                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                                <DollarSign className="w-4 h-4 text-slate-400" />
+                                Cost
+                            </button>
+                        </li>
+                        <li>
+                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                                <ShieldAlert className="w-4 h-4 text-slate-400" />
+                                HSE
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                {/* Management */}
+                <div className="mb-6">
+                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">Management</p>
+                    <ul className="space-y-1">
+                        <li>
+                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                                <Users className="w-4 h-4 text-slate-400" />
+                                Team & Users
+                            </button>
+                        </li>
+                        <li>
+                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                                <FileText className="w-4 h-4 text-slate-400" />
+                                Reports
                             </button>
                         </li>
                     </ul>

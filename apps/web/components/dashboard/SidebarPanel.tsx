@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import {
     LayoutDashboard,
     Library,
@@ -62,18 +63,18 @@ export default function SidebarPanel() {
                     <p className="px-3 text-xs font-medium text-slate-400 mb-2">Main</p>
                     <ul className="space-y-1">
                         <li>
-                            <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-b from-white/80 to-white/40 shadow-sm border border-white/60 text-slate-800 text-sm font-medium group transition-all">
+                            <Link href="/dashboard" className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-b from-white/80 to-white/40 shadow-sm border border-white/60 text-slate-800 text-sm font-medium group transition-all">
                                 <div className="flex items-center gap-3">
                                     <LayoutDashboard className="w-4 h-4 text-slate-900" />
                                     Dashboard
                                 </div>
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/projects" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <Folder className="w-4 h-4 text-slate-500" />
                                 Projects
-                            </button>
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -83,40 +84,40 @@ export default function SidebarPanel() {
                     <p className="px-3 text-xs font-medium text-slate-400 mb-2">CDE Containers</p>
                     <ul className="space-y-1">
                         <li>
-                            <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href="/dashboard/documents?container=wip" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <Files className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     WIP (Work in Progress)
                                 </div>
                                 <span className="text-[10px] text-slate-400">12</span>
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href="/dashboard/documents?container=shared" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <Share className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     Shared
                                 </div>
                                 <span className="text-[10px] text-slate-400">8</span>
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href="/dashboard/documents?container=published" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <CheckCircle2 className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     Published
                                 </div>
                                 <span className="text-[10px] text-slate-400">24</span>
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href="/dashboard/documents?container=archive" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <Archive className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     Archive
                                 </div>
                                 <span className="text-[10px] text-slate-400">156</span>
-                            </button>
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -126,28 +127,28 @@ export default function SidebarPanel() {
                     <p className="px-3 text-xs font-medium text-slate-400 mb-2">Project Data</p>
                     <ul className="space-y-1">
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/bim" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <Box className="w-4 h-4 text-slate-400" />
                                 BIM Models
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/schedule" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <Calendar className="w-4 h-4 text-slate-400" />
                                 Schedule
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/cost" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <DollarSign className="w-4 h-4 text-slate-400" />
                                 Cost
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/hse" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <ShieldAlert className="w-4 h-4 text-slate-400" />
                                 HSE
-                            </button>
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -157,16 +158,16 @@ export default function SidebarPanel() {
                     <p className="px-3 text-xs font-medium text-slate-400 mb-2">Management</p>
                     <ul className="space-y-1">
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/users" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <Users className="w-4 h-4 text-slate-400" />
                                 Team & Users
-                            </button>
+                            </Link>
                         </li>
                         <li>
-                            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
+                            <Link href="/dashboard/reports" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors">
                                 <FileText className="w-4 h-4 text-slate-400" />
                                 Reports
-                            </button>
+                            </Link>
                         </li>
                     </ul>
                 </div>

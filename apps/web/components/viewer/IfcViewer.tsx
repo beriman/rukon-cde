@@ -185,9 +185,9 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
             const intersects = raycasterRef.current.intersectObjects([model]);
             if (intersects.length > 0) {
                 const index = intersects[0].faceIndex;
-                if (index === undefined) return;
+                if (index === undefined || index === null) return;
 
-                const id = ifcLoader.ifcManager.getExpressId(model.geometry, index);
+                const id = ifcLoader.ifcManager.getExpressId(model.geometry, index as number);
                 setSelectedExpressId(id);
 
                 try {

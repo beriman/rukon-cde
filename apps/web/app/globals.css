@@ -64,6 +64,31 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-slate-600;
   }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Selection */
+::selection {
+  background-color: #dbeafe;
+  color: #1d4ed8;
 }

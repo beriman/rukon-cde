@@ -22,6 +22,11 @@ const config: Config = {
 					DEFAULT: '#2563eb',
 					foreground: '#ffffff'
 				},
+				glass: {
+					100: 'rgba(255, 255, 255, 0.4)',
+					200: 'rgba(255, 255, 255, 0.7)',
+					300: 'rgba(255, 255, 255, 0.9)',
+				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { IFCLoader } from 'web-ifc-three/IFCLoader';
+// @ts-ignore - Three.js examples types not available for this version
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { SmartReviewPanel } from './SmartReviewPanel';
 import { Button } from '../ui/button';

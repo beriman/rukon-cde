@@ -111,6 +111,7 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
                         // Optimization: Get only IFCPRODUCT (physical items) if we knew the type ID.
                         // Standard IFCPRODUCT type ID is often internal. 
                         // Let's rely on getAllItems which returns IDs.
+                        // @ts-ignore - getAllItems exists at runtime but not in type definitions
                         const allItemIds = await manager.getAllItems(modelID);
 
                         const newGuidMap: Record<string, number> = {};

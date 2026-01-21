@@ -31,16 +31,17 @@ export class OrganizationsController {
     sendInvitation(
         @Request() req,
         @Param('id') organizationId: string,
-        @Body() body: { email: string; role?: string },
+        @Body() dto: InviteUserDto,
     ) {
         return this.invitationsService.create(
             organizationId,
-            body.email,
-            body.role,
+            dto.email,
+            dto.role,
             req.user.userId,
         );
     }
 
+    @Public()
     @Get('invitations/verify/:token')
     verifyInvitation(@Param('token') token: string) {
         return this.invitationsService.verifyToken(token);

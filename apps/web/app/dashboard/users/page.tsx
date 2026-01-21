@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { inviteUser } from '../../../lib/users-api';
+import { useAuthStore } from '../../../stores/useAuthStore';
 import {
     Search,
     UserPlus,
@@ -56,13 +58,24 @@ const stakeholderConfig: Record<StakeholderType, { label: string; color: string;
 };
 
 export default function UsersPage() {
-    const [users] = useState<User[]>(mockUsers);
+    const [users, setUsers] = useState<User[]>(mockUsers);
     const [search, setSearch] = useState('');
     const [filterStakeholder, setFilterStakeholder] = useState<StakeholderType | 'all'>('all');
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteStakeholder, setInviteStakeholder] = useState<StakeholderType>('user');
     const [inviteCompany, setInviteCompany] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [organizationId, setOrganizationId] = useState<string | null>(null);
+    const user = useAuthStore((state) => state.user);
+
+    useEffect(() => {
+        if (user) {
+            // @ts-ignore
+            setOrganizationId(user.organizationId);
+        }
+    }, [user]);
 
     // Filter users
     const filteredUsers = users.filter(user => {
@@ -288,14 +301,28 @@ export default function UsersPage() {
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        // TODO: Send invite API call
-                                        alert(`Invite sent to ${inviteEmail}`);
-                                        setShowInviteModal(false);
-                                        setInviteEmail('');
-                                        setInviteCompany('');
+                                    onClick={async () => {
+                                        setIsLoading(true);
+                                        setError(null);
+                                        try {
+                                            if (!organizationId) {
+                                                throw new Error('Organization ID not found');
+                                            }
+                                            const newUser = await inviteUser({ email: inviteEmail, role: inviteStakeholder, organizationId });
+                                            // Note: The new user might not have a company field, so we're adding it here for the UI
+                                            // In a real app, you'd likely want to expand the invite payload and user type
+                                            setUsers([...users, { ...newUser, company: inviteCompany, stakeholderType: inviteStakeholder as StakeholderType, status: 'pending', joinedAt: new Date().toISOString() }]);
+                                            setShowInviteModal(false);
+                                            setInviteEmail('');
+                                            setInviteCompany('');
+                                        } catch (err: any) {
+                                            setError(err.response?.data?.message || 'Failed to invite user');
+                                        } finally {
+                                            setIsLoading(false);
+                                        }
                                     }}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors"
+                                    disabled={isLoading}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
                                 >
                                     <Mail className="w-4 h-4" />
                                     Send Invite

@@ -231,15 +231,19 @@ model File {
 }
 
 model FileVersion {
-  id         String   @id @default(uuid())
-  fileId     String
-  file       File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  version    Int
-  s3Key      String
-  size       Int
-  uploadedBy String
-  cdeState   String   @default("WIP")
-  createdAt  DateTime @default(now())
+  id           String   @id @default(uuid())
+  fileId       String
+  file         File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  version      Int
+
+  // [NEW] Kolom Revisi ISO 19650 (e.g., "P01.01", "C01")
+  revisionCode String?  @map("revision_code")
+
+  s3Key        String
+  size         Int
+  uploadedBy   String
+  cdeState     String   @default("WIP")
+  createdAt    DateTime @default(now())
   
   @@unique([fileId, version])
   @@index([fileId])

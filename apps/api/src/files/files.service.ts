@@ -39,8 +39,6 @@ export class FilesService {
             throw new BadRequestException({
                 message: 'Invalid file naming convention',
                 error: validation.error,
-                expected: validation.expected,
-                example: validation.example,
                 yourFilename: file.originalname,
             });
         }

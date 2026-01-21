@@ -1,10 +1,9 @@
-import { Controller, Post, Param, Body, UseGuards, Request, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Param, UseGuards, Request, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { FilesService } from '../files/files.service';
 import { AuditService } from '../common/services/audit.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { TenantMiddleware } from '../common/middleware/tenant.middleware';
-import { AuditAction } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditAction } from '@prisma/client';
 
 @Controller('projects/:projectId/files')
 @UseGuards(JwtAuthGuard)
@@ -15,91 +14,61 @@ export class FilesWorkflowController {
         private prisma: PrismaService,
     ) { }
 
-    // Story 1.16: Promote WIP -> SHARED
-    // Only INFORMATION_MANAGER or LEAD_APPOINTED_PARTY can do this?
-    // For now, let's enforce role check.
+    private async checkPermission(userId: string, projectId: string, allowedRoles: string[]) {
+        const project = await this.prisma.project.findUnique({
+            where: { id: projectId },
+            select: { organizationId: true }
+        });
+        if (!project) throw new ForbiddenException('Project not found');
+
+        const orgUser = await this.prisma.organizationUser.findUnique({
+            where: {
+                userId_organizationId: { userId, organizationId: project.organizationId }
+            }
+        });
+
+        // Asumsi: Role menggunakan enum OrgRole (OWNER, ADMIN, MEMBER)
+        if (!orgUser || !allowedRoles.includes(orgUser.role)) {
+            throw new ForbiddenException('Akses ditolak: Peran Anda tidak mengizinkan aksi ini.');
+        }
+    }
+
     @Post(':fileId/promote')
-    async promoteToShared(
-        @Request() req,
-        @Param('projectId') projectId: string,
-        @Param('fileId') fileId: string,
-    ) {
-        const user = req.user;
-        // Role Check: In a real app we'd check Project Role. 
-        // For compliance, let's assume any Org Member with specific permission can do it.
-        // Or strictly check if user is Task Team Manager / Information Manager.
-        // Let's defer strict RBAC specific to roles for now and focus on state transition logic.
+    async promoteToShared(@Request() req, @Param('projectId') projectId: string, @Param('fileId') fileId: string) {
+        // Hanya Admin/Owner yang boleh promote ke SHARED
+        await this.checkPermission(req.user.id, projectId, ['OWNER', 'ADMIN']);
 
         const file = await this.filesService.findOne(fileId);
-
         if (file.cdeState !== 'WIP') {
-            throw new ForbiddenException(`File is in ${file.cdeState} state, cannot promote to SHARED from here.`);
+            throw new BadRequestException(`File harus berstatus WIP. Status saat ini: ${file.cdeState}`);
         }
-
-        // Update state to SHARED
-        // In ISO 19650, this might involve moving to a different folder "Shared"
-        // But for metadata-based CDE, we just update the tag.
 
         const updatedFile = await this.prisma.file.update({
             where: { id: fileId },
             data: {
                 cdeState: 'SHARED',
-                // Also update the current version's state
                 versions: {
                     update: {
-                        where: {
-                            fileId_version: {
-                                fileId: fileId,
-                                version: file.currentVersion
-                            }
-                        },
+                        where: { fileId_version: { fileId, version: file.currentVersion } },
                         data: { cdeState: 'SHARED' }
                     }
                 }
             },
         });
 
-        // Log Audit
-        await this.auditService.log(
-            user.id,
-            AuditAction.FILE_PROMOTE,
-            fileId,
-            'FILE',
-            {
-                previousState: 'WIP',
-                newState: 'SHARED',
-                projectId
-            }
-        );
-
-        return {
-            message: 'File promoted to SHARED state',
-            file: updatedFile
-        };
+        await this.auditService.log(req.user.id, AuditAction.FILE_PROMOTE, fileId, 'FILE', { projectId, from: 'WIP', to: 'SHARED' });
+        return { message: 'File promoted to SHARED', data: updatedFile };
     }
 
-    // Story 1.17: Publish SHARED -> PUBLISHED
-    // Only LEAD_APPOINTED_PARTY or APPOINTING_PARTY (Client) can do this.
     @Post(':fileId/publish')
-    async publish(
-        @Request() req,
-        @Param('projectId') projectId: string,
-        @Param('fileId') fileId: string,
-    ) {
-        const user = req.user;
+    async publish(@Request() req, @Param('projectId') projectId: string, @Param('fileId') fileId: string) {
+        // Hanya Owner yang boleh PUBLISH
+        await this.checkPermission(req.user.id, projectId, ['OWNER']);
 
         const file = await this.filesService.findOne(fileId);
-
         if (file.cdeState !== 'SHARED') {
-            throw new ForbiddenException(`File is in ${file.cdeState} state, cannot PUBLISH from here. Must be SHARED first.`);
+            throw new BadRequestException('File harus SHARED sebelum bisa PUBLISHED.');
         }
-
-        // Update state to PUBLISHED
-        // In this step, we typically "freeze" the file.
-        // We might want to create a NEW version that is a copy of the current one but marked as PUBLISHED,
-        // ensuring it doesn't change even if someone updates the original file later (though our versioning handles that).
-        // Since our system is version-based, the current version IS immutable once a new one is uploaded. 
-        // So we just tag this version as PUBLISHED.
 
         const updatedFile = await this.prisma.file.update({
             where: { id: fileId },
@@ -107,35 +76,14 @@ export class FilesWorkflowController {
                 cdeState: 'PUBLISHED',
                 versions: {
                     update: {
-                        where: {
-                            fileId_version: {
-                                fileId: fileId,
-                                version: file.currentVersion
-                            }
-                        },
-                        data: { cdeState: 'PUBLISHED' }
+                        where: { fileId_version: { fileId, version: file.currentVersion } },
+                        data: { cdeState: 'PUBLISHED', revisionCode: 'C01' }
                     }
                 }
             },
         });
 
-        // Log Audit
-        await this.auditService.log(
-            user.id,
-            AuditAction.FILE_PUBLISH,
-            fileId,
-            'FILE',
-            {
-                previousState: 'SHARED',
-                newState: 'PUBLISHED',
-                projectId,
-                version: file.currentVersion
-            }
-        );
-
-        return {
-            message: 'File PUBLISHED successfully',
-            file: updatedFile
-        };
+        await this.auditService.log(req.user.id, AuditAction.FILE_PUBLISH, fileId, 'FILE', { projectId, version: file.currentVersion });
+        return { message: 'File PUBLISHED', data: updatedFile };
     }
 }

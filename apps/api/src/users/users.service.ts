@@ -114,4 +114,128 @@ export class UsersService {
             },
         });
     }
+
+    async getDashboardData(userId: string) {
+        // 1. Get user's organizations
+        const orgUsers = await this.prisma.organizationUser.findMany({
+            where: { userId },
+            select: { organizationId: true },
+        });
+        const orgIds = orgUsers.map((ou) => ou.organizationId);
+
+        if (orgIds.length === 0) {
+            return [];
+        }
+
+        // 2. Get projects in these organizations
+        const projects = await this.prisma.project.findMany({
+            where: {
+                organizationId: { in: orgIds },
+                status: 'ACTIVE',
+            },
+            select: {
+                id: true,
+                name: true,
+                code: true,
+                organization: {
+                    select: { name: true },
+                },
+                taskDeliveryPlans: {
+                    select: {
+                        deliverables: {
+                            where: {
+                                assignedTo: userId,
+                                NOT: { status: 'DELIVERED' },
+                            },
+                            select: {
+                                id: true,
+                                title: true,
+                                status: true,
+                                endDate: true,
+                            },
+                        },
+                    },
+                },
+                incidents: {
+                    where: {
+                        actions: {
+                            some: {
+                                assigneeId: userId,
+                                NOT: { status: { in: ['COMPLETED', 'VERIFIED'] } },
+                            },
+                        },
+                    },
+                    select: {
+                        actions: {
+                            where: {
+                                assigneeId: userId,
+                                NOT: { status: { in: ['COMPLETED', 'VERIFIED'] } },
+                            },
+                            select: {
+                                id: true,
+                                description: true,
+                                status: true,
+                                dueDate: true,
+                            },
+                        },
+                    },
+                },
+                bcfTopics: {
+                    where: {
+                        assignedTo: userId,
+                        NOT: { status: 'CLOSED' },
+                    },
+                    select: {
+                        id: true,
+                        title: true,
+                        status: true,
+                        priority: true,
+                    },
+                },
+            },
+        });
+
+        // 3. Transform data
+        return projects.map((project) => {
+            const deliverables = project.taskDeliveryPlans.flatMap((p) =>
+                p.deliverables.map((d) => ({
+                    id: d.id,
+                    title: d.title,
+                    status: d.status,
+                    dueDate: d.endDate,
+                    type: 'DELIVERABLE',
+                })),
+            );
+
+            const incidentActions = project.incidents.flatMap((i) =>
+                i.actions.map((a) => ({
+                    id: a.id,
+                    title: a.description,
+                    status: a.status,
+                    dueDate: a.dueDate,
+                    type: 'INCIDENT_ACTION',
+                })),
+            );
+
+            const bcfTopics = project.bcfTopics.map((t) => ({
+                id: t.id,
+                title: t.title,
+                status: t.status,
+                dueDate: null, // BCF topics might not have a direct due date in this selection
+                type: 'BCF_TOPIC',
+                priority: t.priority,
+            }));
+
+            const tasks = [...deliverables, ...incidentActions, ...bcfTopics];
+
+            return {
+                id: project.id,
+                name: project.name,
+                code: project.code,
+                organizationName: project.organization.name,
+                taskCount: tasks.length,
+                tasks: tasks,
+            };
+        });
+    }
 }

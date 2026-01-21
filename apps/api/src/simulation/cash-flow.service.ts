@@ -80,23 +80,73 @@ export class CashFlowService {
         const maxDate = new Date(Math.max(...taskCosts.map(t => t.end.getTime())));
 
         const result: DailyCashFlow[] = [];
-        let cumulative = 0;
 
+        // Generate all date points to ensure coverage and handle non-linear time (like DST) correctly
+        // We replicate the exact sampling points used in the original loop
+        const dates: Date[] = [];
         for (let d = new Date(minDate); d <= maxDate; d.setDate(d.getDate() + 1)) {
-            const currentDateStr = d.toISOString().split('T')[0];
-            let dailyTotal = 0;
+            dates.push(new Date(d));
+        }
 
-            // Sum active tasks
+        // Use a Float64Array for efficient storage of differences
+        // Size is dates.length + 1 to handle the 'end' update going past the array end
+        const diffArray = new Float64Array(dates.length + 1);
+
+        if (dates.length > 0) {
+            const baseTime = dates[0].getTime();
+            const oneDay = 24 * 60 * 60 * 1000;
+            const datesLen = dates.length;
+
+            // Helper to find the index of the first date >= target
+            // This works like std::lower_bound
+            const getIndex = (target: Date): number => {
+                // Heuristic guess based on linear time
+                // This gets us very close (O(1)) even with DST shifts
+                let idx = Math.floor((target.getTime() - baseTime) / oneDay);
+
+                // Clamp to valid range [0, datesLen - 1]
+                if (idx < 0) idx = 0;
+                if (idx >= datesLen) idx = datesLen - 1;
+
+                // Fine-tune search (handles DST drift and small inaccuracies)
+                // Search forward
+                while (idx < datesLen && dates[idx] < target) {
+                    idx++;
+                }
+                // Search backward
+                while (idx > 0 && dates[idx-1] >= target) {
+                    idx--;
+                }
+                return idx;
+            };
+
             for (const task of taskCosts) {
-                if (d >= task.start && d < task.end) { // < End because cost is distributed per day
-                    dailyTotal += task.dailyCostRate;
+                // We want the range [startI, endI)
+                // startI is the first index where dates[i] >= task.start (Inclusive start)
+                const startI = getIndex(task.start);
+
+                // endI is the first index where dates[i] >= task.end.
+                // Since the active condition is d < task.end, this date is EXCLUDED.
+                // Thus endI is the upper bound (exclusive).
+                const endI = getIndex(task.end);
+
+                if (startI < endI) {
+                    diffArray[startI] += task.dailyCostRate;
+                    diffArray[endI] -= task.dailyCostRate;
                 }
             }
+        }
 
-            cumulative += dailyTotal;
+        let currentDaily = 0;
+        let cumulative = 0;
+
+        for (let i = 0; i < dates.length; i++) {
+            currentDaily += diffArray[i];
+            cumulative += currentDaily;
+
             result.push({
-                date: currentDateStr,
-                dailyCost: dailyTotal,
+                date: dates[i].toISOString().split('T')[0],
+                dailyCost: currentDaily,
                 cumulativeCost: cumulative
             });
         }

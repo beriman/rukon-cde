@@ -98,4 +98,32 @@ describe('HseService', () => {
       expect(stats.triRate).toBe(0);
     });
   });
+
+  describe('getStatsWithTrends', () => {
+      it('should return stats with monthly trends', async () => {
+          const now = new Date();
+          const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+          mockPrismaService.hseDailyReport.findMany.mockResolvedValue([
+              { date: now, manhours: 1000000 },
+          ]);
+
+          mockPrismaService.incident.findMany.mockResolvedValue([
+              { type: 'MTI', date: now },
+              { type: 'RWI', date: now },
+              { type: 'LTI', date: now },
+          ]);
+
+          const stats = await service.getStatsWithTrends('project-1');
+
+          expect(stats.monthlyTrends).toBeDefined();
+          const currentMonthTrend = stats.monthlyTrends.find((t: any) => t.month === currentMonthKey);
+
+          expect(currentMonthTrend).toBeDefined();
+          expect(currentMonthTrend.incidents).toBe(3);
+          expect(currentMonthTrend.manhours).toBe(1000000);
+          expect(currentMonthTrend.ltiRate).toBe(1); // 1 LTI * 1M / 1M
+          expect(currentMonthTrend.triRate).toBe(3); // 3 Recordables * 1M / 1M
+      });
+  });
 });

@@ -89,13 +89,13 @@ export class HseService {
             });
 
             // Calculate monthly trends
-            const monthlyData: Record<string, { incidents: number; manhours: number }> = {};
+            const monthlyData: Record<string, { incidents: number; manhours: number; ltiCount: number; triCount: number }> = {};
 
             for (let i = 11; i >= 0; i--) {
                 const date = new Date(now);
                 date.setMonth(now.getMonth() - i);
                 const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                monthlyData[monthKey] = { incidents: 0, manhours: 0 };
+                monthlyData[monthKey] = { incidents: 0, manhours: 0, ltiCount: 0, triCount: 0 };
             }
 
             // Aggregate incidents by month
@@ -103,6 +103,12 @@ export class HseService {
                 const monthKey = `${incident.date.getFullYear()}-${String(incident.date.getMonth() + 1).padStart(2, '0')}`;
                 if (monthlyData[monthKey]) {
                     monthlyData[monthKey].incidents++;
+                    if (incident.type === 'LTI' || incident.type === 'FATALITY') {
+                        monthlyData[monthKey].ltiCount++;
+                    }
+                    if (['LTI', 'FATALITY', 'MTI', 'RWI', 'ILLNESS'].includes(incident.type)) {
+                        monthlyData[monthKey].triCount++;
+                    }
                 }
             });
 
@@ -116,22 +122,12 @@ export class HseService {
 
             // Calculate rates for each month
             const monthlyTrends = Object.entries(monthlyData).map(([month, data]) => {
-                const ltiCount = incidents.filter(i => {
-                    const monthKey = `${i.date.getFullYear()}-${String(i.date.getMonth() + 1).padStart(2, '0')}`;
-                    return monthKey === month && (i.type === 'LTI' || i.type === 'FATALITY');
-                }).length;
-
-                const triCount = incidents.filter(i => {
-                    const monthKey = `${i.date.getFullYear()}-${String(i.date.getMonth() + 1).padStart(2, '0')}`;
-                    return monthKey === month && ['LTI', 'FATALITY', 'MTI', 'RWI', 'ILLNESS'].includes(i.type);
-                }).length;
-
                 return {
                     month,
                     incidents: data.incidents,
                     manhours: data.manhours,
-                    ltiRate: data.manhours > 0 ? parseFloat(((ltiCount * 1000000) / data.manhours).toFixed(2)) : 0,
-                    triRate: data.manhours > 0 ? parseFloat(((triCount * 1000000) / data.manhours).toFixed(2)) : 0,
+                    ltiRate: data.manhours > 0 ? parseFloat(((data.ltiCount * 1000000) / data.manhours).toFixed(2)) : 0,
+                    triRate: data.manhours > 0 ? parseFloat(((data.triCount * 1000000) / data.manhours).toFixed(2)) : 0,
                 };
             });
 

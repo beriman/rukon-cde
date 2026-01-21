@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 
+export interface ProjectNamingConfig {
+    projectCode: string;
+    allowedOriginators?: string[];
+    allowedTypes?: string[];
+}
+
 interface ValidationResult {
     isValid: boolean;
     uniqueId?: string;
     error?: string;
-    expected?: string;
-    example?: string;
     components?: {
         project: string;
         originator: string;
@@ -19,47 +23,39 @@ interface ValidationResult {
 
 @Injectable()
 export class NamingConventionService {
-    // ISO 19650 pattern: PROJECT-ORIGINATOR-VOLUME-LEVEL-TYPE-ROLE-NUMBER
-    // Example: MRT3-ARC-A-01-DR-A-001
-    private readonly pattern = /^([A-Z0-9]+)-([A-Z]+)-([A-Z0-9]+)-([A-Z0-9]+)-([A-Z]+)-([A-Z])-(\d+)$/;
+    // Regex Standar ISO 19650
+    private readonly defaultPattern = /^([A-Z0-9]+)-([A-Z0-9]+)-([A-Z0-9]+)-([A-Z0-9]+)-([A-Z0-9]+)-([A-Z0-9]+)-(\d{4,6})$/;
 
-    validate(fileName: string): ValidationResult {
-        // Remove file extension
+    validate(fileName: string, config?: ProjectNamingConfig): ValidationResult {
         const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
+        // Hapus suffix revisi jika ada (misal _P01)
+        const baseName = nameWithoutExt.replace(/_[A-Za-z0-9]+$/, '');
 
-        // Remove version suffix if present (e.g., _V2, _v3)
-        const baseName = nameWithoutExt.replace(/_[Vv]\d+$/, '');
-
-        const match = baseName.match(this.pattern);
+        const match = baseName.match(this.defaultPattern);
 
         if (!match) {
             return {
                 isValid: false,
-                error: 'Invalid ISO 19650 naming format',
-                expected: 'PROJECT-ORIGINATOR-VOLUME-LEVEL-TYPE-ROLE-NUMBER',
-                example: 'MRT3-ARC-A-01-DR-A-001.pdf',
+                error: 'Format nama tidak sesuai pola ISO 19650: PROJ-ORIG-VOL-LVL-TYPE-ROLE-NUM',
             };
         }
 
         const [, project, originator, volume, level, type, role, number] = match;
 
+        // Validasi Kontekstual (Project Specific)
+        if (config) {
+            if (project !== config.projectCode) {
+                return { isValid: false, error: `Kode proyek salah. Tertulis: ${project}, Seharusnya: ${config.projectCode}` };
+            }
+            if (config.allowedOriginators?.length && !config.allowedOriginators.includes(originator)) {
+                return { isValid: false, error: `Originator '${originator}' tidak dikenal.` };
+            }
+        }
+
         return {
             isValid: true,
             uniqueId: baseName,
-            components: {
-                project,
-                originator,
-                volume,
-                level,
-                type,
-                role,
-                number,
-            },
+            components: { project, originator, volume, level, type, role, number },
         };
-    }
-
-    extractUniqueId(fileName: string): string | null {
-        const validation = this.validate(fileName);
-        return validation.isValid ? validation.uniqueId : null;
     }
 }

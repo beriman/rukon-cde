@@ -47,12 +47,16 @@ export class SyncService {
 
         // Example: Handle Task Deliverable updates
         if (changes.taskDeliverables && Array.isArray(changes.taskDeliverables)) {
-            for (const change of changes.taskDeliverables) {
+            const deliverableIds = changes.taskDeliverables.map(c => c.id);
+            const currentDeliverables = await this.prisma.taskDeliverable.findMany({
+                where: { id: { in: deliverableIds } }
+            });
+            const currentMap = new Map(currentDeliverables.map(d => [d.id, d]));
+
+            await Promise.all(changes.taskDeliverables.map(async (change) => {
                 try {
                     // Check conflict
-                    const current = await this.prisma.taskDeliverable.findUnique({
-                        where: { id: change.id }
-                    });
+                    const current = currentMap.get(change.id);
 
                     if (current && current.updatedAt > new Date(change.lastServerSync)) {
                         results.conflicts.push({
@@ -61,7 +65,7 @@ export class SyncService {
                             serverState: current,
                             clientState: change.data
                         });
-                        continue;
+                        return;
                     }
 
                     // Apply update
@@ -77,7 +81,7 @@ export class SyncService {
                 } catch (error) {
                     results.errors.push({ entity: 'TaskDeliverable', id: change.id, error: error.message });
                 }
-            }
+            }));
         }
 
         return results;

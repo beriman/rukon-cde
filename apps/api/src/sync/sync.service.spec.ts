@@ -30,6 +30,7 @@ describe('SyncService', () => {
 
         service = module.get<SyncService>(SyncService);
         prisma = module.get<PrismaService>(PrismaService);
+        jest.clearAllMocks();
     });
 
     it('should be defined', () => {
@@ -71,11 +72,13 @@ describe('SyncService', () => {
                 ],
             };
 
-            // Mock server record updated LATER than client sync
-            mockPrismaService.taskDeliverable.findUnique.mockResolvedValue({
-                id: 'td-1',
-                updatedAt: new Date('2024-01-02'), // Newer
-            });
+            // Update: Mock findMany instead of findUnique
+            mockPrismaService.taskDeliverable.findMany.mockResolvedValue([
+                {
+                    id: 'td-1',
+                    updatedAt: new Date('2024-01-02'), // Newer
+                }
+            ]);
 
             const result = await service.pushChanges(projectId, changes, userId);
 
@@ -97,11 +100,13 @@ describe('SyncService', () => {
                 ],
             };
 
-            // Mock server record updated BEFORE or SAME time
-            mockPrismaService.taskDeliverable.findUnique.mockResolvedValue({
-                id: 'td-2',
-                updatedAt: new Date('2023-12-31'), // Older
-            });
+            // Update: Mock findMany instead of findUnique
+             mockPrismaService.taskDeliverable.findMany.mockResolvedValue([
+                {
+                    id: 'td-2',
+                    updatedAt: new Date('2023-12-31'), // Older
+                }
+            ]);
             mockPrismaService.taskDeliverable.update.mockResolvedValue({ id: 'td-2' });
 
             const result = await service.pushChanges(projectId, changes, userId);

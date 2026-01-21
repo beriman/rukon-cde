@@ -1,11 +1,17 @@
 import { Controller, Get, Patch, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
+
+    @Get('me/dashboard')
+    getDashboardData(@CurrentUser() user: any) {
+        return this.usersService.getDashboardData(user.id);
+    }
 
     @Get()
     findAll(

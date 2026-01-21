@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmbeddingService } from './embedding.service';
+import { Prisma } from '@prisma/client';
 
 interface ChunkWithMeta {
     text: string;
@@ -28,42 +29,44 @@ export class IngestionService {
         // Chunk the content with page tracking
         const chunks = this.chunkTextWithPages(content, 500, 100);
 
-        let insertedCount = 0;
+        if (chunks.length === 0) {
+            return 0;
+        }
 
-        for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
+        try {
+            // Generate embeddings for all chunks in parallel
+            const embeddings = await Promise.all(
+                chunks.map(chunk => this.embeddingService.generateEmbedding(chunk.text))
+            );
 
-            try {
-                // Generate embedding
-                const embedding = await this.embeddingService.generateEmbedding(chunk.text);
-                const embeddingStr = this.embeddingService.formatForPgVector(embedding);
-
-                // Store in database with enhanced metadata
-                await this.prisma.$executeRaw`
-          INSERT INTO document_chunks (file_id, project_id, chunk_index, content, embedding, metadata)
-          VALUES (
-            ${fileId}::uuid, 
-            ${projectId}::uuid, 
-            ${i}, 
-            ${chunk.text}, 
-            ${embeddingStr}::vector,
-            ${JSON.stringify({
+            // Prepare values for batch insertion
+            const values = chunks.map((chunk, i) => {
+                const embeddingStr = this.embeddingService.formatForPgVector(embeddings[i]);
+                const metadata = {
                     fileName,
                     chunkIndex: i,
                     pageNumber: chunk.pageNumber,
                     charStart: chunk.charStart,
-                    charEnd: chunk.charEnd
-                })}::jsonb
-          )
-        `;
+                    charEnd: chunk.charEnd,
+                };
+                return Prisma.sql`(${fileId}::uuid, ${projectId}::uuid, ${i}, ${chunk.text}, ${embeddingStr}::vector, ${JSON.stringify(metadata)}::jsonb)`;
+            });
 
-                insertedCount++;
-            } catch (error: any) {
-                console.error(`Failed to ingest chunk ${i}:`, error.message);
-            }
+            // Construct the single batch INSERT query
+            const query = Prisma.sql`
+        INSERT INTO document_chunks (file_id, project_id, chunk_index, content, embedding, metadata)
+        VALUES ${Prisma.join(values)}
+      `;
+
+            // Execute the batch insert and return the number of rows affected
+            const insertedCount = await this.prisma.$executeRaw(query);
+            return insertedCount;
+
+        } catch (error: any) {
+            console.error(`Failed to ingest document chunks for file ${fileId}:`, error.message);
+            // In case of a batch failure, 0 chunks are inserted
+            return 0;
         }
-
-        return insertedCount;
     }
 
     /**

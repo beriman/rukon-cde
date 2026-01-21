@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useProjectStore } from '@/stores/useProjectStore';
 import {
     Files,
     Search,
@@ -87,9 +89,18 @@ const containerAccess: Record<ContainerType, {
 };
 
 export default function DocumentsPage() {
+    const searchParams = useSearchParams();
+    const { activeProject } = useProjectStore();
     const [activeContainer, setActiveContainer] = useState<ContainerType>('wip');
     const [expandedFolders, setExpandedFolders] = useState<string[]>(['kontraktor']);
     const [currentUserStakeholder] = useState<Stakeholder>('kontraktor'); // Simulated current user
+
+    useEffect(() => {
+        const container = searchParams.get('container') as ContainerType;
+        if (container && containerAccess[container]) {
+            setActiveContainer(container);
+        }
+    }, [searchParams]);
 
     const toggleFolder = (folderId: string) => {
         setExpandedFolders(prev =>

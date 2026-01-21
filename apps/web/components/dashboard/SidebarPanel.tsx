@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import ProjectSelector from './ProjectSelector';
+import { useProjectStore } from '@/stores/useProjectStore';
 import {
     LayoutDashboard,
     Library,
@@ -25,6 +27,8 @@ import {
 } from 'lucide-react';
 
 export default function SidebarPanel() {
+    const { activeProject } = useProjectStore();
+
     return (
         <div className="w-72 glass-panel rounded-[2rem] flex flex-col p-5 z-10 relative overflow-hidden">
             {/* Mac-like Window Controls */}
@@ -81,10 +85,10 @@ export default function SidebarPanel() {
 
                 {/* CDE Containers */}
                 <div className="mb-6">
-                    <p className="px-3 text-xs font-medium text-slate-400 mb-2">CDE Containers</p>
-                    <ul className="space-y-1">
+                    <ProjectSelector />
+                    <ul className={`space-y-1 transition-opacity ${!activeProject ? 'opacity-50 pointer-events-none' : ''}`}>
                         <li>
-                            <Link href="/dashboard/documents?container=wip" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href={activeProject ? `/dashboard/documents?container=wip&projectId=${activeProject.id}` : '#'} className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <Files className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     WIP (Work in Progress)
@@ -93,7 +97,7 @@ export default function SidebarPanel() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/dashboard/documents?container=shared" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href={activeProject ? `/dashboard/documents?container=shared&projectId=${activeProject.id}` : '#'} className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <Share className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     Shared
@@ -102,7 +106,7 @@ export default function SidebarPanel() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/dashboard/documents?container=published" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href={activeProject ? `/dashboard/documents?container=published&projectId=${activeProject.id}` : '#'} className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <CheckCircle2 className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     Published
@@ -111,7 +115,7 @@ export default function SidebarPanel() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/dashboard/documents?container=archive" className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
+                            <Link href={activeProject ? `/dashboard/documents?container=archive&projectId=${activeProject.id}` : '#'} className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-600 hover:bg-white/30 text-sm font-medium transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <Archive className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
                                     Archive

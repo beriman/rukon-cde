@@ -311,7 +311,7 @@ export default function UsersPage() {
                                             const newUser = await inviteUser({ email: inviteEmail, role: inviteStakeholder, organizationId });
                                             // Note: The new user might not have a company field, so we're adding it here for the UI
                                             // In a real app, you'd likely want to expand the invite payload and user type
-                                            setUsers([...users, { ...newUser, company: inviteCompany, stakeholderType: inviteStakeholder as StakeholderType, status: 'pending', joinedAt: new Date().toISOString() }]);
+                                            setUsers([...users, { ...newUser, name: newUser.name || inviteEmail.split('@')[0], company: inviteCompany, stakeholderType: inviteStakeholder as StakeholderType, status: 'pending', joinedAt: new Date().toISOString() }]);
                                             setShowInviteModal(false);
                                             setInviteEmail('');
                                             setInviteCompany('');

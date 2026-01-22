@@ -3,6 +3,8 @@ import { OrganizationsService } from './organizations.service';
 import { InvitationsService } from './invitations.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateOrgDto } from './dto/create-org.dto';
+import { InviteUserDto } from './dto/invite-user.dto';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('organizations')
 @UseGuards(AuthGuard('jwt'))

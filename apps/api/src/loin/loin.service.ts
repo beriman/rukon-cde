@@ -91,13 +91,37 @@ export class LoinService {
         let passedCount = 0;
         let failedCount = 0;
 
-        for (const el of elements) {
+        // Pre-group rules by entity for O(1) lookup
+        const rulesByEntity = new Map<string, IdsRule[]>();
+        const globalRules: IdsRule[] = [];
+
+        for (const rule of activeRules) {
+            if (rule.ifcEntity === 'IfcBuildingElement') {
+                globalRules.push(rule);
+            } else {
+                if (!rulesByEntity.has(rule.ifcEntity)) {
+                    rulesByEntity.set(rule.ifcEntity, []);
+                }
+                rulesByEntity.get(rule.ifcEntity)!.push(rule);
+            }
+        }
+
+        // Optimization: Chunk processing to avoid blocking event loop
+        const CHUNK_SIZE = 1000;
+
+        for (let i = 0; i < elements.length; i++) {
+            const el = elements[i];
+
+            // Yield to event loop periodically
+            if (i > 0 && i % CHUNK_SIZE === 0) {
+                await new Promise(resolve => setImmediate(resolve));
+            }
+
             const failedRulesForElement: string[] = [];
 
             // Find rules that apply to this element type
-            const applicableRules = activeRules.filter(r =>
-                r.ifcEntity === el.type || r.ifcEntity === 'IfcBuildingElement' // Simple inheritance support
-            );
+            const entityRules = rulesByEntity.get(el.type) || [];
+            const applicableRules = [...entityRules, ...globalRules];
 
             for (const rule of applicableRules) {
                 // Check Pset

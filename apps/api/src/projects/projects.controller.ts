@@ -53,6 +53,11 @@ export class ProjectsController {
         return this.projectsService.findOne(id);
     }
 
+    @Get(':id/dashboard')
+    getDashboard(@Param('id') id: string) {
+        return this.projectsService.getDashboardData(id);
+    }
+
     @Patch(':id')
     update(@Param('id') id: string, @Body() data: { name?: string; code?: string }) {
         return this.projectsService.update(id, data);

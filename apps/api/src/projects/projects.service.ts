@@ -175,4 +175,57 @@ export class ProjectsService {
             },
         });
     }
+
+    async getDashboardData(id: string) {
+        const project = await this.prisma.project.findUnique({
+            where: { id },
+            include: {
+                taskDeliveryPlans: {
+                    include: { deliverables: true }
+                },
+                incidents: true,
+                procurementItems: true,
+                submittals: true,
+                bcfTopics: true,
+                billOfQuantities: {
+                    include: { items: true }
+                }
+            }
+        });
+
+        if (!project) throw new NotFoundException('Project not found');
+
+        // 1. Progress Calculation (Naive approach based on Task Deliverables)
+        const totalTasks = project.taskDeliveryPlans.flatMap(p => p.deliverables).length;
+        const completedTasks = project.taskDeliveryPlans.flatMap(p => p.deliverables).filter(d => d.status === 'DELIVERED').length;
+        const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+        // 2. HSE Stats
+        const safeManhours = 0; // Placeholder, needs HseDailyReport aggregation
+        const incidentCount = project.incidents.length;
+
+        // 3. Procurement
+        const orderedItems = project.procurementItems.length;
+
+        // 4. Quality / Docs
+        const openSubmittals = project.submittals.filter(s => s.status !== 'APPROVED').length;
+
+        // 5. BIM Issues
+        const openIssues = project.bcfTopics.filter(t => t.status !== 'CLOSED').length;
+
+        return {
+            id: project.id,
+            name: project.name,
+            code: project.code,
+            metrics: {
+                progress: Math.round(progress),
+                safeManhours,
+                incidentCount,
+                orderedItems,
+                openSubmittals,
+                openIssues
+            },
+            recentActivity: [] // Placeholder for now
+        };
+    }
 }

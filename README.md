@@ -120,6 +120,14 @@ See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed deployment instructions.
   # Follow platform-specific instructions
   ```
 
+> [!IMPORTANT]
+> **RVT Conversion Support**
+> To enable automatic conversion of Revit (.rvt) files to IFC, you MUST install **ODA File Converter** on the backend server.
+> 1. Download: [ODA File Converter](https://www.opendesign.com/guestfiles/oda_file_converter)
+> 2. Install using default settings.
+> 3. Set `ODA_PATH` in `.env` if installed in a custom location (Default: `C:\Program Files\ODA\ODAFileConverter 25.x.x\ODAFileConverter.exe`).
+> If not installed, the system will use a MOCK simulation for demonstration purposes.
+
 ## 🛠️ Tech Stack
 
 ### Backend

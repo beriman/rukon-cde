@@ -22,13 +22,30 @@ export class ProjectsService {
                 // 2. Create Default CDE Folders (ISO 19650 standard containers)
                 const defaultFolders = ['WIP', 'SHARED', 'PUBLISHED', 'ARCHIVED'];
 
-                await tx.folder.createMany({
-                    data: defaultFolders.map((name) => ({
-                        name,
-                        projectId: project.id,
-                        parentId: null, // Root folders
-                    })),
-                });
+                // Create root folders one by one to get their IDs
+                for (const name of defaultFolders) {
+                    const folder = await tx.folder.create({
+                        data: {
+                            name,
+                            projectId: project.id,
+                            parentId: null,
+                        },
+                    });
+
+                    // 3. Create Discipline Sub-folders for WIP (ISO 19650-2)
+                    if (name === 'WIP') {
+                        // User requested full names (e.g. "Arsitek" instead of "ARCH")
+                        const disciplines = ['Arsitek', 'Struktur', 'Mekanikal Elektrikal', 'Sipil', 'Lanskap'];
+                        await tx.folder.createMany({
+                            data: disciplines.map((disc) => ({
+                                name: disc,
+                                projectId: project.id,
+                                parentId: folder.id,
+                                discipline: disc,
+                            })),
+                        });
+                    }
+                }
 
                 return project;
             });

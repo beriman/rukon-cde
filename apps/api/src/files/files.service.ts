@@ -2,8 +2,9 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { NamingConventionService } from '../common/services/naming-convention.service';
 import { AuditService } from '../common/services/audit.service';
+import { ConversionService } from '../common/services/conversion.service';
 import { AuditAction } from '@prisma/client';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class FilesService {
         private prisma: PrismaService,
         private namingService: NamingConventionService,
         private auditService: AuditService,
+        private conversionService: ConversionService,
     ) {
         // Initialize S3 client
         this.s3Client = new S3Client({
@@ -133,6 +135,11 @@ export class FilesService {
                     },
                 });
 
+                // Trigger Conversion if RVT
+                if (file.originalname.toLowerCase().endsWith('.rvt')) {
+                    this.conversionService.processFile(updatedFile.id, s3Key).catch(console.error);
+                }
+
                 return {
                     id: updatedFile.id,
                     name: updatedFile.name,
@@ -201,6 +208,11 @@ export class FilesService {
                         },
                     },
                 });
+
+                // Trigger Conversion if RVT
+                if (file.originalname.toLowerCase().endsWith('.rvt')) {
+                    this.conversionService.processFile(newFile.id, s3Key).catch(console.error);
+                }
 
                 return {
                     id: newFile.id,
@@ -309,12 +321,6 @@ export class FilesService {
         console.log(`[DOWNLOAD STUB] Would generate presigned URL for: ${targetVersion.s3Key}`);
         console.log(`Version: ${targetVersion.version}, File: ${file.name}`);
 
-        // Audit Log
-        // Note: Assuming we have context for user who is downloading. 
-        // Since we don't have request context here, we skip logging or would need to refactor to pass user.
-        // For now, we will skip logging DOWNLOAD in service to avoid breaking API signature too much, 
-        // or we adding it if easy.
-
         return {
             url: stubUrl,
             filename: file.name,
@@ -322,5 +328,64 @@ export class FilesService {
             size: targetVersion.size,
             expiresIn: 300, // 5 minutes
         };
+    }
+
+    // Story 1.21: Soft Delete to Cold Storage
+    async archive(id: string, userId: string) {
+        const file = await this.findOne(id);
+
+        // Check if already archived
+        if (file.cdeState === 'ARCHIVED') {
+            throw new BadRequestException('File is already archived');
+        }
+
+        // 1. Move S3 Object to Cold Storage (Archive Folder + Glacier Class)
+        if (process.env.AWS_S3_BUCKET) {
+            for (const version of file.versions) {
+                const oldKey = version.s3Key;
+                const newKey = `archive/${oldKey}`; // Prefix with archive/
+
+                try {
+                    // Copy to new location with StorageClass: GLACIER (or DEEP_ARCHIVE)
+                    await this.s3Client.send(new CopyObjectCommand({
+                        Bucket: this.bucket,
+                        CopySource: `${this.bucket}/${oldKey}`,
+                        Key: newKey,
+                        StorageClass: 'GLACIER',
+                        MetadataDirective: 'COPY',
+                    }));
+
+                    // Delete original
+                    await this.s3Client.send(new DeleteObjectCommand({
+                        Bucket: this.bucket,
+                        Key: oldKey,
+                    }));
+
+                    console.log(`[ARCHIVE] Moved ${oldKey} to ${newKey} (Glacier)`);
+                } catch (e) {
+                    console.error(`Failed to move ${oldKey} to Glacier`, e);
+                }
+            }
+        }
+
+        // 2. Update DB Status
+        const updated = await this.prisma.file.update({
+            where: { id },
+            data: {
+                cdeState: 'ARCHIVED',
+                updatedAt: new Date()
+            }
+        });
+
+        // 3. Audit Log
+        await this.auditService.log(
+            userId,
+            AuditAction.FILE_DELETE,
+            id,
+            'FILE',
+            { message: 'Moved to Cold Storage (Glacier)' }
+        ).catch(e => console.error('Audit fail', e));
+
+        return updated;
     }
 }

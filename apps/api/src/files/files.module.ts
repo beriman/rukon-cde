@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { FilesService } from './files.service';
-import { FilesWorkflowController } from './files-workflow.controller';
 import { FilesController } from './files.controller';
-import { PrismaModule } from '../prisma/prisma.module';
-import { NamingConventionService } from '../common/services/naming-convention.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { CommonModule } from '../common/common.module';
+import { ConversionService } from '../common/services/conversion.service';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [FilesController, FilesWorkflowController],
-    providers: [FilesService, NamingConventionService],
+    imports: [CommonModule],
+    controllers: [FilesController],
+    providers: [FilesService, PrismaService, ConversionService],
     exports: [FilesService],
 })
 export class FilesModule { }

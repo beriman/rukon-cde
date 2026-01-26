@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     description: "Common Data Environment for Modern Construction",
 };
 
+import { MainProvider } from "@/components/providers/MainProvider";
+
 export default function RootLayout({
     children,
 }: {
@@ -25,7 +27,9 @@ export default function RootLayout({
     return (
         <html lang="en" className="scroll-smooth">
             <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
-                {children}
+                <MainProvider>
+                    {children}
+                </MainProvider>
             </body>
         </html>
     );

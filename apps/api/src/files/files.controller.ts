@@ -2,6 +2,7 @@ import {
     Controller,
     Post,
     Get,
+    Delete,
     Param,
     UseGuards,
     UseInterceptors,
@@ -64,5 +65,10 @@ export class FilesController {
     @Get(':id/versions')
     getVersions(@Param('id') id: string) {
         return this.filesService.getVersions(id);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string, @Request() req) {
+        return this.filesService.archive(id, req.user.userId);
     }
 }

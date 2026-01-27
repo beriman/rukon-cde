@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { FolderOpen, Plus, Loader2, Edit2, Archive, RotateCcw, MoreVertical } from 'lucide-react';
+import { FolderOpen, Plus, Loader2, Edit2, Archive, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { EditProjectModal } from '@/components/projects/edit-project-modal';
 import { CreateProjectModal } from '@/components/projects/create-project-modal';
@@ -18,18 +18,21 @@ interface Project {
 
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const [showArchived, setShowArchived] = useState(false);
-    const [editingProject, setEditingProject] = useState<Project | null>(null);
-    const [archivingProjectId, setArchivingProjectId] = useState<string | null>(null);
+
+    // Modals state
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [archivingProjectId, setArchivingProjectId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchProjects();
     }, [showArchived]);
 
     const fetchProjects = async () => {
-        setLoading(true);
+        setIsLoading(true);
         try {
             const params: any = {};
             if (!showArchived) params.status = 'ACTIVE';
@@ -39,7 +42,7 @@ export default function ProjectsPage() {
         } catch (err) {
             console.error('Failed to fetch projects:', err);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -83,11 +86,8 @@ export default function ProjectsPage() {
                         Show Archived
                     </label>
                     <button
-                        onClick={() => {
-                            console.log('New Project button clicked');
-                            setIsCreateModalOpen(true);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer relative z-50"
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         <Plus className="w-4 h-4" />
                         New Project
@@ -96,7 +96,7 @@ export default function ProjectsPage() {
             </div>
 
             {/* Projects Grid */}
-            {loading ? (
+            {isLoading ? (
                 <div className="flex items-center justify-center h-64">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
@@ -141,7 +141,8 @@ export default function ProjectsPage() {
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setEditingProject(project);
+                                                setSelectedProject(project);
+                                                setIsEditModalOpen(true);
                                             }}
                                             className="p-2 text-zinc-600 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
                                             title="Edit project"
@@ -191,13 +192,17 @@ export default function ProjectsPage() {
             )}
 
             {/* Edit Project Modal */}
-            {editingProject && (
+            {isEditModalOpen && selectedProject && (
                 <EditProjectModal
-                    project={editingProject}
-                    onClose={() => setEditingProject(null)}
+                    project={selectedProject}
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setSelectedProject(null);
+                    }}
                     onSuccess={() => {
                         fetchProjects();
-                        setEditingProject(null);
+                        setIsEditModalOpen(false);
+                        setSelectedProject(null);
                     }}
                 />
             )}

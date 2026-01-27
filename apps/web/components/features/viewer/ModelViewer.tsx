@@ -74,12 +74,15 @@ export function ModelViewer({ fileId }: ModelViewerProps) {
                 const { data } = await apiClient.get(`/files/${fileId}/download`);
                 const url = data.url;
 
-                await loader.loadAsync(url, (event) => {
-                    const progress = Math.round((event.loaded / event.total) * 100);
-                    setLoadingProgress(progress);
-                }).then((model) => {
-                    scene.add(model);
-                    setIsLoading(false);
+                await new Promise((resolve, reject) => {
+                    loader.load(url, (model: any) => {
+                        scene.add(model);
+                        setIsLoading(false);
+                        resolve(model);
+                    }, (event) => {
+                        const progress = Math.round((event.loaded / event.total) * 100);
+                        setLoadingProgress(progress);
+                    }, reject);
                 });
 
             } catch (error) {

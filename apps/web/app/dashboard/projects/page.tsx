@@ -83,8 +83,11 @@ export default function ProjectsPage() {
                         Show Archived
                     </label>
                     <button
-                        onClick={() => setIsCreateModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        onClick={() => {
+                            console.log('New Project button clicked');
+                            setIsCreateModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer relative z-50"
                     >
                         <Plus className="w-4 h-4" />
                         New Project

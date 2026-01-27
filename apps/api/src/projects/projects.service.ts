@@ -6,20 +6,52 @@ import { CreateProjectDto } from './dto/create-project.dto';
 export class ProjectsService {
     constructor(private prisma: PrismaService) { }
 
-    async create(createProjectDto: CreateProjectDto) {
+    async create(userId: string, createProjectDto: CreateProjectDto) {
         try {
+            if (!createProjectDto.organizationId && !createProjectDto.newOrganizationName) {
+                throw new BadRequestException('Either organizationId or newOrganizationName must be provided');
+            }
+
             // Transaction ensures both project and default folders are created or fails together
             return await this.prisma.$transaction(async (tx) => {
-                // 1. Create Project
+                let organizationId = createProjectDto.organizationId;
+
+                // 1. If we need to create a new Organization
+                if (!organizationId && createProjectDto.newOrganizationName) {
+                    const slug = createProjectDto.newOrganizationName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000);
+
+                    const newOrg = await tx.organization.create({
+                        data: {
+                            name: createProjectDto.newOrganizationName,
+                            slug,
+                        }
+                    });
+
+                    // Add Creator as OWNER
+                    await tx.organizationUser.create({
+                        data: {
+                            userId,
+                            organizationId: newOrg.id,
+                            role: 'OWNER',
+                        }
+                    });
+
+                    organizationId = newOrg.id;
+                }
+
+                // 2. Create Project
+                // Note: We use the resolved organizationId here (either passed or newly created)
+                if (!organizationId) throw new BadRequestException('Organization ID missing');
+
                 const project = await tx.project.create({
                     data: {
                         name: createProjectDto.name,
                         code: createProjectDto.code,
-                        organizationId: createProjectDto.organizationId,
+                        organizationId: organizationId!,
                     },
                 });
 
-                // 2. Create Default CDE Folders (ISO 19650 standard containers)
+                // 3. Create Default CDE Folders (ISO 19650 standard containers)
                 const defaultFolders = ['WIP', 'SHARED', 'PUBLISHED', 'ARCHIVED'];
 
                 // Create root folders one by one to get their IDs
@@ -32,7 +64,7 @@ export class ProjectsService {
                         },
                     });
 
-                    // 3. Create Discipline Sub-folders for WIP (ISO 19650-2)
+                    // 4. Create Discipline Sub-folders for WIP (ISO 19650-2)
                     if (name === 'WIP') {
                         // User requested full names (e.g. "Arsitek" instead of "ARCH")
                         const disciplines = ['Arsitek', 'Struktur', 'Mekanikal Elektrikal', 'Sipil', 'Lanskap'];

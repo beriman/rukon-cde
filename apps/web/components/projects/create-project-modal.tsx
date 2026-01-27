@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { X, Loader2, Building2 } from 'lucide-react';
+import { X, Loader2, Building2, Plus, ArrowRight } from 'lucide-react';
 
 interface Organization {
     id: string;
@@ -18,8 +18,12 @@ interface CreateProjectModalProps {
 export function CreateProjectModal({ onClose, onSuccess }: CreateProjectModalProps) {
     const [name, setName] = useState('');
     const [code, setCode] = useState('');
+
+    // Organization State
     const [organizationId, setOrganizationId] = useState('');
     const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const [isNewOrg, setIsNewOrg] = useState(false);
+    const [newOrgName, setNewOrgName] = useState('');
 
     // UI States
     const [isLoadingOrgs, setIsLoadingOrgs] = useState(true);
@@ -34,13 +38,16 @@ export function CreateProjectModal({ onClose, onSuccess }: CreateProjectModalPro
                 const orgs = res.data;
                 setOrganizations(orgs);
 
-                // Auto-select first org if available
                 if (orgs.length > 0) {
                     setOrganizationId(orgs[0].id);
+                } else {
+                    // Automatically switch to "New Org" mode if none exist
+                    setIsNewOrg(true);
                 }
             } catch (err) {
                 console.error('Failed to fetch organizations', err);
-                setError('Failed to load organizations. Please try again.');
+                // Don't error block, just let them create new
+                setIsNewOrg(true);
             } finally {
                 setIsLoadingOrgs(false);
             }
@@ -54,18 +61,31 @@ export function CreateProjectModal({ onClose, onSuccess }: CreateProjectModalPro
         setError('');
         setIsSubmitting(true);
 
-        if (!organizationId) {
+        if (!isNewOrg && !organizationId) {
             setError('Please select an organization');
             setIsSubmitting(false);
             return;
         }
 
+        if (isNewOrg && !newOrgName.trim()) {
+            setError('Please enter an organization name');
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
-            await apiClient.post('/projects', {
+            const payload: any = {
                 name,
                 code,
-                organizationId
-            });
+            };
+
+            if (isNewOrg) {
+                payload.newOrganizationName = newOrgName;
+            } else {
+                payload.organizationId = organizationId;
+            }
+
+            await apiClient.post('/projects', payload);
             onSuccess();
             onClose();
         } catch (err: any) {
@@ -116,24 +136,49 @@ export function CreateProjectModal({ onClose, onSuccess }: CreateProjectModalPro
                         </div>
                     )}
 
-                    {/* Organization Select */}
+                    {/* Organization Section */}
                     <div>
-                        <label htmlFor="org" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                            Organization *
-                        </label>
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                Organization *
+                            </label>
+                            {organizations.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setIsNewOrg(!isNewOrg)}
+                                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                                >
+                                    {isNewOrg ? 'Select Existing' : 'Create New'}
+                                </button>
+                            )}
+                        </div>
+
                         {isLoadingOrgs ? (
                             <div className="flex items-center gap-2 text-sm text-zinc-500 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700">
                                 <Loader2 className="w-4 h-4 animate-spin" />
                                 Loading organizations...
                             </div>
+                        ) : isNewOrg ? (
+                            <div className="space-y-1">
+                                <input
+                                    type="text"
+                                    value={newOrgName}
+                                    onChange={(e) => setNewOrgName(e.target.value)}
+                                    placeholder="Enter new organization name..."
+                                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:bg-zinc-800 dark:text-white"
+                                    required
+                                />
+                                <p className="text-xs text-zinc-500">
+                                    A new organization will be created with you as the owner.
+                                </p>
+                            </div>
                         ) : (
                             <div className="relative">
                                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                                 <select
-                                    id="org"
                                     value={organizationId}
                                     onChange={(e) => setOrganizationId(e.target.value)}
-                                    required
+                                    required={!isNewOrg}
                                     className="w-full pl-10 pr-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:bg-zinc-800 dark:text-white appearance-none"
                                 >
                                     <option value="" disabled>Select Organization</option>
@@ -144,11 +189,6 @@ export function CreateProjectModal({ onClose, onSuccess }: CreateProjectModalPro
                                     ))}
                                 </select>
                             </div>
-                        )}
-                        {organizations.length === 0 && !isLoadingOrgs && (
-                            <p className="text-xs text-amber-600 mt-1">
-                                You need to belong to an organization to create a project.
-                            </p>
                         )}
                     </div>
 
@@ -199,7 +239,7 @@ export function CreateProjectModal({ onClose, onSuccess }: CreateProjectModalPro
                         </button>
                         <button
                             type="submit"
-                            disabled={isSubmitting || !organizationId || isLoadingOrgs}
+                            disabled={isSubmitting || isLoadingOrgs || (!isNewOrg && !organizationId) || (isNewOrg && !newOrgName)}
                             className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors flex items-center justify-center"
                         >
                             {isSubmitting ? (

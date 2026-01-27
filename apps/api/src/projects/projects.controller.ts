@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Query, Req } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { FoldersService } from './folders.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -14,8 +14,8 @@ export class ProjectsController {
     ) { }
 
     @Post()
-    create(@Body() createProjectDto: CreateProjectDto) {
-        return this.projectsService.create(createProjectDto);
+    create(@Req() req, @Body() createProjectDto: CreateProjectDto) {
+        return this.projectsService.create(req.user.id, createProjectDto);
     }
 
     @Get()

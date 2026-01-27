@@ -72,14 +72,20 @@ export function ModelCompareViewer({ fileId, versionA, versionB }: ModelCompareV
                 const matA = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.3, side: DoubleSide, depthTest: false });
                 const matB = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.3, side: DoubleSide, depthTest: false });
 
-                const p1 = loader.loadAsync(dataA.url).then(model => {
+                const loadModel = (url: string) => {
+                    return new Promise<any>((resolve, reject) => {
+                        loader.load(url, (model) => resolve(model), undefined, reject);
+                    });
+                };
+
+                const p1 = loadModel(dataA.url).then(model => {
                     model.traverse((child: any) => {
                         if (child.isMesh) child.material = matA;
                     });
                     scene.add(model);
                 });
 
-                const p2 = loader.loadAsync(dataB.url).then(model => {
+                const p2 = loadModel(dataB.url).then(model => {
                     model.traverse((child: any) => {
                         if (child.isMesh) child.material = matB;
                     });

@@ -228,4 +228,110 @@ export class ProjectsService {
             recentActivity: [] // Placeholder for now
         };
     }
+
+    async seedIsoTasks(projectId: string) {
+        const tasks = [
+            {
+                title: 'Define Organizational Information Requirements (OIR)',
+                description: 'Establish the high-level strategic information requirements for the organization.',
+                checklist: [
+                    { id: 'oir-1', text: 'Define Organizational Goals', completed: false },
+                    { id: 'oir-2', text: 'Define Asset Management Policy', completed: false },
+                    { id: 'oir-3', text: 'Define Information Security Requirements', completed: false }
+                ]
+            },
+            {
+                title: 'Define Asset Information Requirements (AIR)',
+                description: 'Specify the detailed asset data required for operation and maintenance.',
+                checklist: [
+                    { id: 'air-1', text: 'Identify Maintainable Assets', completed: false },
+                    { id: 'air-2', text: 'Define Attribute Data Standards (e.g., COBie)', completed: false },
+                    { id: 'air-3', text: 'Define Document Requirements per Asset', completed: false }
+                ]
+            },
+            {
+                title: 'Define Exchange Information Requirements (EIR)',
+                description: 'Set out the managerial, commercial, and technical aspects of producing information.',
+                checklist: [
+                    { id: 'eir-1', text: 'Define Information Delivery Milestones', completed: false },
+                    { id: 'eir-2', text: 'Specify File Formats and Versions', completed: false },
+                    { id: 'eir-3', text: 'Define CDE Procedures', completed: false }
+                ]
+            },
+            {
+                title: 'Develop BIM Execution Plan (BEP)',
+                description: 'Explain how the information management aspects of the appointment will be carried out.',
+                checklist: [
+                    { id: 'bep-1', text: 'Assign Roles and Responsibilities', completed: false },
+                    { id: 'bep-2', text: 'Define Collaboration Process', completed: false },
+                    { id: 'bep-3', text: 'Select Software and Versions', completed: false }
+                ]
+            }
+        ];
+
+        // Ensure 01-WIP/Requirements folder exists
+        let folder = await this.prisma.folder.findFirst({
+            where: {
+                projectId,
+                name: 'Requirements',
+                parent: { name: '01-WIP' } // Assuming consistent naming, simplified for MVP
+            }
+        });
+
+        // Simplified folder creation for MVP if not strict structure
+        if (!folder) {
+            // Check root WIP first
+            let wip = await this.prisma.folder.findFirst({
+                where: { projectId, name: '01-WIP' } // Assuming '01-WIP' or 'WIP' depending on creation logic
+            });
+
+            if (!wip) {
+                // Try finding 'WIP' created by defaultFolders
+                wip = await this.prisma.folder.findFirst({
+                    where: { projectId, name: 'WIP' }
+                });
+            }
+
+            if (wip) {
+                folder = await this.prisma.folder.create({
+                    data: {
+                        name: 'Requirements',
+                        projectId,
+                        parentId: wip.id
+                    }
+                });
+            }
+            // Fallback if no WIP folder structure exists yet (shouldn't happen in seeded project)
+        }
+
+        // Create Tasks
+        const createdTasks = [];
+        for (const t of tasks) {
+            const task = await this.prisma.projectTask.create({
+                data: {
+                    projectId,
+                    title: t.title,
+                    description: t.description,
+                    checklist: t.checklist || []
+                }
+            });
+            createdTasks.push(task);
+        }
+
+        return createdTasks;
+    }
+
+    async getProjectTasks(projectId: string) {
+        return this.prisma.projectTask.findMany({
+            where: { projectId },
+            orderBy: { createdAt: 'asc' }
+        });
+    }
+
+    async updateTask(taskId: string, data: any) {
+        return this.prisma.projectTask.update({
+            where: { id: taskId },
+            data
+        });
+    }
 }

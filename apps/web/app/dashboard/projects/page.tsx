@@ -5,6 +5,7 @@ import { apiClient } from '@/lib/api-client';
 import { FolderOpen, Plus, Loader2, Edit2, Archive, RotateCcw, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { EditProjectModal } from '@/components/projects/edit-project-modal';
+import { CreateProjectModal } from '@/components/projects/create-project-modal';
 import { ConfirmationDialog } from '@/components/confirmation-dialog';
 
 interface Project {
@@ -21,6 +22,7 @@ export default function ProjectsPage() {
     const [showArchived, setShowArchived] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [archivingProjectId, setArchivingProjectId] = useState<string | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     useEffect(() => {
         fetchProjects();
@@ -80,7 +82,10 @@ export default function ProjectsPage() {
                         />
                         Show Archived
                     </label>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
                         <Plus className="w-4 h-4" />
                         New Project
                     </button>
@@ -169,6 +174,17 @@ export default function ProjectsPage() {
                         ))
                     )}
                 </div>
+            )}
+
+            {/* Create Project Modal */}
+            {isCreateModalOpen && (
+                <CreateProjectModal
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onSuccess={() => {
+                        fetchProjects();
+                        setIsCreateModalOpen(false);
+                    }}
+                />
             )}
 
             {/* Edit Project Modal */}

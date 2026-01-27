@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { FileText, Download, Eye, MoreHorizontal, RotateCcw } from 'lucide-react';
+import { FileText, Download, Eye, MoreHorizontal, RotateCcw, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { VersionHistoryDialog } from './VersionHistoryDialog';
+import { SubmitDialog } from './SubmitDialog';
 
 interface File {
     id: string;
@@ -36,6 +37,7 @@ interface FileExplorerProps {
 
 export function FileExplorer({ folderId }: FileExplorerProps) {
     const [historyFileId, setHistoryFileId] = useState<string | null>(null);
+    const [submitFileId, setSubmitFileId] = useState<string | null>(null);
     const params = useParams();
     const projectId = params.projectId as string;
 
@@ -149,6 +151,12 @@ export function FileExplorer({ folderId }: FileExplorerProps) {
                                     <Download className="mr-2 h-4 w-4" /> Download
                                 </Link>
                             </DropdownMenuItem>
+
+                            {file.cdeState === 'WIP' && (
+                                <DropdownMenuItem onClick={() => setSubmitFileId(file.id)}>
+                                    <CheckCircle2 className="mr-2 h-4 w-4" /> Submit for Approval
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
@@ -181,6 +189,15 @@ export function FileExplorer({ folderId }: FileExplorerProps) {
                 open={!!historyFileId}
                 onOpenChange={(open) => !open && setHistoryFileId(null)}
             />
+
+            <SubmitDialog
+                open={!!submitFileId}
+                onOpenChange={(open) => !open && setSubmitFileId(null)}
+                fileId={submitFileId || ''}
+                projectId={projectId}
+                onSuccess={() => refetch()}
+            />
         </div>
     );
 }
+

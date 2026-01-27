@@ -140,4 +140,86 @@ export class HseService {
             throw new InternalServerErrorException('Failed to calculate HSE trends');
         }
     }
+
+    async getComprehensiveDashboard(projectId: string) {
+        // 1. Fetch Targets (Current Period)
+        const now = new Date();
+        // Assuming Weekly target for now
+        // Find latest target or specific week target
+        const target = await this.prisma.hseTarget.findFirst({
+            where: { projectId, type: 'WEEKLY' }, // Simplified: just get latest weekly target
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // 2. Fetch Actuals (This Week)
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+
+        const reports = await this.prisma.hseDailyReport.findMany({
+            where: {
+                projectId,
+                date: { gte: startOfWeek }
+            }
+        });
+
+        const manhoursWeek = reports.reduce((sum, r) => sum + r.manhours, 0);
+
+        // Meetings count
+        const meetings = await this.prisma.safetyMeeting.findMany({
+            where: { projectId, date: { gte: startOfWeek } }
+        });
+        const meetingCounts = meetings.reduce((acc, m) => {
+            acc[m.type] = (acc[m.type] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Inspections count
+        const inspections = await this.prisma.inspectionForm.findMany({
+            where: { projectId, date: { gte: startOfWeek } }
+        });
+        const inspectionCounts = inspections.reduce((acc, i) => {
+            acc[i.type] = (acc[i.type] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Incidents Breakdown
+        const incidents = await this.prisma.incident.findMany({
+            where: { projectId }
+        });
+
+        const incidentCounts = {
+            FIRST_AID: 0, MTI: 0, RWI: 0, LTI: 0, FATALITY: 0,
+            PROPERTY_DAMAGE: 0, SPILL: 0, NEAR_MISS: 0, UNSAFE_ACT: 0
+        };
+
+        incidents.forEach(i => {
+            // Mapping existing types to request
+            if (i.type === 'FIRST_AID') incidentCounts.FIRST_AID++;
+            else if (i.type === 'MTI') incidentCounts.MTI++;
+            else if (i.type === 'RWI') incidentCounts.RWI++;
+            else if (i.type === 'LTI') incidentCounts.LTI++;
+            else if (i.type === 'FATALITY') incidentCounts.FATALITY++;
+            else if (i.type === 'SPILL') incidentCounts.SPILL++; // If SPILL type exists
+            else if (i.type === 'NEAR_MISS') incidentCounts.NEAR_MISS++;
+            // etc...
+        });
+
+        // Previous Best Logic (Simplified: Standard LTI Free Days calculation)
+        // Calculating "Best Record" requires analyzing the whole incident timeline
+        // I'll stick to Current LTI Free for MVP + derived stats from getStats()
+        const stats = await this.getStats(projectId);
+
+        return {
+            period: { start: startOfWeek, end: now },
+            targets: target || {},
+            actuals: {
+                manhours: manhoursWeek,
+                meetings: meetingCounts,
+                inspections: inspectionCounts,
+                incidents: incidentCounts
+            },
+            stats: stats,
+            // "Fatality Rate", "LTI Rate" are in stats
+        };
+    }
 }

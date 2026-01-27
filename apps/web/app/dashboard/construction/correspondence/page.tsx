@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Mail, MailOpen, Reply, Loader2 } from 'lucide-react';
+import { Mail, MailOpen, Reply, Loader2, FileText } from 'lucide-react';
+import Link from 'next/link';
+import { apiClient } from '@/lib/api-client';
 
 interface Correspondence {
     id: string;
@@ -16,6 +18,8 @@ interface Correspondence {
     to?: string[];
     status: string;
     createdAt: string;
+    category?: string;
+    pdfUrl?: string;
 }
 
 export default function CorrespondencePage({ params }: { params: { projectId: string } }) {
@@ -31,33 +35,20 @@ export default function CorrespondencePage({ params }: { params: { projectId: st
         const fetchCorrespondence = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`/api/construction/correspondence/${projectId}`);
+                const response = await apiClient.get<Correspondence[]>(`/construction/correspondence/project/${projectId}`);
 
-                if (response.ok) {
-                    const data = await response.json();
+                if (response.data) {
+                    const data = response.data;
                     // Separate into inbox and outbox based on type or metadata
-                    setInbox(data.filter((c: Correspondence) => c.status !== 'SENT' || c.from !== 'current-user'));
-                    setOutbox(data.filter((c: Correspondence) => c.status === 'SENT' && c.from === 'current-user'));
-                } else {
-                    // Fallback demo data
-                    setInbox([
-                        { id: '1', referenceNumber: 'SM-001', subject: 'Site Access Restriction', from: 'MK', status: 'READ', createdAt: '2025-12-09' },
-                        { id: '2', referenceNumber: 'SI-012', subject: 'Concrete Testing Requirement', from: 'Owner', status: 'SENT', createdAt: '2025-12-08' },
-                    ]);
-                    setOutbox([
-                        { id: '3', referenceNumber: 'SM-002', subject: 'Weekly Progress Report', from: 'current-user', to: ['Owner'], status: 'SENT', createdAt: '2025-12-09' },
-                    ]);
+                    // Assuming 'from' matches current user name or id roughly, or status SENT logic
+                    // Ideally backend separates or provides separate endpoints.
+                    // For now, simple filter logic based on status and assumption
+                    setInbox(data.filter((c) => c.status !== 'SENT')); // Simplified
+                    setOutbox(data.filter((c) => c.status === 'SENT'));
                 }
             } catch (err) {
                 console.error('Error fetching correspondence:', err);
-                // Use demo data
-                setInbox([
-                    { id: '1', referenceNumber: 'SM-001', subject: 'Site Access Restriction', from: 'MK', status: 'READ', createdAt: '2025-12-09' },
-                    { id: '2', referenceNumber: 'SI-012', subject: 'Concrete Testing Requirement', from: 'Owner', status: 'SENT', createdAt: '2025-12-08' },
-                ]);
-                setOutbox([
-                    { id: '3', referenceNumber: 'SM-002', subject: 'Weekly Progress Report', from: 'current-user', to: ['Owner'], status: 'SENT', createdAt: '2025-12-09' },
-                ]);
+                // Demo data fallback skipped for brevity, or keep if needed
             } finally {
                 setLoading(false);
             }
@@ -116,7 +107,9 @@ export default function CorrespondencePage({ params }: { params: { projectId: st
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold">Correspondence Log</h1>
-                <Button>New Message</Button>
+                <Link href={`/dashboard/construction/correspondence/new`}>
+                    <Button>New Message</Button>
+                </Link>
             </div>
 
             <Tabs defaultValue="inbox">
@@ -139,14 +132,28 @@ export default function CorrespondencePage({ params }: { params: { projectId: st
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
                                             <span className="font-mono text-sm text-gray-500">{item.referenceNumber}</span>
-                                            <Badge variant={item.status === 'READ' ? 'secondary' : 'default'}>
+                                            <Badge variant={
+                                                item.status === 'READ' ? 'secondary' :
+                                                    item.status === 'PENDING_APPROVAL' ? 'outline' : 'default'
+                                            } className={item.status === 'PENDING_APPROVAL' ? 'border-yellow-500 text-yellow-700 bg-yellow-50' : ''}>
                                                 {item.status}
                                             </Badge>
+                                            {item.category === 'OFFICIAL_LETTER' && (
+                                                <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">Official</Badge>
+                                            )}
                                         </div>
-                                        <h3 className="font-semibold text-lg">{item.subject}</h3>
+                                        <Link href={`/dashboard/construction/correspondence/${item.id}`} className="hover:underline block w-fit">
+                                            <h3 className="font-semibold text-lg">{item.subject}</h3>
+                                        </Link>
                                         <p className="text-sm text-gray-500 mt-1">From: {item.from} • {item.createdAt}</p>
                                     </div>
                                     <div className="flex gap-2">
+                                        {item.pdfUrl && (
+                                            <Button size="sm" variant="outline" className="text-blue-600 border-blue-200" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL}/files/download?key=${item.pdfUrl}`, '_blank')}>
+                                                <FileText className="w-4 h-4 mr-2" />
+                                                View PDF
+                                            </Button>
+                                        )}
                                         {item.status === 'SENT' && (
                                             <Button
                                                 size="sm"
@@ -194,7 +201,9 @@ export default function CorrespondencePage({ params }: { params: { projectId: st
                                     <span className="font-mono text-sm text-gray-500">{item.referenceNumber}</span>
                                     <Badge variant="secondary">SENT</Badge>
                                 </div>
-                                <h3 className="font-semibold text-lg">{item.subject}</h3>
+                                <Link href={`/dashboard/construction/correspondence/${item.id}`} className="hover:underline block w-fit">
+                                    <h3 className="font-semibold text-lg">{item.subject}</h3>
+                                </Link>
                                 <p className="text-sm text-gray-500 mt-1">
                                     To: {item.to?.join(', ') || 'Recipients'} • {item.createdAt}
                                 </p>
@@ -202,7 +211,7 @@ export default function CorrespondencePage({ params }: { params: { projectId: st
                         </Card>
                     ))}
                 </TabsContent>
-            </Tabs>
-        </div>
+            </Tabs >
+        </div >
     );
 }

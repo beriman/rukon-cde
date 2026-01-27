@@ -1,4 +1,5 @@
-import { Controller, Get, Patch, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Body, Param, UseGuards, Query, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -11,6 +12,11 @@ export class UsersController {
     @Get('me/dashboard')
     getDashboardData(@CurrentUser() user: any) {
         return this.usersService.getDashboardData(user.id);
+    }
+
+    @Get('me/profile')
+    getProfile(@CurrentUser() user: any) {
+        return this.usersService.findOneById(user.id);
     }
 
     @Get()
@@ -42,5 +48,10 @@ export class UsersController {
     @Delete(':id')
     deactivate(@Param('id') id: string) {
         return this.usersService.deactivate(id);
+    }
+    @Post('me/signature')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadSignature(@CurrentUser() user: any, @UploadedFile() file: Express.Multer.File) {
+        return this.usersService.uploadSignature(user.id, file);
     }
 }

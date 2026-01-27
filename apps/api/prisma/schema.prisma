@@ -12,6 +12,7 @@ model User {
   email         String    @unique
   password      String
   name          String?
+  signatureUrl  String?   // Digital Signature Image URL
   role          GlobalRole @default(USER)
   isActive      Boolean   @default(true)
   lastLoginAt   DateTime?
@@ -25,6 +26,7 @@ model User {
   submittedProgress ProgressUpdate[]
   assignedActions IncidentAction[]
   submittals    Submittal[]
+  approvedCorrespondences Correspondence[] @relation("CorrespondenceApprover")
   inspections   InspectionForm[]
   
   createdAt     DateTime  @default(now())
@@ -43,6 +45,10 @@ model Organization {
   projects    Project[]
   invitations Invitation[]
   planningDocuments PlanningDocument[]
+  
+  // Official Letterhead Configuration
+  letterheadHeader String?
+  letterheadFooter String?
   
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -88,6 +94,7 @@ model Project {
   hsePersonnel         HsePersonnel[]
   emergencyContacts    HseEmergencyContact[]
   hseAudits            HseAudit[]
+  hseTargets           HseTarget[]
   inspectionTemplates  InspectionTemplate[]
   emergencyDrills      EmergencyDrill[]
   
@@ -111,6 +118,7 @@ model Project {
   
   // Epic 7: Mobile Field App
   siteCaptures   SiteCapture[]
+  tasks          ProjectTask[] 
   
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -144,6 +152,8 @@ model Folder {
   discipline String? // e.g. "ARCH", "STRUCT", "MEP"
   isSystem   Boolean @default(false)
   
+  permissions Json? // e.g. { "read": ["*"], "write": ["ADMIN"] }
+
   @@map("folders")
 }
 
@@ -471,6 +481,22 @@ model ApprovalWorkflow {
   @@map("approval_workflows")
 }
 
+model ProjectTask {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  checklist   Json?    // Array of { id: string, text: string, completed: boolean }
+  status      String   @default("OPEN")
+  assignedTo  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("project_tasks")
+}
+
 model DrawingMarkup {
   id        String   @id @default(uuid())
   fileId    String
@@ -625,6 +651,34 @@ model HseDailyReport {
   @@map("hse_daily_reports")
 }
 
+model HseTarget {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  
+  periodStart DateTime // Start of week/month
+  periodEnd   DateTime
+  type        String   // WEEKLY, MONTHLY
+  
+  // Targets
+  manhours       Int?
+  ltiFreeManhours Int?
+  safeManhours   Int?
+  
+  inspections    Int?
+  meetings       Int?
+  observations   Int? // Safety Cards
+  
+  // Specific targets can be JSON or cols
+  details        Json? // { "TBM": 5, "HEAVY_EQUIPMENT": 10 }
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([projectId])
+  @@map("hse_targets")
+}
+
 model InspectionForm {
   id          String   @id @default(uuid())
   projectId   String
@@ -667,6 +721,11 @@ enum InspectionType {
   FIRE_EXTINGUISHER
   ELECTRICAL_TOOLS
   GENERAL_SITE
+  HEAVY_EQUIPMENT
+  LIFTING_GEAR
+  VEHICLE
+  TOOLS
+  PRE_MOBILIZATION
 }
 
 enum InspectionResult {
@@ -699,6 +758,10 @@ enum MeetingType {
   TBM
   INDUCTION
   EMERGENCY_DRILL
+  GENERAL_SAFETY_TALK
+  WEEKLY_SAFETY_MEETING
+  COMMITTEE_MEETING
+  TRAINING
 }
 
 model HsePersonnel {
@@ -847,6 +910,11 @@ enum SubmittalType {
   SHOP_DRAWING
   METHOD_STATEMENT
   MATERIAL_APPROVAL
+  RFI
+  WORK_REQUEST
+  MODEL_LOD400
+  MODEL_LOD500
+  AS_BUILT_DRAWING
 }
 
 enum SubmittalStatus {
@@ -876,6 +944,12 @@ model Submittal {
   workflow        ApprovalWorkflow? @relation(fields: [workflowId], references: [id])
   
   status          SubmittalStatus @default(DRAFT)
+  
+  // Workflow Tracking
+  currentStageIndex Int           @default(0)
+  activeApprovers   String[]      // Array of User IDs who need to approve now
+  reviews           Json?         // History: [{ stage: 0, approver: "id", status: "APPROVED", date: "..." }]
+  
   submittedBy     String
   submitter       User            @relation(fields: [submittedBy], references: [id])
   
@@ -1053,6 +1127,11 @@ model CobieValidation {
 }
 
 // Story 4.8: Correspondence
+enum CorrespondenceCategory {
+  GENERAL
+  OFFICIAL_LETTER
+}
+
 model Correspondence {
   id          String   @id @default(uuid())
   projectId   String
@@ -1068,7 +1147,16 @@ model Correspondence {
   
   attachments String[] // File IDs
   
-  status      String   // SENT, READ, REPLIED
+  // Official Letter Support
+  category    CorrespondenceCategory @default(GENERAL)
+  pdfUrl      String?  // Storage URL for the generated immutable PDF
+  
+  status      String   // SENT, READ, REPLIED, PENDING_APPROVAL
+  
+  // Approval Workflow
+  approvedById String?
+  approvedBy   User?   @relation("CorrespondenceApprover", fields: [approvedById], references: [id])
+  approvedAt   DateTime?
   
   createdAt   DateTime @default(now())
   

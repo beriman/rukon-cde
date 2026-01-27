@@ -1,10 +1,14 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrgDto } from './dto/create-org.dto';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class OrganizationsService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private filesService: FilesService
+    ) { }
 
     async create(userId: string, dto: CreateOrgDto) {
         try {
@@ -102,5 +106,23 @@ export class OrganizationsService {
             // Unexpected errors
             throw new InternalServerErrorException('Failed to fetch organization');
         }
+    }
+    async uploadLetterhead(userId: string, orgId: string, type: 'header' | 'footer', file: any) {
+        // Verify access
+        await this.findOne(orgId, userId);
+
+        const subfolder = type === 'header' ? 'headers' : 'footers';
+        const result = await this.filesService.uploadSystemFile(orgId, file, subfolder);
+
+        // Update Org
+        // We store the s3Key. The PdfService or Frontend will convert to URL as needed.
+        const updateData = type === 'header'
+            ? { letterheadHeader: result.s3Key }
+            : { letterheadFooter: result.s3Key };
+
+        return this.prisma.organization.update({
+            where: { id: orgId },
+            data: updateData,
+        });
     }
 }

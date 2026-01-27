@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizationsService } from './organizations.service';
 import { InvitationsService } from './invitations.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -52,5 +53,15 @@ export class OrganizationsController {
     @Post('invitations/accept/:token')
     acceptInvitation(@Request() req, @Param('token') token: string) {
         return this.invitationsService.acceptInvitation(token, req.user.userId);
+    }
+    @Post(':id/letterhead')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadLetterhead(
+        @Request() req,
+        @Param('id') id: string,
+        @Query('type') type: 'header' | 'footer',
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.organizationsService.uploadLetterhead(req.user.userId, id, type, file);
     }
 }

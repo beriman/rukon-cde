@@ -10,14 +10,19 @@ import { ClaimService } from './claim.service';
 import { ClaimController } from './claim.controller';
 import { CobieService } from './cobie.service';
 import { CorrespondenceService } from './correspondence.service';
+import { ApprovalService } from './approval.service';
+import { FilesModule } from '../files/files.module';
+import { PdfService } from '../common/services/pdf.service';
+import { CorrespondenceController } from './correspondence.controller';
 
 @Module({
-    imports: [PrismaModule],
+    imports: [PrismaModule, FilesModule],
     controllers: [
         ConstructionController,
         SubmittalController,
         ProcurementController,
         ClaimController,
+        CorrespondenceController,
     ],
     providers: [
         ProgressService,
@@ -26,6 +31,9 @@ import { CorrespondenceService } from './correspondence.service';
         ClaimService,
         CobieService,
         CorrespondenceService,
+        CorrespondenceService,
+        ApprovalService,
+        PdfService,
     ],
     exports: [
         ProgressService,
@@ -34,6 +42,7 @@ import { CorrespondenceService } from './correspondence.service';
         ClaimService,
         CobieService,
         CorrespondenceService,
+        ApprovalService,
     ],
 })
 export class ConstructionModule { }

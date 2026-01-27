@@ -63,6 +63,26 @@ export class ProjectsController {
         return this.projectsService.update(id, data);
     }
 
+    @Post(':id/iso-requirements')
+    seedIsoRequirements(@Param('id') id: string) {
+        return this.projectsService.seedIsoTasks(id);
+    }
+
+    @Get(':id/tasks')
+    getTasks(@Param('id') id: string) {
+        return this.projectsService.getProjectTasks(id);
+    }
+
+    @Patch('tasks/:taskId')
+    updateTask(@Param('taskId') taskId: string, @Body() data: any) {
+        return this.projectsService.updateTask(taskId, data);
+    }
+
+    @Get(':id/monitoring')
+    getMonitoring(@Param('id') id: string) {
+        return this.projectsService.getMonitoringData(id);
+    }
+
     @Patch(':id/archive')
     archive(@Param('id') id: string) {
         return this.projectsService.archive(id);

@@ -52,4 +52,14 @@ export class SubmittalController {
     async getSubmittalById(@Param('id') id: string) {
         return this.submittalService.getSubmittalById(id);
     }
+
+    @Post(':id/start-workflow')
+    async startWorkflow(@Param('id') id: string, @Body() body: { workflowId: string }) {
+        return this.submittalService.startWorkflow(id, body.workflowId);
+    }
+
+    @Post(':id/approve')
+    async approve(@Param('id') id: string, @Body() body: { userId: string, comment?: string, signature?: string }) {
+        return this.submittalService.approve(id, body.userId, body.comment, body.signature);
+    }
 }

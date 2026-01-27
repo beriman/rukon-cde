@@ -16,4 +16,9 @@ export class HseController {
     getStatsWithTrends(@Param('projectId') projectId: string) {
         return this.hseService.getStatsWithTrends(projectId);
     }
+
+    @Get('projects/:projectId/hse/dashboard')
+    getDashboard(@Param('projectId') projectId: string) {
+        return this.hseService.getComprehensiveDashboard(projectId);
+    }
 }

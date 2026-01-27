@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class UsersService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private filesService: FilesService
+    ) { }
 
     async findAll(organizationId: string, options?: {
         search?: string;
@@ -112,6 +116,21 @@ export class UsersService {
                 // deletedAt: new Date() - requires schema update
                 updatedAt: new Date(),
             },
+        });
+    }
+
+    async uploadSignature(userId: string, file: Express.Multer.File) {
+        const uploadRes = await this.filesService.uploadSystemFile(
+            userId, // Use userId as context
+            file,
+            'signatures'
+        );
+
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                signatureUrl: uploadRes.s3Key
+            } as any // Cast until prisma generate
         });
     }
 

@@ -11,6 +11,7 @@ import { FileExplorer } from '@/components/features/files/FileExplorer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { DocumentMonitoring } from '@/components/features/projects/DocumentMonitoring';
 
 interface Project {
     id: string;
@@ -92,6 +93,12 @@ export default function ProjectDetailsPage() {
                     </div>
                 </div>
                 <div className="flex gap-2">
+                    <Link href={`/projects/${projectId}/requirements`}>
+                        <Button variant="outline">
+                            <FileText className="mr-2 h-4 w-4" />
+                            ISO Requirements
+                        </Button>
+                    </Link>
                     <UploadWizard
                         projectId={projectId}
                         projectCode={project.code}
@@ -123,20 +130,25 @@ export default function ProjectDetailsPage() {
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    HSE Incidents
-                                </CardTitle>
-                                <HardHat className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{dashboard?.metrics.incidentCount}</div>
-                                <p className="text-xs text-muted-foreground">
-                                    Reported incidents
-                                </p>
-                            </CardContent>
-                        </Card>
+                        <Link href={`/projects/${projectId}/hse`}>
+                            <Card className="hover:border-green-500 cursor-pointer transition-colors">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        HSE Performance
+                                    </CardTitle>
+                                    <HardHat className="h-4 w-4 text-green-600" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{dashboard?.metrics.incidentCount}</div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Incidents Recorded
+                                    </p>
+                                    <div className="mt-2 text-xs text-green-700 font-medium">
+                                        Click for details & reporting
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -202,6 +214,10 @@ export default function ProjectDetailsPage() {
                                 </div>
                             </CardContent>
                         </Card>
+                    </div>
+
+                    <div className="mt-6">
+                        <DocumentMonitoring projectId={projectId} />
                     </div>
                 </TabsContent>
 

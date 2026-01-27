@@ -1,13 +1,15 @@
-import { Settings, User, Bell, Shield, Palette, Database, Globe, ChevronRight } from 'lucide-react';
+import { Settings, User, Bell, Shield, Palette, Database, Globe, ChevronRight, Building } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SettingsPage() {
     const sections = [
-        { icon: User, label: 'Profile', desc: 'Manage your account details' },
-        { icon: Bell, label: 'Notifications', desc: 'Configure alert preferences' },
-        { icon: Shield, label: 'Security', desc: 'Password and authentication' },
-        { icon: Palette, label: 'Appearance', desc: 'Theme and display options' },
-        { icon: Database, label: 'Data', desc: 'Export and backup settings' },
-        { icon: Globe, label: 'Language', desc: 'Regional preferences' },
+        { icon: User, label: 'Profile', desc: 'Manage your account details', href: '/dashboard/settings/profile' },
+        { icon: Building, label: 'Organization', desc: 'Manage organization and branding', href: '/dashboard/settings/organization' },
+        { icon: Bell, label: 'Notifications', desc: 'Configure alert preferences', href: '/dashboard/settings/notifications' },
+        { icon: Shield, label: 'Security', desc: 'Password and authentication', href: '/dashboard/settings/security' },
+        { icon: Palette, label: 'Appearance', desc: 'Theme and display options', href: '/dashboard/settings/appearance' },
+        { icon: Database, label: 'Data', desc: 'Export and backup settings', href: '/dashboard/settings/data' },
+        { icon: Globe, label: 'Language', desc: 'Regional preferences', href: '/dashboard/settings/language' },
     ];
 
     return (
@@ -29,7 +31,7 @@ export default function SettingsPage() {
                 {sections.map((section) => {
                     const Icon = section.icon;
                     return (
-                        <button key={section.label} className="glass-card rounded-2xl p-5 text-left hover:shadow-lg transition-shadow group">
+                        <Link key={section.label} href={section.href} className="glass-card rounded-2xl p-5 text-left hover:shadow-lg transition-shadow group block">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
@@ -42,7 +44,7 @@ export default function SettingsPage() {
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
                             </div>
-                        </button>
+                        </Link>
                     );
                 })}
             </div>

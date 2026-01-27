@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import {
     Sparkles,
     Home,
@@ -22,11 +23,11 @@ const navItems = [
     { icon: Box, label: 'Assets', href: '/dashboard/assets' },
 ];
 
-export default function NavRail() {
+export default function NavRail({ className }: { className?: string }) {
     const pathname = usePathname();
 
     return (
-        <div className="flex flex-col justify-between w-18 shrink-0 gap-2 z-10 items-center py-1">
+        <div className={cn("flex flex-col justify-between w-18 shrink-0 gap-2 z-10 items-center py-1", className)}>
             {/* Top Nav Pill */}
             <div className="bg-[#1a1a1a] rounded-full flex flex-col items-center py-5 gap-6 text-white/50 w-14 shadow-2xl shadow-black/20">
                 {/* Logo */}

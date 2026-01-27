@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import ProjectSelector from './ProjectSelector';
 import { useProjectStore } from '@/stores/useProjectStore';
+import { cn } from '@/lib/utils';
 import {
     LayoutDashboard,
     Library,
@@ -26,11 +27,11 @@ import {
     FileText,
 } from 'lucide-react';
 
-export default function SidebarPanel() {
+export default function SidebarPanel({ className }: { className?: string }) {
     const { activeProject } = useProjectStore();
 
     return (
-        <div className="w-72 glass-panel rounded-[2rem] flex flex-col p-5 z-10 relative overflow-hidden">
+        <div className={cn("w-72 glass-panel rounded-[2rem] flex flex-col p-5 z-10 relative overflow-hidden", className)}>
             {/* Mac-like Window Controls */}
             <div className="flex gap-2 mb-6 px-1">
                 <div className="w-3 h-3 rounded-full bg-red-400/80 border border-red-500/20"></div>

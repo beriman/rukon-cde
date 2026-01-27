@@ -89,7 +89,7 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
         ifcLoader.load(
             modelUrl,
             async (model) => {
-                scene.add(model);
+                scene.add(model as any);
                 setIfcModel(model as unknown as IFCModel);
                 setLoadingProgress(100);
 
@@ -182,12 +182,12 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
 
             raycasterRef.current.setFromCamera(mouse, camera);
 
-            const intersects = raycasterRef.current.intersectObjects([model]);
+            const intersects = raycasterRef.current.intersectObjects([model as unknown as THREE.Object3D]);
             if (intersects.length > 0) {
                 const index = intersects[0].faceIndex;
                 if (index === undefined || index === null) return;
 
-                const id = ifcLoader.ifcManager.getExpressId(model.geometry, index as number);
+                const id = ifcLoader.ifcManager.getExpressId((model as any).geometry, index as number);
                 setSelectedExpressId(id);
 
                 try {

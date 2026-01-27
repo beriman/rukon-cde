@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../hooks/useAuth';
-import api from '../../lib/api';
+import { apiClient as api } from '../../lib/api-client';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 

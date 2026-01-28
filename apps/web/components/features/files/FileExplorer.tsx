@@ -13,7 +13,7 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '../../ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

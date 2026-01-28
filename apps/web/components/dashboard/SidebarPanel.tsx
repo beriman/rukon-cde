@@ -30,7 +30,7 @@ export default function SidebarPanel() {
     const { activeProject } = useProjectStore();
 
     return (
-        <div className="w-72 glass-panel rounded-[2rem] flex flex-col p-5 z-10 relative overflow-hidden">
+        <div className="w-64 md:w-72 glass-panel rounded-2xl md:rounded-[2rem] flex flex-col p-5 z-10 relative overflow-hidden">
             {/* Mac-like Window Controls */}
             <div className="flex gap-2 mb-6 px-1">
                 <div className="w-3 h-3 rounded-full bg-red-400/80 border border-red-500/20"></div>

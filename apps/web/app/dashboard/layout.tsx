@@ -25,8 +25,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
                 <div className="fixed inset-0 z-50 flex flex-col bg-black/50 md:hidden backdrop-blur-sm">
-                    <div className="flex h-full p-3 gap-3 overflow-hidden">
-                        <div className="flex gap-3 h-full overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex h-full p-3 gap-2 overflow-hidden">
+                        <div className="flex gap-2 h-full overflow-auto" onClick={(e) => e.stopPropagation()}>
                             <NavRail />
                             <SidebarPanel />
                         </div>
@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
 
             {/* Column 3: Main Dashboard Content */}
-            <div className="flex-1 glass-panel rounded-[2rem] flex flex-col p-4 md:p-8 z-10 relative overflow-hidden min-w-0">
+            <div className="flex-1 glass-panel rounded-2xl md:rounded-[2rem] flex flex-col p-4 md:p-8 z-10 relative overflow-hidden min-w-0">
                 {/* Mobile Header */}
                 <div className="md:hidden flex items-center justify-between mb-4">
                     <button

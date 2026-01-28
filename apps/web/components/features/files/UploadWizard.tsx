@@ -267,7 +267,7 @@ export function UploadWizard({ projectId, projectCode, folderId }: UploadWizardP
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Target Folder:</span>
-                                        <span className="font-medium text-slate-800">{foldersId ? 'WIP' : 'Unknown'}</span>
+                                        <span className="font-medium text-slate-800">{folderId ? 'WIP' : 'Unknown'}</span>
                                     </div>
                                 </div>
                             </div>

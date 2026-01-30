@@ -29,6 +29,10 @@ model User {
   approvedCorrespondences Correspondence[] @relation("CorrespondenceApprover")
   inspections   InspectionForm[]
   
+  // Transmittals
+  sentTransmittals      Transmittal[] @relation("TransmittalSender")
+  receivedTransmittals  TransmittalRecipient[]
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -119,6 +123,9 @@ model Project {
   // Epic 7: Mobile Field App
   siteCaptures   SiteCapture[]
   tasks          ProjectTask[] 
+  
+  // Epic 8: Transmittals
+  transmittals   Transmittal[]
   
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -229,6 +236,7 @@ model File {
   submittals   Submittal[]
   validationReports ValidationReport[]
   simulationLinks SimulationLink[]
+  transmittalItems TransmittalItem[]
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -1459,3 +1467,80 @@ model SiteCapture {
   @@index([synced])
   @@map("site_captures")
 }
+
+// --- EPIC 8: Transmittals ---
+
+model Transmittal {
+  id              String   @id @default(uuid())
+  transmittalNo   String   
+  subject         String
+  message         String?
+  
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id])
+  
+  senderId        String
+  sender          User     @relation("TransmittalSender", fields: [senderId], references: [id])
+  
+  recipients      TransmittalRecipient[]
+  items           TransmittalItem[]
+  
+  status          TransmittalStatus @default(DRAFT)
+  sentAt          DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([projectId, transmittalNo])
+  @@index([projectId])
+  @@map("transmittals")
+}
+
+enum TransmittalStatus {
+  DRAFT
+  SENT
+  VOID
+}
+
+model TransmittalRecipient {
+  id              String   @id @default(uuid())
+  transmittalId   String
+  transmittal     Transmittal @relation(fields: [transmittalId], references: [id], onDelete: Cascade)
+  
+  recipientId     String
+  recipient       User     @relation(fields: [recipientId], references: [id])
+  
+  status          RecipientStatus @default(PENDING)
+  viewedAt        DateTime?
+  acknowledgedAt  DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([transmittalId, recipientId])
+  @@map("transmittal_recipients")
+}
+
+enum RecipientStatus {
+  PENDING
+  RECEIVED
+  ACKNOWLEDGED
+}
+
+model TransmittalItem {
+  id              String   @id @default(uuid())
+  transmittalId   String
+  transmittal     Transmittal @relation(fields: [transmittalId], references: [id], onDelete: Cascade)
+  
+  fileId          String
+  file            File     @relation(fields: [fileId], references: [id])
+  
+  revision        String?
+  purpose         String?  // e.g. "For Approval", "For Information"
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([transmittalId, fileId])
+  @@map("transmittal_items")
+}
+

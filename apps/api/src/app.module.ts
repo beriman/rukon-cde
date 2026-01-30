@@ -27,6 +27,7 @@ import { SyncModule } from './sync/sync.module';
 import { SiteCaptureModule } from './site-capture/site-capture.module';
 import { QrModule } from './qr/qr.module';
 import { AiModule } from './ai/ai.module';
+import { TransmittalsModule } from './transmittals/transmittals.module';
 
 @Module({
     imports: [
@@ -58,6 +59,7 @@ import { AiModule } from './ai/ai.module';
         SiteCaptureModule,
         QrModule,
         AiModule,
+        TransmittalsModule,
     ],
     controllers: [AppController],
     providers: [

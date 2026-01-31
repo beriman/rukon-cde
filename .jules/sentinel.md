@@ -1,0 +1,4 @@
+## 2025-02-20 - Path Traversal in Local File Uploads
+**Vulnerability:** The `FilesService.uploadSystemFile` method in `apps/api` was vulnerable to path traversal because it concatenated `file.originalname` and `subfolder` directly into a file system path without sanitization. An attacker could use filenames like `../../../etc/passwd` to overwrite arbitrary files on the server (when local storage fallback is active).
+**Learning:** Even when using higher-level abstractions or ORMs, direct file system operations must always sanitize user-controlled inputs. `path.join` does not prevent traversal if the segments contain `..`.
+**Prevention:** Always use `path.basename()` on user-provided filenames and directory names before constructing file paths. Validate that the resulting path is within the expected directory.

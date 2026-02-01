@@ -201,4 +201,34 @@ export class AuthService {
             refresh_token: rt,
         };
     }
+
+    async googleSync(dto: { email: string; name: string }) {
+        let user = await this.usersService.findOneByEmail(dto.email);
+
+        if (!user) {
+            // Auto-register user from Google
+            user = await this.usersService.create({
+                email: dto.email,
+                name: dto.name,
+                password: '', // OAuth users don't have local passwords
+            });
+            
+            await this.auditService.log(user.id, AuditAction.LOGIN, undefined, undefined, { method: 'GOOGLE_OAUTH_NEW' });
+        } else {
+            await this.auditService.log(user.id, AuditAction.LOGIN, undefined, undefined, { method: 'GOOGLE_OAUTH_EXISTING' });
+        }
+
+        const tokens = await this.generateTokens(user.id, user.email, user.role);
+        await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+        return {
+            ...tokens,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+            },
+        };
+    }
 }

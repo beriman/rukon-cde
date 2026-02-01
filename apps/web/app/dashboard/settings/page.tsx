@@ -1,67 +1,172 @@
-import { Settings, User, Bell, Shield, Palette, Database, Globe, ChevronRight, Building } from 'lucide-react';
-import Link from 'next/link';
+'use client';
 
-export default function SettingsPage() {
-    const sections = [
-        { icon: User, label: 'Profile', desc: 'Manage your account details', href: '/dashboard/settings/profile' },
-        { icon: Building, label: 'Organization', desc: 'Manage organization and branding', href: '/dashboard/settings/organization' },
-        { icon: Bell, label: 'Notifications', desc: 'Configure alert preferences', href: '/dashboard/settings/notifications' },
-        { icon: Shield, label: 'Security', desc: 'Password and authentication', href: '/dashboard/settings/security' },
-        { icon: Palette, label: 'Appearance', desc: 'Theme and display options', href: '/dashboard/settings/appearance' },
-        { icon: Database, label: 'Data', desc: 'Export and backup settings', href: '/dashboard/settings/data' },
-        { icon: Globe, label: 'Language', desc: 'Regional preferences', href: '/dashboard/settings/language' },
-    ];
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { User, Mail, Phone, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
+
+export default function ProfilePage() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [success, setSuccess] = useState(false);
+    
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        address: ''
+    });
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const fetchProfile = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/me/profile`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const user = response.data;
+            setFormData({
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                address: user.address || ''
+            });
+        } catch (error) {
+            console.error('Failed to fetch profile', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+        setSuccess(false);
+
+        try {
+            const token = localStorage.getItem('token');
+            await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/profile`, 
+                {
+                    name: formData.name,
+                    phone: formData.phone,
+                    address: formData.address
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 3000);
+        } catch (error) {
+            console.error('Failed to update profile', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="h-full flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
+            </div>
+        );
+    }
 
     return (
-        <>
-            {/* Header */}
-            <div className="flex justify-between items-start mb-8">
-                <div>
-                    <h1 className="text-3xl font-medium text-slate-800 tracking-tight mb-1">
-                        Settings
-                    </h1>
-                    <p className="text-sm text-slate-500 font-light">
-                        Manage your account and preferences
-                    </p>
-                </div>
+        <div className="p-4 max-w-2xl mx-auto">
+            <div className="mb-10">
+                <h1 className="text-3xl font-semibold text-slate-800 tracking-tight mb-2">
+                    Profile Settings
+                </h1>
+                <p className="text-slate-500 font-light">
+                    Manage your personal information and contact details.
+                </p>
             </div>
 
-            {/* Settings Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {sections.map((section) => {
-                    const Icon = section.icon;
-                    return (
-                        <Link key={section.label} href={section.href} className="glass-card rounded-2xl p-5 text-left hover:shadow-lg transition-shadow group block">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                                        <Icon className="w-5 h-5 text-slate-600" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-medium text-slate-800">{section.label}</h3>
-                                        <p className="text-sm text-slate-400">{section.desc}</p>
-                                    </div>
-                                </div>
-                                <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
+            <div className="glass-card rounded-[2rem] p-8 bg-white border border-slate-100">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Name */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400 ml-1 flex items-center gap-2">
+                            <User className="w-3 h-3" /> Full Name
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            className="w-full px-4 py-3 border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-300 transition-all bg-slate-50/50"
+                            placeholder="e.g. Beriman Juliano"
+                            required
+                        />
+                    </div>
+
+                    {/* Email (Disabled - from Auth) */}
+                    <div className="space-y-2 opacity-60">
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400 ml-1 flex items-center gap-2">
+                            <Mail className="w-3 h-3" /> Email Address
+                        </label>
+                        <input
+                            type="email"
+                            value={formData.email}
+                            disabled
+                            className="w-full px-4 py-3 border border-slate-100 rounded-2xl text-sm bg-slate-100/50 cursor-not-allowed"
+                        />
+                        <p className="text-[10px] text-slate-400 ml-1">* Email is managed via Google Account</p>
+                    </div>
+
+                    {/* WhatsApp / Phone */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400 ml-1 flex items-center gap-2">
+                            <Phone className="w-3 h-3" /> WhatsApp Number
+                        </label>
+                        <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            className="w-full px-4 py-3 border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-300 transition-all bg-slate-50/50"
+                            placeholder="e.g. +62 812 3456 7890"
+                        />
+                    </div>
+
+                    {/* Address */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400 ml-1 flex items-center gap-2">
+                            <MapPin className="w-3 h-3" /> Office/Home Address
+                        </label>
+                        <textarea
+                            value={formData.address}
+                            onChange={(e) => setFormData({...formData, address: e.target.value})}
+                            className="w-full px-4 py-3 border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-300 transition-all bg-slate-50/50 min-h-[100px]"
+                            placeholder="e.g. Bintaro Jaya, Tangerang Selatan"
+                        />
+                    </div>
+
+                    <div className="pt-4 flex items-center gap-4">
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="flex-1 py-4 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                            {saving ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : 'Update Profile'}
+                        </button>
+                        
+                        {success && (
+                            <div className="flex items-center gap-2 text-green-500 font-bold text-sm animate-in fade-in slide-in-from-left-2">
+                                <CheckCircle2 className="w-5 h-5" />
+                                Updated!
                             </div>
-                        </Link>
-                    );
-                })}
+                        )}
+                    </div>
+                </form>
             </div>
-
-            {/* Danger Zone */}
-            <div className="mt-8 glass-card rounded-2xl p-6 border border-red-200/50">
-                <h3 className="font-medium text-red-600 mb-2">Danger Zone</h3>
-                <p className="text-sm text-slate-500 mb-4">Irreversible actions</p>
-                <div className="flex gap-3">
-                    <button className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-colors">
-                        Delete Account
-                    </button>
-                    <button className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
-                        Export All Data
-                    </button>
-                </div>
-            </div>
-        </>
+        </div>
     );
 }

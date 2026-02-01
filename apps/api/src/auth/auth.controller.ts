@@ -32,4 +32,10 @@ export class AuthController {
         await this.authService.logout(body.userId);
         return { message: 'Logged out successfully' };
     }
+
+    @Post('google-sync')
+    @HttpCode(HttpStatus.OK)
+    async googleSync(@Body() dto: { email: string; name: string }) {
+        return this.authService.googleSync(dto);
+    }
 }

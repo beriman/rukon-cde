@@ -32,12 +32,14 @@ import {
     Loader2,
     MoreHorizontal,
     Activity,
-    Lock
+    Lock,
+    Calendar as CalendarIcon
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { IfcViewer } from '@/components/viewer/IfcViewer';
+import DailyLogWidget from '@/components/dashboard/DailyLogWidget';
 
 interface ProjectDetailsProps {
     projectId: string;
@@ -47,8 +49,11 @@ const AVAILABLE_WIDGETS = [
     { id: '3D_VIEWER', name: '3D BIM Viewer', icon: Box, color: 'text-blue-400', desc: 'Interactive 3D models (IFC)' },
     { id: '4D_SIM', name: '4D Schedule', icon: Clock, color: 'text-amber-400', desc: 'Time-based construction simulation' },
     { id: '5D_COST', name: '5D Cost Heatmap', icon: DollarSign, color: 'text-emerald-400', desc: 'Visual cost distribution on model' },
+    { id: 'DAILY_LOG', name: 'Daily Site Log', icon: CalendarIcon, color: 'text-sky-400', desc: 'Auto-aggregated site progress & weather' },
     { id: 'MIDP_MONITOR', name: 'MIDP Analytics', icon: LayoutDashboard, color: 'text-cyan-400', desc: 'Monitor Task Information Delivery Plans (TIDP)' },
     { id: 'LIVE_CAMERA', name: 'Live Site Camera', icon: Video, color: 'text-rose-400', desc: 'Real-time CCTV & site monitoring' },
+    { id: 'FINANCIAL_RADAR', name: 'Financial Health', icon: DollarSign, color: 'text-emerald-400', desc: 'Cost vs Budget variance radar' },
+    { id: 'AI_PREDICT', name: 'AI Predictive Engine', icon: Zap, color: 'text-blue-400', desc: 'Predictive delay alerts & health score' },
     { id: '2D_DOCS', name: '2D Documents', icon: FileText, color: 'text-indigo-400', desc: 'Pinned technical drawings & PDFs' },
     { id: 'S_CURVE', name: 'Progress Curve', icon: TrendingUp, color: 'text-fuchsia-400', desc: 'S-Curve (Target vs Actual)' },
     { id: 'HSE', name: 'HSE Metrics', icon: HardHat, color: 'text-orange-400', desc: 'Safety statistics & safe days' },
@@ -240,6 +245,9 @@ export default function ProjectDashboard({ projectId }: ProjectDetailsProps) {
                             </div>
                         )}
 
+                        {/* Daily Log Widget (Cycle 5) */}
+                        {activeWidgets.includes('DAILY_LOG') && <DailyLogWidget projectId={projectId} />}
+
                         {/* S-Curve Analytics */}
                         {activeWidgets.includes('S_CURVE') && (
                             <div className="rounded-[2.5rem] bg-[#1e293b] border border-slate-800 p-8 shadow-xl">
@@ -287,6 +295,36 @@ export default function ProjectDashboard({ projectId }: ProjectDetailsProps) {
                 {/* Right Side: Data & Intelligence (MIDP/Correspondence) */}
                 <div className="lg:col-span-4 space-y-8">
                     
+                    {/* AI Predictive Insight (Cycle 7) */}
+                    {activeWidgets.includes('AI_PREDICT') && (
+                        <div className="rounded-[2.5rem] bg-gradient-to-br from-blue-900/40 to-slate-900 border border-blue-500/20 p-8 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Activity className="w-24 h-24 text-blue-400" />
+                            </div>
+                            <h4 className="font-bold text-white mb-6 flex items-center gap-3">
+                                <Zap className="w-5 h-5 text-blue-400 animate-pulse" />
+                                AI Predictive Insight
+                            </h4>
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Project Health Score</span>
+                                    <span className="text-2xl font-black text-white">92/100</span>
+                                </div>
+                                <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
+                                    <div className="flex gap-4 items-start">
+                                        <div className="p-2 bg-blue-500/20 rounded-xl">
+                                            <AlertCircle className="w-4 h-4 text-blue-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-blue-100">Projected Delay: 0 Days</p>
+                                            <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Current submission velocity matches the baseline schedule. Keep ARCH team active for next milestone.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* MIDP Monitoring (Deeper Logic) */}
                     {activeWidgets.includes('MIDP_MONITOR') && (
                         <div className="rounded-[2.5rem] bg-[#1e293b] border border-slate-800 p-8 shadow-xl">
@@ -315,6 +353,50 @@ export default function ProjectDashboard({ projectId }: ProjectDetailsProps) {
                             <button className="w-full mt-10 py-4 bg-slate-900/50 hover:bg-slate-900 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] rounded-2xl transition-all">
                                 View Full Delivery Schedule
                             </button>
+                        </div>
+                    )}
+
+                    {/* Financial Radar Widget (Cycle 6) */}
+                    {activeWidgets.includes('FINANCIAL_RADAR') && (
+                        <div className="rounded-[2.5rem] bg-[#1e293b] border border-slate-800 p-8 shadow-xl relative overflow-hidden">
+                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl" />
+                            <div className="flex justify-between items-start mb-8">
+                                <div>
+                                    <h4 className="font-bold text-white flex items-center gap-2">
+                                        <DollarSign className="w-5 h-5 text-emerald-400" />
+                                        Financial Health Radar
+                                    </h4>
+                                    <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Budget Utilization vs Physical Progress</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[9px] font-black rounded uppercase border border-emerald-500/20">On Track</span>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-3 gap-6">
+                                <div className="space-y-1">
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase">Estimated Budget</p>
+                                    <p className="text-xl font-black text-white">IDR 3.4T</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase">Actual Cost (AC)</p>
+                                    <p className="text-xl font-black text-emerald-400">IDR 1.2T</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase">Cost Variance</p>
+                                    <p className="text-xl font-black text-blue-400">-0.4%</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 space-y-2">
+                                <div className="flex justify-between text-[9px] font-bold uppercase text-slate-500">
+                                    <span>Budget Burn Rate</span>
+                                    <span className="text-white">35.2%</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]" style={{width: '35.2%'}} />
+                                </div>
+                            </div>
                         </div>
                     )}
 

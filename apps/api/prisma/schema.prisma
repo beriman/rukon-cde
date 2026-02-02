@@ -366,6 +366,11 @@ model FileVersion {
   size         Int
   uploadedBy   String
   cdeState     String   @default("WIP")
+  
+  // Digital Signature (UU ITE Compliance)
+  isSigned     Boolean  @default(false)
+  signatureData Json?    // { signedBy: "UserId", timestamp: "...", certHash: "..." }
+  
   createdAt    DateTime @default(now())
   
   @@unique([fileId, version])
@@ -764,8 +769,15 @@ model HseDailyReport {
   manhours     Int      @default(0) // Total manhours for the day
   workersCount Int      @default(0)
   
-  weather      String?
+  // Weather Info (Procore Style)
+  weatherCondition String? // Sunny, Rain, Cloudy
+  temperature      Float?
+  humidity         Float?
+  
   notes        String?
+  
+  // Progress Integration
+  completedTasks Json?   // [{ taskId: "T01", description: "Column Casting" }]
   
   recordedBy   String
   recorder     User     @relation(fields: [recordedBy], references: [id])
@@ -1300,6 +1312,11 @@ model Correspondence {
   approvedById String?
   approvedBy   User?   @relation("CorrespondenceApprover", fields: [approvedById], references: [id])
   approvedAt   DateTime?
+  
+  // Threading (Aconex Feature)
+  parentId     String?
+  parent       Correspondence? @relation("LetterThreading", fields: [parentId], references: [id])
+  replies      Correspondence[] @relation("LetterThreading")
   
   createdAt   DateTime @default(now())
   

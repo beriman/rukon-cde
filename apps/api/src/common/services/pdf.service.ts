@@ -110,12 +110,25 @@ export class PdfService {
 
         content.push({
             columns: [
+                // QR Verification Code (Dynamic Image)
+                {
+                    width: 100,
+                    stack: [
+                        {
+                            image: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://rukon.io/verify/${data.referenceNumber}`,
+                            width: 60,
+                            alignment: 'left'
+                        },
+                        { text: 'SCAN TO VERIFY', fontSize: 7, bold: true, marginTop: 5, color: '#3b82f6' }
+                    ]
+                },
                 { width: '*', text: '' },
                 {
                     width: 200,
                     stack: signatureStack
                 }
-            ]
+            ],
+            marginTop: 20
         });
 
         // 7. Footer Image

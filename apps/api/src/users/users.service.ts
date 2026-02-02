@@ -107,6 +107,18 @@ export class UsersService {
         });
     }
 
+    async updateProfile(id: string, data: { name?: string; phone?: string; address?: string }) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                name: data.name,
+                phone: data.phone,
+                address: data.address,
+                updatedAt: new Date(),
+            },
+        });
+    }
+
     async deactivate(id: string) {
         // Soft delete - in future add deletedAt field
         // For now, we could update a status field or just disable login

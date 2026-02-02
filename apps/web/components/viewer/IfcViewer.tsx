@@ -32,6 +32,10 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [is4DOpen, setIs4DOpen] = useState(false);
     const [isCostOpen, setIsCostOpen] = useState(false);
+    
+    // Cycle 3: Spatial Bookmarks
+    const [bookmarks, setBookmarks] = useState<any[]>([]);
+    const controlsRef = useRef<any>(null);
     const [simDate, setSimDate] = useState<Date>(new Date('2024-01-01'));
     const [links, setLinks] = useState<SimulationLink[]>([]);
     const [tasks, setTasks] = useState<ScheduleTask[]>([]);
@@ -69,6 +73,7 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
         // Setup Controls
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
+        controlsRef.current = controls;
 
         // Lights
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
@@ -363,11 +368,51 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
         // Implement zoom logic here
     };
 
+    const saveBookmark = () => {
+        if (!controlsRef.current || !cameraRef.current) return;
+        const name = prompt("Enter view name:", `View ${bookmarks.length + 1}`);
+        if (!name) return;
+
+        const newBookmark = {
+            id: Math.random().toString(36).substr(2, 9),
+            name,
+            position: cameraRef.current.position.clone(),
+            target: controlsRef.current.target.clone()
+        };
+        setBookmarks([...bookmarks, newBookmark]);
+    };
+
+    const loadBookmark = (b: any) => {
+        if (!controlsRef.current || !cameraRef.current) return;
+        cameraRef.current.position.copy(b.position);
+        controlsRef.current.target.copy(b.target);
+        controlsRef.current.update();
+    };
+
     return (
         <div className="relative w-full h-[80vh] border rounded-lg overflow-hidden bg-gray-50 flex">
             <div ref={containerRef} className="w-full h-full relative">
                 {loadingProgress === 100 && (
                     <div className="flex flex-col gap-2 absolute top-4 right-4 z-10">
+                        {/* Cycle 3 Bookmark Controls */}
+                        <div className="bg-white/90 backdrop-blur p-2 rounded-xl border shadow-sm mb-2 space-y-2">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Spatial Bookmarks</p>
+                            <div className="max-h-32 overflow-y-auto space-y-1">
+                                {bookmarks.map(b => (
+                                    <button 
+                                        key={b.id} 
+                                        onClick={() => loadBookmark(b)}
+                                        className="w-full text-left px-2 py-1.5 hover:bg-blue-50 text-[10px] font-bold text-slate-600 rounded-lg flex items-center gap-2"
+                                    >
+                                        <Eye className="w-3 h-3 text-blue-400" /> {b.name}
+                                    </button>
+                                ))}
+                            </div>
+                            <Button size="sm" variant="outline" className="w-full text-[10px] h-8" onClick={saveBookmark}>
+                                <Plus className="w-3 h-3 mr-1" /> Save View
+                            </Button>
+                        </div>
+
                         <Button
                             size="sm"
                             onClick={() => setIsPanelOpen(true)}

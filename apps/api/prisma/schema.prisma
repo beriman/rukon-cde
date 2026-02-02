@@ -12,6 +12,8 @@ model User {
   email         String    @unique
   password      String
   name          String?
+  phone         String?   // WhatsApp Number
+  address       String?   // Full Address
   signatureUrl  String?   // Digital Signature Image URL
   role          GlobalRole @default(USER)
   isActive      Boolean   @default(true)
@@ -28,6 +30,9 @@ model User {
   submittals    Submittal[]
   approvedCorrespondences Correspondence[] @relation("CorrespondenceApprover")
   inspections   InspectionForm[]
+  joinRequests  ProjectJoinRequest[]
+  ledTeams      ProjectTeam[] @relation("TeamLeader")
+  teams         ProjectTeam[] @relation("TeamMembers")
   
   // Transmittals
   sentTransmittals      Transmittal[] @relation("TransmittalSender")
@@ -76,11 +81,47 @@ model OrganizationUser {
   @@map("organization_users")
 }
 
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  PENDING_PAYMENT
+}
+
+enum ProjectStage {
+  PLANNING
+  DESIGN
+  PROCUREMENT
+  CONSTRUCTION
+  COMMISSIONING
+  OPERATION
+}
+
+enum SubscriptionPlan {
+  FREE
+  UMKM
+  KORPORASI
+}
+
 model Project {
   id             String       @id @default(uuid())
   name           String
   code           String
   organizationId String
+  
+  // Monetization
+  plan           SubscriptionPlan @default(FREE)
+  isPaid         Boolean          @default(false)
+  ownerId        String?          // The user who created & pays for the project
+  
+  // Dashboard & Unified View
+  currentStage   ProjectStage     @default(PLANNING)
+  pinnedItems    Json?            // { sCurve: FileId, milestones: [], activeFormId: string }
+  dashboardStats Json?            // Cache for aggregate progress data
+  activeWidgets  Json?            // Array of enabled widgets
+  
+  // Watermark Settings
+  watermarkEnabled Boolean         @default(false)
+  watermarkConfig  Json?           // { text: "FOR CONSTRUCTION", position: "bottom-right", opacity: 0.5 }
   
   organization   Organization @relation(fields: [organizationId], references: [id])
   
@@ -88,6 +129,9 @@ model Project {
   planningDocuments PlanningDocument[]
   taskDeliveryPlans TaskDeliveryPlan[]
   approvalWorkflows ApprovalWorkflow[]
+  
+  joinRequests   ProjectJoinRequest[]
+  projectTeams   ProjectTeam[]
   
   // Epic 5: HSE
   incidents            Incident[]
@@ -138,6 +182,65 @@ model Project {
 enum ProjectStatus {
   ACTIVE
   ARCHIVED
+  PENDING_PAYMENT
+}
+
+enum SubscriptionPlan {
+  FREE
+  UMKM
+  KORPORASI
+}
+
+model ProjectJoinRequest {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  status    String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  
+  project   Project  @relation(fields: [projectId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, userId])
+  @@map("project_join_requests")
+}
+
+model ProjectTeam {
+  id             String   @id @default(uuid())
+  projectId      String
+  name           String   // e.g. "PT Arkonin (Consultant)"
+  leaderId       String?  // Project Manager of this team
+  
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  leader         User?    @relation("TeamLeader", fields: [leaderId], references: [id])
+  members        User[]   @relation("TeamMembers")
+  
+  wipFolderId    String?  @unique
+  wipFolder      Folder?  @relation("TeamWipFolder", fields: [wipFolderId], references: [id])
+
+  submissions    TeamSubmission[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("project_teams")
+}
+
+model TeamSubmission {
+  id        String   @id @default(uuid())
+  teamId    String
+  type      String   // SCURVE, SCHEDULE, MILESTONE, FORM_RESPONSE
+  content   Json     // Data submitted
+  status    String   @default("PENDING") // PENDING, PINNED, ARCHIVED
+  
+  team      ProjectTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("team_submissions")
 }
 
 model Folder {
@@ -160,6 +263,8 @@ model Folder {
   isSystem   Boolean @default(false)
   
   permissions Json? // e.g. { "read": ["*"], "write": ["ADMIN"] }
+  
+  teamWip       ProjectTeam? @relation("TeamWipFolder")
 
   @@map("folders")
 }
@@ -261,6 +366,11 @@ model FileVersion {
   size         Int
   uploadedBy   String
   cdeState     String   @default("WIP")
+  
+  // Digital Signature (UU ITE Compliance)
+  isSigned     Boolean  @default(false)
+  signatureData Json?    // { signedBy: "UserId", timestamp: "...", certHash: "..." }
+  
   createdAt    DateTime @default(now())
   
   @@unique([fileId, version])
@@ -351,6 +461,11 @@ model AuditLog {
   details     Json?
   ipAddress   String?
   userAgent   String?
+  
+  // High-Security Feature
+  hash        String?     // SHA-256 of the log entry for integrity check
+  isImmutable Boolean     @default(true)
+  
   createdAt   DateTime    @default(now())
 
   user        User        @relation(fields: [userId], references: [id])
@@ -479,7 +594,15 @@ model ApprovalWorkflow {
   projectId      String
   project        Project  @relation(fields: [projectId], references: [id])
   name           String
-  stages         Json     // Array of stage definitions
+  description    String?
+  
+  // Logic: [{ order: 1, role: "PM", userId: null, action: "APPROVE" }]
+  stages         Json     
+  
+  // Automations
+  targetFolderId String?  // Move here on total success (e.g. Published)
+  rejectFolderId String?  // Move here on rejection
+  
   isActive       Boolean  @default(true)
   submittals     Submittal[]
   
@@ -646,8 +769,15 @@ model HseDailyReport {
   manhours     Int      @default(0) // Total manhours for the day
   workersCount Int      @default(0)
   
-  weather      String?
+  // Weather Info (Procore Style)
+  weatherCondition String? // Sunny, Rain, Cloudy
+  temperature      Float?
+  humidity         Float?
+  
   notes        String?
+  
+  // Progress Integration
+  completedTasks Json?   // [{ taskId: "T01", description: "Column Casting" }]
   
   recordedBy   String
   recorder     User     @relation(fields: [recordedBy], references: [id])
@@ -1140,22 +1270,39 @@ enum CorrespondenceCategory {
   OFFICIAL_LETTER
 }
 
+enum CorrespondenceType {
+  GENERAL
+  SITE_INSTRUCTION
+  REQUEST_FOR_INFORMATION
+  CONFIRMATION_OF_VERBAL_INSTRUCTION
+  MATERIAL_APPROVAL
+  SHOP_DRAWING_SUBMISSION
+  PAYMENT_CERTIFICATE
+}
+
 model Correspondence {
-  id          String   @id @default(uuid())
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id])
+  id              String   @id @default(uuid())
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id])
   
-  type        String   // SITE_MEMO, SITE_INSTRUCTION
+  type            CorrespondenceType @default(GENERAL)
   referenceNumber String @unique
   
-  from        String
-  to          String[]
-  subject     String
-  message     String
+  // Aconex Feature: Permanent Record
+  isLocked        Boolean @default(true) // Once sent, cannot be edited
+  
+  from            String
+  to              String[]
+  subject         String
+  message         String
   
   attachments String[] // File IDs
   
-  // Official Letter Support
+  // Financial Impact (ThinkProject feature)
+  hasCostImpact   Boolean @default(false)
+  estimatedCost   Float?
+  estimatedTime   Int?    // Days
+  
   category    CorrespondenceCategory @default(GENERAL)
   pdfUrl      String?  // Storage URL for the generated immutable PDF
   
@@ -1165,6 +1312,11 @@ model Correspondence {
   approvedById String?
   approvedBy   User?   @relation("CorrespondenceApprover", fields: [approvedById], references: [id])
   approvedAt   DateTime?
+  
+  // Threading (Aconex Feature)
+  parentId     String?
+  parent       Correspondence? @relation("LetterThreading", fields: [parentId], references: [id])
+  replies      Correspondence[] @relation("LetterThreading")
   
   createdAt   DateTime @default(now())
   

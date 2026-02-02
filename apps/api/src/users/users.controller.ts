@@ -19,6 +19,11 @@ export class UsersController {
         return this.usersService.findOneById(user.id);
     }
 
+    @Patch('me/profile')
+    updateProfile(@CurrentUser() user: any, @Body() body: { name?: string; phone?: string; address?: string }) {
+        return this.usersService.updateProfile(user.id, body);
+    }
+
     @Get()
     findAll(
         @Query('organizationId') organizationId: string,

@@ -1,0 +1,4 @@
+## 2024-05-23 - HTML Injection in Email Service
+**Vulnerability:** The `EmailService` was constructing HTML emails using template literals with unsanitized user inputs (`organizationName`, `title`, `message`). This allowed attackers to inject arbitrary HTML (including scripts, though email client execution varies) into invitation and notification emails.
+**Learning:** Developers often forget that email bodies are HTML and subject to injection just like web pages. The lack of a built-in templating engine with auto-escaping (like Handlebars or EJS) in the simple string concatenation approach led to this oversight.
+**Prevention:** Always sanitize user input before embedding it in HTML strings. Preferably, use an email templating engine that handles escaping automatically. If manual construction is necessary, use a strict `escapeHtml` utility.

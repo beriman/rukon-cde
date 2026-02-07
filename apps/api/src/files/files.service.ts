@@ -429,8 +429,17 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        // Security: Validate subfolder to prevent path traversal
+        if (!/^[a-zA-Z0-9_-]+$/.test(subfolder)) {
+            throw new BadRequestException('Invalid subfolder name');
+        }
+
+        const path = require('path');
+        // Security: Sanitize filename to prevent path traversal
+        const safeFilename = path.basename(file.originalname);
+
         const timestamp = Date.now();
-        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
+        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${safeFilename}`;
 
         if (process.env.AWS_S3_BUCKET) {
             await this.s3Client.send(new PutObjectCommand({
@@ -443,14 +452,14 @@ export class FilesService {
         } else {
             // Local fallback
             const fs = require('fs');
-            const path = require('path');
+            // path is already required above
             const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
 
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filePath = path.join(uploadDir, `${timestamp}-${file.originalname}`);
+            const filePath = path.join(uploadDir, `${timestamp}-${safeFilename}`);
             fs.writeFileSync(filePath, file.buffer);
         }
 

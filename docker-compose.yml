@@ -28,16 +28,32 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      bitl-service:
+        condition: service_started
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/rukon_dev
       - JWT_SECRET=dev-secret-key-change-in-production
       - PORT=3001
+      - BITL_SERVICE_URL=http://bitl-service:8000
     ports:
       - "3001:3001"
     volumes:
       - ./apps/api:/app
       - /app/node_modules
     command: npm run start:dev
+
+  # BITL Service (Python Microservice)
+  bitl-service:
+    build:
+      context: apps/bitl-service
+      dockerfile: Dockerfile
+    container_name: rukon-bitl
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/bitl-service:/app
+    environment:
+      - ENV=development
 
   # Next.js Web
   web:

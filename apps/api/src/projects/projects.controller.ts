@@ -78,10 +78,10 @@ export class ProjectsController {
         return this.projectsService.updateTask(taskId, data);
     }
 
-    @Get(':id/monitoring')
-    getMonitoring(@Param('id') id: string) {
-        return this.projectsService.getMonitoringData(id);
-    }
+    // @Get(':id/monitoring')
+    // getMonitoring(@Param('id') id: string) {
+    //     return this.projectsService.getMonitoringData(id);
+    // }
 
     @Patch(':id/archive')
     archive(@Param('id') id: string) {

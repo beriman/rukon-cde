@@ -202,7 +202,31 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async verifyGoogleToken(token: string) {
+        try {
+            const response = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`);
+            if (!response.ok) {
+                return null;
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Google Token Verification Failed:', error);
+            return null;
+        }
+    }
+
+    async googleSync(dto: { email: string; name: string; token?: string }) {
+        // Security Fix: Verify Google Token
+        if (!dto.token) {
+            throw new UnauthorizedException('Google Access Token is required');
+        }
+
+        const tokenInfo = await this.verifyGoogleToken(dto.token);
+
+        if (!tokenInfo || tokenInfo.email !== dto.email) {
+            throw new UnauthorizedException('Invalid Google Access Token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

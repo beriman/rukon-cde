@@ -4,13 +4,14 @@ import { FilesController } from './files.controller';
 import { FilesWorkflowController } from './files-workflow.controller';
 import { SigningController } from './signing.controller';
 import { PrismaService } from '../prisma/prisma.service';
-import { CommonModule } from '../common/common.module';
 import { ConversionService } from '../common/services/conversion.service';
+import { NamingConventionService } from '../common/services/naming-convention.service';
+import { AuditService } from '../common/services/audit.service';
 
 @Module({
-    imports: [CommonModule],
+    imports: [],
     controllers: [FilesController, FilesWorkflowController, SigningController],
-    providers: [FilesService, PrismaService, ConversionService],
+    providers: [FilesService, PrismaService, ConversionService, NamingConventionService, AuditService],
     exports: [FilesService],
 })
 export class FilesModule { }

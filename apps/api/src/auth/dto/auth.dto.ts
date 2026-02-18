@@ -31,3 +31,9 @@ export class LoginDto {
     @IsNotEmpty()
     password: string;
 }
+
+export class GoogleSyncDto {
+    @IsString()
+    @IsNotEmpty()
+    accessToken: string;
+}

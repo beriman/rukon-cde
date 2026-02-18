@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, GoogleSyncDto } from './dto/auth.dto';
 import { AuditService } from '../common/services/audit.service';
 import { AuditAction } from '@prisma/client';
 
@@ -202,33 +202,60 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
-        let user = await this.usersService.findOneByEmail(dto.email);
-
-        if (!user) {
-            // Auto-register user from Google
-            user = await this.usersService.create({
-                email: dto.email,
-                name: dto.name,
-                password: '', // OAuth users don't have local passwords
+    async googleSync(dto: GoogleSyncDto) {
+        try {
+            const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: {
+                    Authorization: `Bearer ${dto.accessToken}`,
+                },
             });
-            
-            await this.auditService.log(user.id, AuditAction.LOGIN, undefined, undefined, { method: 'GOOGLE_OAUTH_NEW' });
-        } else {
-            await this.auditService.log(user.id, AuditAction.LOGIN, undefined, undefined, { method: 'GOOGLE_OAUTH_EXISTING' });
+
+            if (!response.ok) {
+                throw new UnauthorizedException('Invalid Google Token');
+            }
+
+            const payload = await response.json();
+
+            if (!payload.email) {
+                throw new UnauthorizedException('Email not provided by Google');
+            }
+
+            const email = payload.email;
+            const name = payload.name || email;
+
+            let user = await this.usersService.findOneByEmail(email);
+
+            if (!user) {
+                // Auto-register user from Google
+                user = await this.usersService.create({
+                    email,
+                    name,
+                    password: '', // OAuth users don't have local passwords
+                });
+
+                await this.auditService.log(user.id, AuditAction.LOGIN, undefined, undefined, { method: 'GOOGLE_OAUTH_NEW' });
+            } else {
+                await this.auditService.log(user.id, AuditAction.LOGIN, undefined, undefined, { method: 'GOOGLE_OAUTH_EXISTING' });
+            }
+
+            const tokens = await this.generateTokens(user.id, user.email, user.role);
+            await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+            return {
+                ...tokens,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                },
+            };
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            console.error('Google Sync Error', error);
+            throw new UnauthorizedException('Google authentication failed');
         }
-
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
-        await this.updateRefreshToken(user.id, tokens.refresh_token);
-
-        return {
-            ...tokens,
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            },
-        };
     }
 }

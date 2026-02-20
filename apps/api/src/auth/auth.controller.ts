@@ -1,7 +1,7 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, GoogleSyncDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +35,7 @@ export class AuthController {
 
     @Post('google-sync')
     @HttpCode(HttpStatus.OK)
-    async googleSync(@Body() dto: { email: string; name: string }) {
+    async googleSync(@Body() dto: GoogleSyncDto) {
         return this.authService.googleSync(dto);
     }
 }

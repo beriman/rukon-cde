@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, GoogleSyncDto } from './dto/auth.dto';
 import { AuditService } from '../common/services/audit.service';
 import { AuditAction } from '@prisma/client';
 
@@ -202,7 +202,48 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: GoogleSyncDto) {
+        // Strictly verify Google Access Token
+        if (!dto.token) {
+            throw new UnauthorizedException('Google token is required');
+        }
+
+        try {
+            // Enforce a timeout for the fetch request to avoid hanging
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${dto.token}`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new UnauthorizedException('Invalid Google token');
+            }
+
+            const data = await response.json();
+
+            if (data.email_verified !== 'true' && data.email_verified !== true) {
+                throw new UnauthorizedException('Google email not verified');
+            }
+
+            // Verify email matches the token's email
+            if (data.email !== dto.email) {
+                throw new UnauthorizedException('Token email does not match provided email');
+            }
+
+            // Optional: Verify audience if configured
+            if (process.env.GOOGLE_CLIENT_ID && data.aud !== process.env.GOOGLE_CLIENT_ID) {
+                throw new UnauthorizedException('Invalid token audience');
+            }
+
+        } catch (error) {
+            if (error instanceof UnauthorizedException) throw error;
+            console.error('Google token verification failed', error);
+            throw new UnauthorizedException('Failed to verify Google token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

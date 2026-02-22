@@ -23,6 +23,7 @@ export default function AuthCallback() {
             try {
                 // Sync with NestJS Backend
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
+                    token: session.provider_token,
                     email: session.user.email,
                     name: session.user.user_metadata.full_name || session.user.email,
                 });

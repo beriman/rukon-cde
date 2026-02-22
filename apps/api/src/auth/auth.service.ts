@@ -202,14 +202,28 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
-        let user = await this.usersService.findOneByEmail(dto.email);
+    async googleSync(dto: { token: string; email?: string; name?: string }) {
+        // Verify Google Token
+        const tokenResponse = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${dto.token}`);
+        if (!tokenResponse.ok) {
+            throw new UnauthorizedException('Invalid Google Token');
+        }
+
+        const data = await tokenResponse.json();
+
+        if (data.email_verified !== 'true') {
+            throw new UnauthorizedException('Email not verified by Google');
+        }
+
+        const email = data.email;
+
+        let user = await this.usersService.findOneByEmail(email);
 
         if (!user) {
             // Auto-register user from Google
             user = await this.usersService.create({
-                email: dto.email,
-                name: dto.name,
+                email: email,
+                name: dto.name || email,
                 password: '', // OAuth users don't have local passwords
             });
             

@@ -35,7 +35,7 @@ export class AuthController {
 
     @Post('google-sync')
     @HttpCode(HttpStatus.OK)
-    async googleSync(@Body() dto: { email: string; name: string }) {
+    async googleSync(@Body() dto: { token: string; email: string; name: string }) {
         return this.authService.googleSync(dto);
     }
 }

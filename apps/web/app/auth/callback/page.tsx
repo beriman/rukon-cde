@@ -21,10 +21,18 @@ export default function AuthCallback() {
             }
 
             try {
+                // Verify Google Token exists
+                if (!session.provider_token) {
+                    console.error('No provider token found');
+                    router.push('/auth?error=missing_provider_token');
+                    return;
+                }
+
                 // Sync with NestJS Backend
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
                     email: session.user.email,
                     name: session.user.user_metadata.full_name || session.user.email,
+                    accessToken: session.provider_token,
                 });
 
                 // Store our local JWT (Rukon Token)

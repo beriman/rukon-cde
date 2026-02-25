@@ -1,4 +1,18 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, Matches, IsOptional } from 'class-validator';
+
+export class GoogleSyncDto {
+    @IsOptional()
+    @IsString()
+    accessToken?: string;
+
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    name?: string;
+}
 
 export class RegisterDto {
     @IsEmail()

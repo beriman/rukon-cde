@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, GoogleSyncDto } from './dto/auth.dto';
 import { AuditService } from '../common/services/audit.service';
 import { AuditAction } from '@prisma/client';
 
@@ -202,14 +202,41 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: GoogleSyncDto) {
+        if (dto.accessToken) {
+            try {
+                const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(dto.accessToken)}`);
+
+                if (!response.ok) {
+                     throw new UnauthorizedException('Invalid Google Token');
+                }
+
+                const data = await response.json();
+
+                if (String(data.email_verified) !== 'true') {
+                    throw new UnauthorizedException('Google Email not verified');
+                }
+
+                dto.email = data.email;
+            } catch (error) {
+                if (error instanceof UnauthorizedException) throw error;
+                throw new UnauthorizedException('Token verification failed');
+            }
+        } else {
+            throw new BadRequestException('Google Access Token is required');
+        }
+
+        if (!dto.email) {
+             throw new BadRequestException('Email could not be retrieved from token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {
             // Auto-register user from Google
             user = await this.usersService.create({
                 email: dto.email,
-                name: dto.name,
+                name: dto.name || '',
                 password: '', // OAuth users don't have local passwords
             });
             

@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] OAuth Authentication Bypass via Trusted Client Input
+**Vulnerability:** The `googleSync` endpoint accepted `email` and `name` from the client and used them to log in or create a user without verifying any proof of identity (like a Google ID Token). This allowed full account takeover by anyone knowing a target's email.
+**Learning:** Never trust client-provided identity claims. Integrating third-party auth (like Supabase or Google) requires strict server-side verification of the token, even if the frontend "says" the user is authenticated.
+**Prevention:** Always require and verify an `accessToken` or `idToken` from the Identity Provider on the backend before linking accounts or issuing sessions. Use the email contained *inside* the verified token, not the one in the request body.

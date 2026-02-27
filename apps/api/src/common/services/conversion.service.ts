@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { FilesService } from '../../files/files.service';
 // import { spawn } from 'child_process';
 import * as path from 'path';

@@ -1,0 +1,4 @@
+## 2024-05-18 - Auth Bypass Vulnerability in Google Sync Endpoint
+**Vulnerability:** The `googleSync` endpoint in `apps/api/src/auth/auth.service.ts` accepted raw email and name input directly from the client without verifying the authenticity of the Google Access Token, resulting in a critical authentication bypass. Any user could forge a request with an arbitrary email address to gain unauthorized access to any account on the platform.
+**Learning:** Client-provided OAuth profile data must always be treated as untrusted. The backend must independently verify the access token against the OAuth provider to ensure the email address actually belongs to the user holding the token.
+**Prevention:** Always require and validate the OAuth provider's access token (e.g., using Google's `tokeninfo` endpoint) on the server-side before issuing internal application tokens, and verify that the email in the token matches the requested email.

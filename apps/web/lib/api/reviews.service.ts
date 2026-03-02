@@ -1,5 +1,13 @@
 import { apiClient } from '../api-client';
-import { SubmittalStatus } from '@prisma/client'; // Assuming types are shared or mirrored
+export enum SubmittalStatus {
+    DRAFT = 'DRAFT',
+    SUBMITTED = 'SUBMITTED',
+    UNDER_REVIEW = 'UNDER_REVIEW',
+    APPROVED = 'APPROVED',
+    APPROVED_WITH_NOTES = 'APPROVED_WITH_NOTES',
+    REJECTED = 'REJECTED',
+    RESUBMITTED = 'RESUBMITTED'
+}
 
 export interface Submittal {
     id: string;
@@ -38,7 +46,7 @@ export const reviewsService = {
         const { data } = await apiClient.post(`/files/reviews/${submittalId}/process`, { status, comments });
         return data;
     },
-    
+
     async getAllSubmittalsByProject(projectId: string): Promise<Submittal[]> {
         const { data } = await apiClient.get(`/construction/submittals?projectId=${projectId}`);
         return data;

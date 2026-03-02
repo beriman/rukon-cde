@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    transpilePackages: ['three', 'web-ifc-three']
+};
 
 module.exports = nextConfig;

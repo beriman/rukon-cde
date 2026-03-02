@@ -261,6 +261,35 @@ export class ProjectsService {
         };
     }
 
+    async getMonitoringData(id: string) {
+        const project = await this.prisma.project.findUnique({
+            where: { id },
+            include: {
+                workPackages: {
+                    include: {
+                        progressUpdates: {
+                            orderBy: { date: 'desc' },
+                            take: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!project) throw new NotFoundException('Project not found');
+
+        // Simple aggregation for dashboard
+        const monitoring = project.workPackages.map(wp => ({
+            id: wp.id,
+            name: wp.name,
+            discipline: wp.discipline,
+            progress: wp.progressUpdates[0]?.percentage || 0,
+            lastUpdated: wp.progressUpdates[0]?.date || wp.createdAt
+        }));
+
+        return monitoring;
+    }
+
     async seedIsoTasks(projectId: string) {
         const tasks = [
             {

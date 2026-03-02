@@ -14,12 +14,16 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
+import { ReviewsService } from './reviews.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('files')
 @UseGuards(JwtAuthGuard)
 export class FilesController {
-    constructor(private readonly filesService: FilesService) { }
+    constructor(
+        private readonly filesService: FilesService,
+        private readonly reviewsService: ReviewsService,
+    ) { }
 
     @Post('upload')
     @UseInterceptors(
@@ -65,6 +69,25 @@ export class FilesController {
     @Get(':id/versions')
     getVersions(@Param('id') id: string) {
         return this.filesService.getVersions(id);
+    }
+
+    @Post(':id/review/initiate')
+    async initiateReview(
+        @Param('id') id: string,
+        @Body('workflowId') workflowId: string,
+        @Request() req,
+    ) {
+        return this.reviewsService.initiateReview(id, workflowId, req.user.userId);
+    }
+
+    @Post('reviews/:submittalId/process')
+    async processReviewStep(
+        @Param('submittalId') submittalId: string,
+        @Body('status') status: 'APPROVED' | 'REJECTED' | 'APPROVED_WITH_NOTES',
+        @Body('comments') comments: string,
+        @Request() req,
+    ) {
+        return this.reviewsService.processReviewStep(submittalId, req.user.userId, status, comments);
     }
 
     @Delete(':id')

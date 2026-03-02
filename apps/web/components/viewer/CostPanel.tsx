@@ -13,9 +13,10 @@ interface CostPanelProps {
     selectedElementGuid: string | null;
     isOpen: boolean;
     onMappingCreated?: () => void;
+    onHighlightElements?: (guids: string[]) => void;
 }
 
-export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onMappingCreated }: CostPanelProps) {
+export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onMappingCreated, onHighlightElements }: CostPanelProps) {
     const [boqs, setBoqs] = useState<BillOfQuantities[]>([]);
     const [selectedBoqId, setSelectedBoqId] = useState<string | null>(null);
     const [items, setItems] = useState<BoQItem[]>([]);
@@ -65,6 +66,14 @@ export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onM
         }
     };
 
+    const handleItemClick = (item: BoQItem) => {
+        setSelectedItemId(item.id);
+        if (onHighlightElements && item.mappings) {
+            const guids = item.mappings.map(m => m.elementGuid);
+            onHighlightElements(guids);
+        }
+    };
+
     const handleLink = async (item: BoQItem) => {
         if (!selectedElementGuid) {
             toast.error("Select an element in 3D view first");
@@ -73,7 +82,7 @@ export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onM
         try {
             await costService.mapItem(projectId, item.id, selectedElementGuid, modelId);
             toast.success(`Linked ${item.description} to element`);
-            loadItems(selectedBoqId!); // Reload to update mappings count if we were showing it
+            loadItems(selectedBoqId!); // Reload to update mappings count
             if (onMappingCreated) onMappingCreated();
         } catch (e) {
             console.error(e);
@@ -119,15 +128,23 @@ export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onM
                         <TableBody>
                             {items.map(item => {
                                 const isSelected = selectedItemId === item.id;
+                                const mappingCount = item.mappings?.length || 0;
                                 return (
                                     <TableRow
                                         key={item.id}
                                         className={`cursor-pointer ${isSelected ? 'bg-blue-50' : ''}`}
-                                        onClick={() => setSelectedItemId(item.id)}
+                                        onClick={() => handleItemClick(item)}
                                     >
                                         <TableCell className="font-mono text-xs">{item.itemCode || '-'}</TableCell>
                                         <TableCell className="text-xs">
-                                            <div className="font-medium">{item.description}</div>
+                                            <div className="font-medium flex items-center gap-2">
+                                                {item.description}
+                                                {mappingCount > 0 && (
+                                                    <span className="text-[10px] bg-blue-100 text-blue-700 px-1 rounded">
+                                                        {mappingCount} linked
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="text-gray-500">{item.quantity} {item.unit} @ {item.unitRate}</div>
                                         </TableCell>
                                         <TableCell className="text-right text-xs font-medium">
@@ -137,14 +154,14 @@ export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onM
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-6 w-6"
+                                                className="h-6 w-6 hover:bg-blue-100 text-blue-600"
                                                 title="Link Selected Element"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleLink(item);
                                                 }}
                                             >
-                                                <LinkIcon className="h-3 w-3" />
+                                                <Plus className="h-3 w-3" />
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -157,3 +174,4 @@ export function CostPanel({ projectId, modelId, selectedElementGuid, isOpen, onM
         </Card>
     );
 }
+

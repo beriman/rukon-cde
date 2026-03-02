@@ -15,9 +15,10 @@ interface GanttPanelProps {
     isOpen: boolean;
     tasks: ScheduleTask[];
     onLinkCreated: () => void;
+    onHighlightElements?: (guids: string[]) => void;
 }
 
-export function GanttPanel({ projectId, modelId, selectedElementId, selectedElementGuid, isOpen, tasks, onLinkCreated }: GanttPanelProps) {
+export function GanttPanel({ projectId, modelId, selectedElementId, selectedElementGuid, isOpen, tasks, onLinkCreated, onHighlightElements }: GanttPanelProps) {
     const [links, setLinks] = useState<SimulationLink[]>([]);
     const [selectedTask, setSelectedTask] = useState<string | null>(null);
 
@@ -34,6 +35,16 @@ export function GanttPanel({ projectId, modelId, selectedElementId, selectedElem
         }
     };
 
+    const handleTaskClick = (taskId: string) => {
+        setSelectedTask(taskId);
+        if (onHighlightElements) {
+            const guids = links
+                .filter(l => l.taskId === taskId)
+                .map(l => l.elementId);
+            onHighlightElements(guids);
+        }
+    };
+
     const handleLink = async () => {
         if (!selectedTask || !selectedElementGuid) return;
         try {
@@ -44,7 +55,8 @@ export function GanttPanel({ projectId, modelId, selectedElementId, selectedElem
             });
             await loadLinks();
             onLinkCreated();
-            setSelectedTask(null);
+            // Optional: Re-highlight updated links
+            handleTaskClick(selectedTask);
         } catch (err) {
             console.error('Failed to link', err);
         }
@@ -80,12 +92,12 @@ export function GanttPanel({ projectId, modelId, selectedElementId, selectedElem
                         return (
                             <div
                                 key={task.id}
-                                className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedTask === task.id ? 'ring-2 ring-primary border-primary' : 'hover:bg-gray-50'}`}
-                                onClick={() => setSelectedTask(task.id)}
+                                className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedTask === task.id ? 'ring-2 ring-primary border-primary bg-blue-50/30' : 'hover:bg-gray-50'}`}
+                                onClick={() => handleTaskClick(task.id)}
                             >
                                 <div className="flex justify-between items-start mb-1">
                                     <span className="font-medium text-sm">{task.title}</span>
-                                    {taskLinkCount > 0 && <span className="text-xs bg-gray-100 px-1.5 rounded">{taskLinkCount} links</span>}
+                                    {taskLinkCount > 0 && <span className="text-xs bg-blue-100 text-blue-700 px-1.5 rounded">{taskLinkCount} links</span>}
                                 </div>
                                 <div className="text-xs text-gray-500 flex justify-between">
                                     <span>{new Date(task.startDate).toLocaleDateString()}</span>
@@ -97,7 +109,10 @@ export function GanttPanel({ projectId, modelId, selectedElementId, selectedElem
                                     <Button
                                         size="sm"
                                         className="w-full mt-2"
-                                        onClick={handleLink}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleLink();
+                                        }}
                                         disabled={isLinked}
                                     >
                                         <Link2 className="w-3 h-3 mr-2" />
@@ -112,3 +127,4 @@ export function GanttPanel({ projectId, modelId, selectedElementId, selectedElem
         </div>
     );
 }
+

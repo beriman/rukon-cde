@@ -97,7 +97,7 @@ export class SubmittalService {
         });
     }
 
-    async approve(id: string, userId: string, comment?: string) {
+    async approve(id: string, userId: string, comment?: string, signature?: string) {
         const submittal = await this.prisma.submittal.findUnique({
             where: { id },
             include: { workflow: true }
@@ -115,20 +115,18 @@ export class SubmittalService {
             approverId: userId,
             status: 'APPROVED',
             date: new Date(),
-            comment
+            comment,
+            signature // Store the signature data/URL
         };
 
         const updatedReviews = [...(submittal.reviews as any[] || []), newReview];
 
         // 2. Check Stage Completion
-        // Logic: if type is ONE, one approval is enough. If ALL, need everyone.
-        // Simplified for this implementation: assuming ONE for INTERNAL/MK, ALL for EXPERTS
         let stageComplete = false;
 
         if (currentStage.type === 'ONE') {
             stageComplete = true;
         } else {
-            // For ALL, check if all approvers have approved
             const approvalsInThisStage = updatedReviews.filter((r: any) => r.stage === submittal.currentStageIndex && r.status === 'APPROVED');
             const approverIds = new Set(approvalsInThisStage.map((r: any) => r.approverId));
             const requiredApprovers = currentStage.approvers.map((a: any) => a.id);
@@ -136,12 +134,10 @@ export class SubmittalService {
         }
 
         if (stageComplete) {
-            // Move to Next Stage or Finish
             const nextStageIndex = submittal.currentStageIndex + 1;
 
             if (nextStageIndex >= stages.length) {
-                // WORKFLOW COMPLETED -> PUBLISHED
-                await this.transitionFileState(submittal.fileId, 'PUBLISHED');
+                await this.transitionFileState(submittal.fileId!, 'PUBLISHED');
 
                 return this.prisma.submittal.update({
                     where: { id },
@@ -153,12 +149,9 @@ export class SubmittalService {
                     }
                 });
             } else {
-                // MOVE TO NEXT STAGE
                 const nextStage = stages[nextStageIndex];
 
-                // Specific Logic for WIP -> SHARED transition
-                // If distinct stages "Internal" (0) -> "Expert" (1), checking if we just finished stage 0
-                if (submittal.currentStageIndex === 0) {
+                if (submittal.currentStageIndex === 0 && submittal.fileId) {
                     await this.transitionFileState(submittal.fileId, 'SHARED');
                 }
 
@@ -172,14 +165,10 @@ export class SubmittalService {
                 });
             }
         } else {
-            // JUST RECORD APPROVAL, STAY IN STAGE
             return this.prisma.submittal.update({
                 where: { id },
                 data: {
                     reviews: updatedReviews,
-                    // Remove current user from active approvers? Or keep them until stage moves?
-                    // Usually keep activeApprovers as "pool of allowed", but maybe filter out who already acted if UI needs it.
-                    // For "ALL" type, we can remove this user from activeApprovers to indicate they are done.
                     activeApprovers: submittal.activeApprovers.filter(uid => uid !== userId)
                 }
             });
@@ -189,30 +178,31 @@ export class SubmittalService {
     private async transitionFileState(fileId: string, targetState: 'SHARED' | 'PUBLISHED') {
         console.log(`[Auto-Transition] Moving File ${fileId} to ${targetState}`);
 
-        const file = await this.prisma.file.findUnique({ where: { id: fileId } });
+        const file = await this.prisma.file.findUnique({ 
+            where: { id: fileId },
+            include: { folder: true }
+        });
         if (!file) return;
 
-        // 1. Find or Create Target Folder
-        // Assumption: "SHARED" and "PUBLISHED" are root-level folders for standard CDE
+        const projectId = file.folder.projectId;
+
         let targetFolder = await this.prisma.folder.findFirst({
             where: {
-                projectId: file.projectId,
-                name: targetState // simplified folder naming
+                projectId: projectId,
+                name: targetState
             }
         });
 
         if (!targetFolder) {
             targetFolder = await this.prisma.folder.create({
                 data: {
-                    projectId: file.projectId,
+                    projectId: projectId,
                     name: targetState,
-                    parentId: null // Root folder
+                    parentId: null
                 }
             });
         }
 
-        // 2. Fetch Approval Info for Metadata
-        // Find the submittal that triggered this
         const submittal = await this.prisma.submittal.findFirst({
             where: { fileId: fileId },
             orderBy: { createdAt: 'desc' },
@@ -228,29 +218,20 @@ export class SubmittalService {
             }
         }
 
-        // 3. Create Copy of File (Simulating "Copy to Folder")
-        // In real app, we might also copy the S3 object to a immutable bucket
         await this.prisma.file.create({
             data: {
-                name: file.name, // In ISO 19650 this would be renamed e.g. from A to P01
+                name: file.name,
                 originalName: file.originalName,
                 mimeType: file.mimeType,
                 size: file.size,
-                s3Key: file.s3Key, // Sharing same S3 object for efficiency in MVP
+                s3Key: file.s3Key,
                 uniqueId: `${file.uniqueId}-${targetState}-${Date.now()}`,
                 cdeState: targetState,
                 uploadedBy: file.uploadedBy,
                 folderId: targetFolder.id,
-                // Embedding approval info in description to ensure it "travels with the document"
-                linkSourceId: file.id, // Traceability
-                // We're storing the signature metadata directly in the file record if we had a field,
-                // but for now we rely on linkSourceId to find the Submittal, OR validationReports.
-                // Let's assume we maintain the link.
+                linkSourceId: file.id,
             }
         });
-
-        // Note: For "Burning" the signature into the PDF, we would need a PDF processing service here.
-        // For MVP, the 'linkSourceId' maintains the chain of custody to the Submittal containing the signature.
     }
 
     /* Existing methods... */

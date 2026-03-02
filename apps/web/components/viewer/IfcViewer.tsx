@@ -169,12 +169,9 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
         const mouse = new THREE.Vector2();
 
         const handleClick = async (event: MouseEvent) => {
-            // We need current ifcModel from state or ref. 
-            // Using closure variable 'ifcModel' wouldn't work if it's async loaded? 
-            // Actually, inside this useEffect, 'ifcModel' is not available yet.
-            // We should check scene children or use a ref for the model.
             const model = scene.children.find(c => c.type === 'Mesh') as unknown as IFCModel;
-            if (!model) return;
+            const loader = ifcLoaderRef.current;
+            if (!model || !loader) return;
 
             const bounds = container.getBoundingClientRect();
             mouse.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
@@ -187,11 +184,27 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
                 const index = intersects[0].faceIndex;
                 if (index === undefined || index === null) return;
 
-                const id = ifcLoader.ifcManager.getExpressId(model.geometry, index as number);
+                const id = loader.ifcManager.getExpressId(model.geometry, index as number);
                 setSelectedExpressId(id);
 
+                // Highlight selection
+                const highlightMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffe600,
+                    depthTest: false,
+                    transparent: true,
+                    opacity: 0.6
+                });
+
+                loader.ifcManager.createSubset({
+                    modelID: model.modelID,
+                    ids: [id],
+                    material: highlightMaterial,
+                    removePrevious: true,
+                    customID: 'selection-highlight',
+                });
+
                 try {
-                    const props = await ifcLoader.ifcManager.getItemProperties(model.modelID, id);
+                    const props = await loader.ifcManager.getItemProperties(model.modelID, id);
                     if (props && props.GlobalId) {
                         setSelectedGuid(props.GlobalId.value);
                     }
@@ -201,6 +214,7 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
             } else {
                 setSelectedExpressId(null);
                 setSelectedGuid(null);
+                loader.ifcManager.removeSubset(model.modelID, undefined, 'selection-highlight');
             }
         };
 
@@ -299,20 +313,11 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
                     material: materials[index],
                     removePrevious: true,
                     customID: `5d-bin-${index}`, // Custom ID to manage subsets
-                    scene: undefined // Add to scene manually or let loader handle it? 
-                    // web-ifc-three createSubset adds to scene if scene arg provided?
-                    // Actually usually it returns a subset.
                 });
-                // Note: web-ifc-three createSubset implementation varies. 
-                // If we pass scene, it adds it.
-                // We'll rely on simple implementation for now.
             } else {
                 loader.ifcManager.removeSubset(ifcModel.modelID, undefined, `5d-bin-${index}`);
             }
         });
-
-        // Clean up on unmount or close?
-        // We should clear subsets when close.
 
     }, [isCostOpen, costMappings, ifcModel]);
 
@@ -358,9 +363,108 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
 
     }, [simDate, links, tasks, ifcModel, is4DOpen]);
 
-    const handleFocus = (expressId: number) => {
+    const handleFocus = async (expressId: number) => {
+        const loader = ifcLoaderRef.current;
+        const camera = cameraRef.current;
+        if (!ifcModel || !loader || !camera) return;
+
         console.log('Focusing', expressId);
-        // Implement zoom logic here
+
+        try {
+            // Highlight selected element
+            const focusMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                depthTest: false,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            loader.ifcManager.createSubset({
+                modelID: ifcModel.modelID,
+                ids: [expressId],
+                material: focusMaterial,
+                removePrevious: true,
+                customID: 'selection-highlight',
+            });
+
+            // @ts-ignore - web-ifc-three types might be missing the customID string overload
+            const subset = loader.ifcManager.getSubset(ifcModel.modelID, 'selection-highlight');
+            if (subset) {
+                subset.geometry.computeBoundingBox();
+                const box = subset.geometry.boundingBox;
+                if (box) {
+                    const center = new THREE.Vector3();
+                    box.getCenter(center);
+
+                    // Move camera
+                    const distance = box.getSize(new THREE.Vector3()).length() * 2;
+                    const direction = camera.position.clone().sub(center).normalize();
+                    const newPosition = center.clone().add(direction.multiplyScalar(distance || 5));
+
+                    camera.position.copy(newPosition);
+                    camera.lookAt(center);
+
+                    // Update express ID and GUID
+                    setSelectedExpressId(expressId);
+                    const props = await loader.ifcManager.getItemProperties(ifcModel.modelID, expressId);
+                    if (props && props.GlobalId) {
+                        setSelectedGuid(props.GlobalId.value);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Focus error', e);
+        }
+    };
+
+    const handleHighlightGuids = (guids: string[]) => {
+        const loader = ifcLoaderRef.current;
+        if (!ifcModel || !loader || guids.length === 0) {
+            if (ifcModel && loader) {
+                loader.ifcManager.removeSubset(ifcModel.modelID, undefined, 'selection-highlight');
+            }
+            return;
+        }
+
+        const expressIds = guids
+            .map(guid => guidMap[guid])
+            .filter((id): id is number => id !== undefined);
+
+        if (expressIds.length > 0) {
+            const highlightMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                depthTest: false,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            loader.ifcManager.createSubset({
+                modelID: ifcModel.modelID,
+                ids: expressIds,
+                material: highlightMaterial,
+                removePrevious: true,
+                customID: 'selection-highlight',
+            });
+
+            // Optional: Zoom to fit all elements
+            const subset = loader.ifcManager.getSubset(ifcModel.modelID, 'selection-highlight');
+            if (subset && cameraRef.current) {
+                subset.geometry.computeBoundingBox();
+                const box = subset.geometry.boundingBox;
+                if (box) {
+                    const center = new THREE.Vector3();
+                    box.getCenter(center);
+                    const size = box.getSize(new THREE.Vector3());
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const fov = cameraRef.current.fov * (Math.PI / 180);
+                    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                    cameraZ *= 2.5; // Zoom out a bit
+
+                    cameraRef.current.position.set(center.x + cameraZ, center.y + cameraZ, center.z + cameraZ);
+                    cameraRef.current.lookAt(center);
+                }
+            }
+        }
     };
 
     return (
@@ -430,6 +534,7 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
                 selectedElementGuid={selectedGuid}
                 tasks={tasks}
                 onLinkCreated={() => simulationService.getLinks(projectId).then(setLinks)}
+                onHighlightElements={handleHighlightGuids}
             />
 
             <CostPanel
@@ -438,6 +543,7 @@ export function IfcViewer({ modelUrl, projectId, fileId }: IfcViewerProps) {
                 modelId={fileId}
                 selectedElementGuid={selectedGuid}
                 onMappingCreated={() => costService.getMappings(projectId).then(setCostMappings)}
+                onHighlightElements={handleHighlightGuids}
             />
 
             {is4DOpen && (

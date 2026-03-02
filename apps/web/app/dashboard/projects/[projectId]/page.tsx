@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ProjectDashboard from './details';
+import ProjectDashboard from '../details';
 import { useParams } from 'next/navigation';
 
 export default function ProjectPage() {

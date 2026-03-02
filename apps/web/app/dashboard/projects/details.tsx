@@ -33,6 +33,8 @@ import {
     MoreHorizontal,
     Activity,
     Lock,
+    AlertCircle,
+    CheckCircle2,
     Calendar as CalendarIcon
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -203,11 +205,10 @@ export default function ProjectDashboard({ projectId }: ProjectDetailsProps) {
                             </div>
                             <div className="h-[600px] bg-slate-950 relative">
                                 <IfcViewer 
-                                    modelUrl={`${process.env.NEXT_PUBLIC_API_URL}/files/demo-model/download`} 
-                                    projectId={projectId}
-                                    fileId="demo-model"
-                                />
-                                {/* HUD Overlay */}
+                                    modelUrls={[`${process.env.NEXT_PUBLIC_API_URL}/files/demo-model/download`]} 
+                                    projectId={projectId} 
+                                    fileId="demo-model" 
+                                />                                {/* HUD Overlay */}
                                 <div className="absolute bottom-6 left-6 pointer-events-none">
                                     <div className="p-4 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-700/50">
                                         <p className="text-[9px] font-bold text-slate-500 uppercase mb-2">Model Intelligence</p>

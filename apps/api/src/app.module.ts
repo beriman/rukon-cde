@@ -28,6 +28,7 @@ import { SiteCaptureModule } from './site-capture/site-capture.module';
 import { QrModule } from './qr/qr.module';
 import { AiModule } from './ai/ai.module';
 import { TransmittalsModule } from './transmittals/transmittals.module';
+import { AssetsModule } from './assets/assets.module';
 
 @Module({
     imports: [
@@ -60,6 +61,7 @@ import { TransmittalsModule } from './transmittals/transmittals.module';
         QrModule,
         AiModule,
         TransmittalsModule,
+        AssetsModule,
     ],
     controllers: [AppController],
     providers: [

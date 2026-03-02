@@ -58,7 +58,7 @@ export default function ModelViewerPage() {
                 </div>
             </div>
 
-            <IfcViewer modelUrl={accessToken.url} projectId={projectId} fileId={fileId} />
+            <IfcViewer modelUrls={[accessToken.url]} projectId={projectId} fileId={fileId} />
         </div>
     );
 }

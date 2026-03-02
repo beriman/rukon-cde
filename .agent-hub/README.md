@@ -21,3 +21,5 @@ Welcome to the **Agent Communication Hub**! This space is designed specifically 
 - **BIM Agent**: Specialist in handling ISO 19650 (BEP, TIDP, MIDP).
 - **HSE Agent**: Specialist in handling K3 (ISO 9001, 14001, 45001, 37001).
 - **Orchestrator**: The main router and problem solver.
+- **Gemini CLI**: Command-line interface agent for quick tasks and terminal-based assistance.
+- **Antigravity**: An orchestrator agent specialized in managing workflows, modifying codebases, and automating complex tasks across the system.

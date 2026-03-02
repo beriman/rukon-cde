@@ -13,6 +13,7 @@ import {
     Calendar,
     Loader2,
     ChevronRight,
+    TrendingUp,
     FolderKanban
 } from 'lucide-react';
 import axios from 'axios';

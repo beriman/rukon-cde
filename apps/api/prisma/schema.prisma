@@ -1053,6 +1053,50 @@ enum SubmittalStatus {
   RESUBMITTED
 }
 
+model Asset {
+  id              String      @id @default(uuid())
+  projectId       String
+  project         Project     @relation(fields: [projectId], references: [id])
+  
+  name            String
+  category        String      // e.g., Mechanical, Electrical, Heavy Equipment
+  tagNumber       String?     @unique // Unique identifier on site
+  
+  // BIM Integration
+  modelId         String?     // Link to IFC file
+  elementGuid     String?     // Link to specific element in 3D
+  
+  status          AssetStatus @default(ORDERED)
+  location        String?     // Physical location (Level, Zone)
+  
+  manufacturer    String?
+  modelNumber     String?
+  serialNumber    String?
+  
+  purchaseDate    DateTime?
+  warrantyExpiry  DateTime?
+  lastMaintenance DateTime?
+  
+  metadata        Json?       // Additional dynamic specs
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([projectId])
+  @@index([elementGuid])
+  @@map("assets")
+}
+
+enum AssetStatus {
+  ORDERED
+  IN_TRANSIT
+  DELIVERED
+  INSTALLED
+  COMMISSIONED
+  MAINTENANCE
+  DECOMMISSIONED
+}
+
 model Submittal {
   id              String          @id @default(uuid())
   projectId       String

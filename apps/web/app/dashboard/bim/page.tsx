@@ -45,9 +45,9 @@ export default function BimPage() {
                     <div />
                 </div>
                 <div className="flex-1">
-                    <IfcViewer 
-                        modelUrl={`${process.env.NEXT_PUBLIC_API_URL}/files/${selectedModel.id}/download`} 
-                        projectId={PROJECT_ID}
+                    <IfcViewer
+                        modelUrls={[`${process.env.NEXT_PUBLIC_API_URL}/files/${selectedModel.id}/download`]}
+                        projectId={projectId}
                         fileId={selectedModel.id}
                     />
                 </div>

@@ -6,7 +6,7 @@ import { IfcViewer } from '@/components/viewer/IfcViewer';
 import axios from 'axios';
 
 // Mock current project ID - In production, this would come from a context or URL
-const PROJECT_ID = 'your-project-id-here'; 
+const PROJECT_ID = 'your-project-id-here';
 
 export default function BimPage() {
     const [models, setModels] = useState<any[]>([]);
@@ -35,7 +35,7 @@ export default function BimPage() {
         return (
             <div className="h-full flex flex-col">
                 <div className="flex justify-between items-center mb-4">
-                    <button 
+                    <button
                         onClick={() => setSelectedModel(null)}
                         className="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-2"
                     >
@@ -47,7 +47,7 @@ export default function BimPage() {
                 <div className="flex-1">
                     <IfcViewer
                         modelUrls={[`${process.env.NEXT_PUBLIC_API_URL}/files/${selectedModel.id}/download`]}
-                        projectId={projectId}
+                        projectId={PROJECT_ID}
                         fileId={selectedModel.id}
                     />
                 </div>
@@ -100,7 +100,7 @@ export default function BimPage() {
                                     Status: <span className="font-semibold text-blue-500">{model.cdeState}</span> • Version: {model.currentVersion}
                                 </p>
                                 <div className="flex gap-2">
-                                    <button 
+                                    <button
                                         onClick={() => setSelectedModel(model)}
                                         className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-slate-900 text-white rounded-lg text-xs hover:bg-slate-800 transition-colors"
                                     >

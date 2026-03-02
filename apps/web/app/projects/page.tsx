@@ -1,10 +1,12 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect } from 'react';
-import { 
-  Search, Plus, MoreVertical, AlertCircle, Mail, 
-  ShieldCheck, Rocket, BookOpen, Activity, Rss, 
-  LifeBuoy, LayoutGrid, FileText, GitBranch, 
+import {
+  Search, Plus, MoreVertical, AlertCircle, Mail,
+  ShieldCheck, Rocket, BookOpen, Activity, Rss,
+  LifeBuoy, LayoutGrid, FileText, GitBranch,
   Calendar, ChevronRight, Bell, User, Loader2, Globe
 } from 'lucide-react';
 import Link from 'next/link';
@@ -28,7 +30,7 @@ export default function ProjectSelectionPage() {
     <div className="min-h-screen bg-slate-950 font-sans text-slate-200 selection:bg-blue-500/30">
       {/* Background Pattern */}
       <div className="fixed inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%231e293b\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4v-4H4v4H0v2h4v4h2v-4h4v-2H6zM36 4v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z\'/%3E%3C/g%3E%3C/svg%3E')] -z-10 opacity-30"></div>
-      
+
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl px-6 shadow-2xl">
         <div className="flex items-center gap-10">
@@ -50,9 +52,9 @@ export default function ProjectSelectionPage() {
         <div className="flex items-center gap-5">
           <div className="relative hidden lg:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-            <input 
-              type="text" 
-              placeholder="Search project profile..." 
+            <input
+              type="text"
+              placeholder="Search project profile..."
               className="h-10 w-72 rounded-xl border border-slate-800 bg-slate-900/50 pl-10 pr-4 text-xs font-medium focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600"
             />
           </div>
@@ -62,8 +64,8 @@ export default function ProjectSelectionPage() {
           </Link>
           <div className="flex items-center gap-3 pl-2 border-l border-slate-800">
             <button className="text-slate-500 hover:text-white transition-colors relative">
-                <Bell size={20} />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
+              <Bell size={20} />
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
             </button>
             <div className="h-9 w-9 overflow-hidden rounded-xl border border-slate-700 bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-sm shadow-inner">
               AB
@@ -74,12 +76,12 @@ export default function ProjectSelectionPage() {
 
       <main className="mx-auto max-w-7xl p-6 lg:p-10">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-          
+
           {/* Left Column: Projects */}
           <div className="lg:col-span-8">
             <div className="mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4 border border-blue-500/20">
-                 <Activity size={12} /> System Active
+                <Activity size={12} /> System Active
               </div>
               <h1 className="text-4xl font-bold text-white tracking-tight">Project Portfolio</h1>
               <p className="mt-3 text-slate-400 text-lg font-light leading-relaxed">
@@ -116,16 +118,16 @@ export default function ProjectSelectionPage() {
             ) : (
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 {projects.map((project) => (
-                  <div 
+                  <div
                     key={project.id}
                     onClick={() => handleProjectSelect(project)}
                     className="group overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm shadow-xl transition-all hover:border-blue-500/50 hover:translate-y-[-4px] cursor-pointer"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-10"></div>
-                      <img 
-                        src={`https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=2070&auto=format&fit=crop`} 
-                        alt={project.name} 
+                      <img
+                        src={`https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=2070&auto=format&fit=crop`}
+                        alt={project.name}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60"
                       />
                       <div className="absolute left-4 top-4 rounded-lg bg-blue-600/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white z-20 shadow-lg">{project.status}</div>
@@ -138,7 +140,7 @@ export default function ProjectSelectionPage() {
                         </div>
                         <button className="text-slate-600 hover:text-white transition-colors"><MoreVertical size={20} /></button>
                       </div>
-                      
+
                       <div className="mb-6">
                         <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                           <span>Physical Progress</span>
@@ -177,7 +179,7 @@ export default function ProjectSelectionPage() {
             {/* Onboarding Section */}
             <div className="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md p-8 shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-                 <Rocket size={80} />
+                <Rocket size={80} />
               </div>
               <div className="mb-6 flex items-center gap-3 font-bold text-white uppercase tracking-widest text-xs">
                 <Rocket className="text-blue-500" size={18} />
@@ -196,7 +198,7 @@ export default function ProjectSelectionPage() {
                   </div>
                   <ChevronRight size={18} className="text-slate-700 group-hover:text-blue-400 transition-colors" />
                 </a>
-                
+
                 <div className="rounded-xl bg-emerald-500/5 p-4 border border-emerald-500/10">
                   <div className="flex items-center gap-4">
                     <div className="rounded-lg bg-emerald-500/10 p-2.5 text-emerald-500">
@@ -257,8 +259,8 @@ export default function ProjectSelectionPage() {
       <footer className="mt-12 border-t border-slate-900 bg-slate-950/50 py-10 px-6">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-             <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center text-[10px] font-black text-slate-500">R</div>
-             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">© 2026 Rukon2 Systems • Professional CDE</p>
+            <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center text-[10px] font-black text-slate-500">R</div>
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">© 2026 Rukon2 Systems • Professional CDE</p>
           </div>
           <div className="flex items-center gap-8">
             <a href="#" className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">Privacy</a>

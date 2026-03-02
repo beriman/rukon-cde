@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
     const router = useRouter();
     const supabase = createClient();
 
@@ -41,7 +41,7 @@ export default function AuthCallback() {
         };
 
         handleCallback();
-    }, [router, supabase.auth]);
+    }, [router, supabase]);
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -53,5 +53,17 @@ export default function AuthCallback() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function AuthCallback() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+                <Loader2 className="w-10 h-10 text-slate-900 animate-spin" />
+            </div>
+        }>
+            <AuthCallbackContent />
+        </Suspense>
     );
 }

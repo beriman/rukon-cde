@@ -1,10 +1,12 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState } from 'react';
-import { 
-  LayoutGrid, Search, Bell, Plus, FileText, AlertTriangle, 
-  CheckCircle2, Activity, ShieldCheck, Globe, TrendingUp, 
-  ChevronRight, Filter, MoreVertical, MessageSquare, 
+import {
+  LayoutGrid, Search, Bell, Plus, FileText, AlertTriangle,
+  CheckCircle2, Activity, ShieldCheck, Globe, TrendingUp,
+  ChevronRight, Filter, MoreVertical, MessageSquare,
   Calendar, Users, MapPin, ArrowUpRight, Clock, Loader2
 } from 'lucide-react';
 import Link from 'next/link';
@@ -77,16 +79,16 @@ export default function ProjectDashboardPage() {
         <div className="flex items-center gap-5">
           <div className="relative hidden lg:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-            <input 
-              type="text" 
-              placeholder="Search in project..." 
+            <input
+              type="text"
+              placeholder="Search in project..."
               className="h-10 w-64 rounded-xl border border-slate-800 bg-slate-900/50 pl-10 pr-4 text-xs font-medium focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600"
             />
           </div>
           <div className="flex items-center gap-3 pl-2 border-l border-slate-800">
             <button className="text-slate-500 hover:text-white transition-colors relative">
-                <Bell size={20} />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
+              <Bell size={20} />
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
             </button>
             <div className="h-9 w-9 overflow-hidden rounded-xl border border-slate-700 bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-sm shadow-inner">
               AB
@@ -105,7 +107,7 @@ export default function ProjectDashboardPage() {
               <span className="text-slate-400">Project Workspace</span>
             </nav>
             <h1 className="text-4xl font-black text-white tracking-tight uppercase italic italic">
-                {activeProject.name}
+              {activeProject.name}
             </h1>
             <div className="mt-4 flex items-center gap-5 text-xs font-bold uppercase tracking-widest text-slate-500">
               <span className="text-slate-300">ID: {activeProject.id.split('-')[0].toUpperCase()}</span>
@@ -138,7 +140,7 @@ export default function ProjectDashboardPage() {
           {/* Document Health */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-               <FileText size={60} />
+              <FileText size={60} />
             </div>
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">Document Health</h3>
@@ -160,8 +162,8 @@ export default function ProjectDashboardPage() {
 
           {/* BIM Coordination */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-               <LayoutGrid size={60} />
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
+              <LayoutGrid size={60} />
             </div>
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">BIM Coordination</h3>
@@ -192,7 +194,7 @@ export default function ProjectDashboardPage() {
           {/* HSE Stats */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-               <ShieldCheck size={60} />
+              <ShieldCheck size={60} />
             </div>
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">HSE Performance</h3>
@@ -208,7 +210,7 @@ export default function ProjectDashboardPage() {
           {/* Schedule Variance */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-               <TrendingUp size={60} />
+              <TrendingUp size={60} />
             </div>
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">Schedule Variance</h3>
@@ -236,7 +238,7 @@ export default function ProjectDashboardPage() {
               </div>
               <button className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-colors">View All Actions</button>
             </div>
-            
+
             <div className="space-y-4">
               {stats?.tasks?.length > 0 ? stats.tasks.map((task: any, i: number) => (
                 <div key={task.id} className="group flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md p-5 shadow-xl transition-all hover:border-blue-500/50 hover:translate-x-1">
@@ -299,11 +301,11 @@ export default function ProjectDashboardPage() {
       <footer className="mt-12 border-t border-slate-900 bg-slate-950/50 py-12 px-6">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-xs font-black text-slate-500 shadow-inner">R</div>
-             <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Rukon2 Enterprise CDE</p>
-                <p className="text-[9px] font-bold text-slate-700 uppercase tracking-widest mt-0.5">Built for ISO 19650 Compliance</p>
-             </div>
+            <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-xs font-black text-slate-500 shadow-inner">R</div>
+            <div>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Rukon2 Enterprise CDE</p>
+              <p className="text-[9px] font-bold text-slate-700 uppercase tracking-widest mt-0.5">Built for ISO 19650 Compliance</p>
+            </div>
           </div>
           <div className="flex items-center gap-10">
             <a href="#" className="text-[10px] font-black text-slate-600 hover:text-white transition-colors uppercase tracking-[0.2em]">Privacy</a>

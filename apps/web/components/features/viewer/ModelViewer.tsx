@@ -11,6 +11,7 @@ import {
     GridHelper,
     Color
 } from 'three';
+// @ts-ignore
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { apiClient } from '@/lib/api-client';
 import { Loader2 } from 'lucide-react';
@@ -77,7 +78,7 @@ export function ModelViewer({ fileId }: ModelViewerProps) {
                 await loader.loadAsync(url, (event) => {
                     const progress = Math.round((event.loaded / event.total) * 100);
                     setLoadingProgress(progress);
-                }).then((model) => {
+                }).then((model: any) => {
                     scene.add(model);
                     setIsLoading(false);
                 });

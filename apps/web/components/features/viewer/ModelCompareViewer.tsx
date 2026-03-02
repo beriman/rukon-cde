@@ -13,6 +13,7 @@ import {
     MeshBasicMaterial,
     DoubleSide
 } from 'three';
+// @ts-ignore
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { apiClient } from '@/lib/api-client';
 import { Loader2 } from 'lucide-react';
@@ -72,14 +73,14 @@ export function ModelCompareViewer({ fileId, versionA, versionB }: ModelCompareV
                 const matA = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.3, side: DoubleSide, depthTest: false });
                 const matB = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.3, side: DoubleSide, depthTest: false });
 
-                const p1 = loader.loadAsync(dataA.url).then(model => {
+                const p1 = loader.loadAsync(dataA.url).then((model: any) => {
                     model.traverse((child: any) => {
                         if (child.isMesh) child.material = matA;
                     });
                     scene.add(model);
                 });
 
-                const p2 = loader.loadAsync(dataB.url).then(model => {
+                const p2 = loader.loadAsync(dataB.url).then((model: any) => {
                     model.traverse((child: any) => {
                         if (child.isMesh) child.material = matB;
                     });

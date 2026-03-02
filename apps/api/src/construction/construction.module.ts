@@ -14,6 +14,10 @@ import { ApprovalService } from './approval.service';
 import { FilesModule } from '../files/files.module';
 import { PdfService } from '../common/services/pdf.service';
 import { CorrespondenceController } from './correspondence.controller';
+import { DailyLogService } from './daily-log.service';
+import { DailyLogController } from './daily-log.controller';
+import { VariationService } from './variation.service';
+import { VariationController } from './variation.controller';
 
 @Module({
     imports: [PrismaModule, FilesModule],
@@ -23,6 +27,8 @@ import { CorrespondenceController } from './correspondence.controller';
         ProcurementController,
         ClaimController,
         CorrespondenceController,
+        DailyLogController,
+        VariationController,
     ],
     providers: [
         ProgressService,
@@ -31,9 +37,10 @@ import { CorrespondenceController } from './correspondence.controller';
         ClaimService,
         CobieService,
         CorrespondenceService,
-        CorrespondenceService,
         ApprovalService,
         PdfService,
+        DailyLogService,
+        VariationService,
     ],
     exports: [
         ProgressService,
@@ -43,6 +50,8 @@ import { CorrespondenceController } from './correspondence.controller';
         CobieService,
         CorrespondenceService,
         ApprovalService,
+        DailyLogService,
+        VariationService,
     ],
 })
 export class ConstructionModule { }

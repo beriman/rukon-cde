@@ -60,6 +60,34 @@ export class FilesService {
         const organizationId = folder.project.organizationId;
         const projectId = folder.projectId;
 
+        // WIP FOLDER VALIDATION (Story: Separate WIP per Group/Company)
+        // Find if folder is under 01-WIP and check team membership
+        const isWip = folder.name === '01-WIP' ||
+            (await this.prisma.folder.findFirst({
+                where: { id: folder.parentId || '', name: '01-WIP' }
+            })) ||
+            (folder.parentId && await this.isUnderWip(folder.parentId));
+
+        if (isWip && folder.project.ownerId !== uploadedBy) {
+            // Check if this folder or its top-level WIP parent is assigned to user's team
+            const teamWithThisWip = await this.prisma.projectTeam.findFirst({
+                where: {
+                    OR: [
+                        { wipFolderId: folderId },
+                        { wipFolderId: folder.parentId || '' }
+                        // Note: For deep nesting, we'd need a recursive check or path attribute
+                    ],
+                    members: { some: { id: uploadedBy } }
+                }
+            });
+
+            // If it's a WIP folder but user not in the team, deny
+            // (Unless it's the root 01-WIP itself, which usually users shouldn't upload to directly anyway)
+            if (!teamWithThisWip && folder.name !== '01-WIP') {
+                throw new BadRequestException('You can only upload to your own team\'s WIP folder.');
+            }
+        }
+
         // PERMISSION CHECK (Story: Restricted Folders)
         // @ts-ignore
         if (folder.permissions && folder.permissions['write']) {
@@ -455,5 +483,17 @@ export class FilesService {
         }
 
         return { s3Key };
+    }
+
+    private async isUnderWip(folderId: string): Promise<boolean> {
+        const folder = await this.prisma.folder.findUnique({
+            where: { id: folderId },
+            select: { name: true, parentId: true }
+        });
+
+        if (!folder) return false;
+        if (folder.name === '01-WIP') return true;
+        if (folder.parentId) return this.isUnderWip(folder.parentId);
+        return false;
     }
 }

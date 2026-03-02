@@ -42,15 +42,23 @@ export class FoldersService {
         });
     }
 
-    async getFolderTree(projectId: string) {
+    async getFolderTree(projectId: string, userId: string) {
         // Verify project exists
         const project = await this.prisma.project.findUnique({
             where: { id: projectId },
+            include: { projectTeams: { include: { members: true } } }
         });
 
         if (!project) {
             throw new NotFoundException('Project not found');
         }
+
+        const isOwner = project.ownerId === userId;
+        // User teams in this project
+        const userTeams = project.projectTeams.filter(team =>
+            team.members.some(member => member.id === userId)
+        );
+        const userWipFolderIds = userTeams.map(t => t.wipFolderId).filter(id => !!id);
 
         // Get root folders first
         const rootFolders = await this.prisma.folder.findMany({
@@ -71,6 +79,17 @@ export class FoldersService {
             },
         });
 
-        return rootFolders;
+        if (isOwner) return rootFolders;
+
+        // Filter: If root is '01-WIP', only show folders assigned to user's teams
+        return rootFolders.map(root => {
+            if (root.name === '01-WIP') {
+                return {
+                    ...root,
+                    children: root.children.filter(child => userWipFolderIds.includes(child.id))
+                };
+            }
+            return root;
+        });
     }
 }

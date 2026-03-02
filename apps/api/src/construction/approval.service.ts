@@ -7,6 +7,7 @@ export interface WorkflowStage {
     name: string;
     key: string;
     type: ApprovalType;
+    slaDays?: number; // Time-bound tracking for SLA (bottleneck monitoring)
     approvers: {
         id: string; // User ID
         role?: string; // Optional: "Project Manager"
@@ -41,18 +42,21 @@ export class ApprovalService {
                 name: 'Internal Review',
                 key: 'INTERNAL',
                 type: 'ONE',
+                slaDays: 3,
                 approvers: [{ id: contractorLeadId, role: 'Contractor Lead' }]
             },
             {
                 name: 'Expert Review',
                 key: 'EXPERT_REVIEW',
                 type: 'ALL',
+                slaDays: 5,
                 approvers: experts.map(id => ({ id, role: 'Tenaga Ahli' }))
             },
             {
                 name: 'MK Approval',
                 key: 'MK_APPROVAL',
                 type: 'ONE',
+                slaDays: 2,
                 approvers: [{ id: mkLeadId, role: 'MK Lead' }]
             }
         ];

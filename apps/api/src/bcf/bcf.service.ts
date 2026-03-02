@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class BcfService {
@@ -47,9 +48,30 @@ export class BcfService {
         return this.prisma.bcfTopic.findUnique({
             where: { id: topicId },
             include: {
-                comments: { orderBy: { date: 'asc' } },
+                comments: {
+                    orderBy: { date: 'asc' },
+                },
                 viewpoints: true
             }
+        });
+    }
+
+    async addComment(topicId: string, userId: string, dto: CreateCommentDto) {
+        return this.prisma.bcfComment.create({
+            data: {
+                topicId,
+                author: userId,
+                comment: dto.comment,
+                date: new Date(),
+                viewpointId: dto.viewpointId
+            }
+        });
+    }
+
+    async updateTopicStatus(topicId: string, status: string) {
+        return this.prisma.bcfTopic.update({
+            where: { id: topicId },
+            data: { status: status as any },
         });
     }
 }

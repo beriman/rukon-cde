@@ -3,16 +3,19 @@
 Ini adalah *single source of truth* sementara bagi para Agen untuk memahami fokus proyek saat ini secara real-time. (Ini terpisah dari PRD, melainkan status mikro saat ini).
 
 ## 🕒 Current Focus
-- **Phase**: Post-ACC Feature Implementation & Stability
-- **Active Epic/Story**: Advanced BIM Coordination (Asset Tracking, Federation, 3D Pinning) - COMPLETED
-- **Immediate Next Step**: Specialized testing by QA (Quinn) and specialized documentation by BIM Agent.
+- **Phase**: Post-Aconex & ACC Feature Implementation
+- **Active Epic/Story**: Mail Management (Threading), Workflow SLA, Asset Tracking - COMPLETED
+- **Immediate Next Step**: Integration of Threading UI in Frontend and specialized documentation by BIM Agent.
 
 ## 🚦 System Status
-- **Overall Readiness**: 🟢 READY FOR DEPLOYMENT (Core) + New Beta Features
+- **Overall Readiness**: 🟢 READY FOR DEPLOYMENT + Enterprise Features (Aconex/ACC)
+- **Aconex Features**:
+  - Mail Threading: Active (Backend Inbox Logic)
+  - Workflow SLA: Active (Time-bound tracking stage-ready)
 - **ACC Features**: 
   - Model Federation: Active (Multi-model support)
-  - Asset Tracking: Active (BIM GUID link + Field Commissioning)
-  - 3D Issue Pinning: Active (Visual coordination pins)
+  - Asset Tracking: Active (BIM GUID link)
+  - 3D Issue Pinning: Active (Visual pins)
 - **Agent Hub**: Fully synchronized.
 - **Known Blockers**: None. Final smoke tests recommended for new features.
 

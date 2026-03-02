@@ -10,6 +10,7 @@ export class CreateCorrespondenceDto {
     to: string[]; // Recipient names?
     category?: 'GENERAL' | 'OFFICIAL_LETTER';
     attachments?: string[];
+    parentId?: string;
 }
 
 @Controller('construction/correspondence')
@@ -42,6 +43,15 @@ export class CorrespondenceController {
     @Post(':id/read')
     markAsRead(@Param('id') id: string) {
         return this.correspondenceService.markAsRead(id);
+    }
+
+    @Post(':id/reply')
+    reply(@Param('id') id: string, @Request() req, @Body() body: { message: string }) {
+        return this.correspondenceService.reply(id, {
+            from: req.user.username || req.user.email || 'Unknown',
+            userId: req.user.id || req.user.userId,
+            message: body.message
+        });
     }
 
     @Patch(':id/approve')

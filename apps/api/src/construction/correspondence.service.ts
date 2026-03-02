@@ -27,12 +27,13 @@ export class CorrespondenceService {
         subject: string;
         message: string;
         attachments?: string[];
+        parentId?: string;
     }) {
         try {
             const count = await this.prisma.correspondence.count({
                 where: {
                     projectId: data.projectId,
-                    type: data.type,
+                    type: data.type as any,
                 },
             });
 
@@ -95,7 +96,7 @@ export class CorrespondenceService {
             return await this.prisma.correspondence.create({
                 data: {
                     projectId: data.projectId,
-                    type: data.type,
+                    type: data.type as any,
                     from: senderName,
                     to: data.to,
                     subject: data.subject,
@@ -105,6 +106,7 @@ export class CorrespondenceService {
                     attachments: data.attachments || [],
                     category: (data.category === 'OFFICIAL_LETTER' ? 'OFFICIAL_LETTER' : 'GENERAL') as any, // Cast for now
                     pdfUrl, // Initially PDF without signature (Draft) or null
+                    parentId: data.parentId,
                 } as any,
             });
         } catch (error) {
@@ -209,19 +211,37 @@ export class CorrespondenceService {
 
     async reply(id: string, replyData: {
         from: string;
+        userId?: string;
         message: string;
     }) {
         try {
+            const parent = await this.prisma.correspondence.findUnique({ where: { id } });
+
+            if (!parent) {
+                throw new NotFoundException('Correspondence not found');
+            }
+
+            const replyCorrespondence = await this.create({
+                projectId: parent.projectId,
+                type: parent.type,
+                category: parent.category as 'GENERAL' | 'OFFICIAL_LETTER',
+                from: replyData.from,
+                userId: replyData.userId,
+                to: [parent.from],
+                subject: parent.subject.startsWith('RE:') || parent.subject.startsWith('Re:') ? parent.subject : `RE: ${parent.subject}`,
+                message: replyData.message,
+                parentId: id,
+            });
+
             await this.prisma.correspondence.update({
                 where: { id },
                 data: { status: 'REPLIED' },
             });
 
-            // In real implementation, create a linked reply correspondence
-            return { success: true };
+            return replyCorrespondence;
         } catch (error) {
-            if (error.code === 'P2025') {
-                throw new NotFoundException('Correspondence not found');
+            if (error instanceof NotFoundException) {
+                throw error;
             }
             throw new InternalServerErrorException('Failed to send reply');
         }
@@ -232,9 +252,15 @@ export class CorrespondenceService {
             return await this.prisma.correspondence.findMany({
                 where: {
                     projectId,
-                    ...(type && { type }),
+                    ...(type && { type: type as any }),
+                    parentId: null, // Only fetch top-level threads
                 },
                 orderBy: { createdAt: 'desc' },
+                include: {
+                    replies: {
+                        orderBy: { createdAt: 'asc' }
+                    }
+                }
             });
         } catch (error) {
             throw new InternalServerErrorException('Failed to fetch correspondences');
@@ -245,6 +271,12 @@ export class CorrespondenceService {
         try {
             const correspondence = await this.prisma.correspondence.findUnique({
                 where: { id },
+                include: {
+                    replies: {
+                        orderBy: { createdAt: 'asc' }
+                    },
+                    parent: true
+                }
             });
 
             if (!correspondence) {

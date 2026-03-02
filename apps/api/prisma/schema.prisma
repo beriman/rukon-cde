@@ -155,6 +155,7 @@ model Project {
   variationOrders VariationOrder[]
   cobieValidations CobieValidation[]
   correspondences Correspondence[]
+  assets         Asset[]
   
   // Epic 6: BCF & Smart Review
   bcfTopics      BcfTopic[]

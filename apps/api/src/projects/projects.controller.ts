@@ -44,8 +44,8 @@ export class ProjectsController {
     }
 
     @Get(':id/folders')
-    getFolderTree(@Param('id') projectId: string) {
-        return this.foldersService.getFolderTree(projectId);
+    getFolderTree(@Req() req, @Param('id') projectId: string) {
+        return this.foldersService.getFolderTree(projectId, req.user.id);
     }
 
     @Get(':id')

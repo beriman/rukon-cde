@@ -1,319 +1,221 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
-import React, { useEffect, useState } from 'react';
-import {
-  LayoutGrid, Search, Bell, Plus, FileText, AlertTriangle,
-  CheckCircle2, Activity, ShieldCheck, Globe, TrendingUp,
-  ChevronRight, Filter, MoreVertical, MessageSquare,
-  Calendar, Users, MapPin, ArrowUpRight, Clock, Loader2
-} from 'lucide-react';
+import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useProjectStore } from '@/stores/useProjectStore';
-import { apiClient } from '@/lib/api-client';
+import { 
+  Search, 
+  Bell, 
+  Box, 
+  FolderOpen, 
+  AlertCircle, 
+  Clock, 
+  CheckSquare, 
+  MoreVertical,
+  ArrowUpRight,
+  Menu,
+  X
+} from 'lucide-react';
 
-export default function ProjectDashboardPage() {
-  const { activeProject, isLoading: isProjectLoading } = useProjectStore();
-  const [stats, setStats] = useState<any>(null);
-  const [isLoadingStats, setIsLoadingStats] = useState(false);
-  const router = useRouter();
+const UserDashboardPage = () => {
+  const projects = [
+    { name: 'Jakarta MRT Phase 3', role: 'Lead Appointed Party', progress: 65, image: '🚇' },
+    { name: 'Dubai Sky-Rise P2', role: 'BIM Coordinator', progress: 42, image: '🏙️' },
+    { name: 'London Crossrail', role: 'Information Manager', progress: 88, image: '🏗️' },
+  ];
 
-  useEffect(() => {
-    if (!activeProject && !isProjectLoading) {
-      router.push('/projects');
-      return;
-    }
-
-    if (activeProject) {
-      fetchDashboardStats();
-    }
-  }, [activeProject, isProjectLoading, router]);
-
-  const fetchDashboardStats = async () => {
-    setIsLoadingStats(true);
-    try {
-      const res = await apiClient.get(`/projects/${activeProject?.id}/dashboard`);
-      setStats(res.data);
-    } catch (err) {
-      console.error('Failed to fetch dashboard stats:', err);
-    } finally {
-      setIsLoadingStats(false);
-    }
-  };
-
-  if (!activeProject) {
-    return (
-      <div className="h-screen bg-slate-950 flex items-center justify-center">
-        <Loader2 size={40} className="text-blue-500 animate-spin" />
-      </div>
-    );
-  }
+  const tasks = [
+    { title: 'Approve Structural IFC', project: 'Jakarta MRT', due: '2h left', priority: 'high' },
+    { title: 'Respond to RFI #402', project: 'Dubai Sky-Rise', due: 'Tomorrow', priority: 'medium' },
+    { title: 'Upload Weekly Report', project: 'London Crossrail', due: 'Friday', priority: 'low' },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-200 selection:bg-blue-500/30">
-      {/* Background Pattern */}
-      <div className="fixed inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%231e293b\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E')] -z-10 opacity-30"></div>
-
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl px-6 shadow-2xl">
-        <div className="flex items-center gap-10">
-          <Link href="/projects" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/20 group-hover:scale-105 transition-transform">
-              R
+    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-sans transition-colors duration-300">
+      {/* Top Nav */}
+      <nav className="sticky top-0 z-50 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-border-dark px-6 py-3">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-8">
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center shadow-lg shadow-primary/20">
+              <span className="text-white font-bold">R</span>
             </div>
-            <span className="text-xl font-bold tracking-tight text-white uppercase italic">
-              Rukon<span className="text-blue-500 italic">2</span>
-            </span>
-          </Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            <Link href="/dashboard" className="text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-5 mt-5 uppercase tracking-wider">Dashboard</Link>
-            <Link href="/documents" className="text-sm font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-wider">Documents</Link>
-            <Link href="/bim" className="text-sm font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-wider">BIM Viewer</Link>
-            <Link href="/hse" className="text-sm font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-wider">HSE</Link>
-            <Link href="/simulation" className="text-sm font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-wider">4D/5D</Link>
-          </nav>
-        </div>
+            <span className="text-lg font-black tracking-tight uppercase italic hidden md:block">Rukon2 CDE</span>
+          </div>
 
-        <div className="flex items-center gap-5">
-          <div className="relative hidden lg:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-            <input
-              type="text"
-              placeholder="Search in project..."
-              className="h-10 w-64 rounded-xl border border-slate-800 bg-slate-900/50 pl-10 pr-4 text-xs font-medium focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600"
+          <div className="flex-1 max-w-2xl relative group hidden sm:block">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+            <input 
+                type="text" 
+                placeholder="Search across projects, documents, or issues (Cmd + K)"
+                className="w-full pl-12 pr-4 py-2.5 bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-xs font-bold"
             />
           </div>
-          <div className="flex items-center gap-3 pl-2 border-l border-slate-800">
-            <button className="text-slate-500 hover:text-white transition-colors relative">
-              <Bell size={20} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
+
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 text-slate-400 hover:text-primary transition-colors">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface-dark"></span>
             </button>
-            <div className="h-9 w-9 overflow-hidden rounded-xl border border-slate-700 bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-sm shadow-inner">
-              AB
+            <div className="flex items-center gap-3 pl-4 border-l border-slate-100 dark:border-border-dark">
+                <div className="text-right hidden sm:block">
+                    <p className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">Eng. Thornton</p>
+                    <p className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter">Information Manager</p>
+                </div>
+                <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-background-dark flex items-center justify-center border border-slate-200 dark:border-border-dark">
+                    <span className="text-[10px] font-black italic">AT</span>
+                </div>
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
-      <main className="p-6 lg:p-10 max-w-[1600px] mx-auto">
-        {/* Project Header */}
-        <header className="mb-10 flex flex-col lg:flex-row justify-between gap-6 lg:items-end">
-          <div>
-            <nav className="mb-4 flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-              <Link href="/projects" className="hover:text-blue-400 transition-colors">Portfolios</Link>
-              <ChevronRight size={12} />
-              <span className="text-slate-400">Project Workspace</span>
-            </nav>
-            <h1 className="text-4xl font-black text-white tracking-tight uppercase italic italic">
-              {activeProject.name}
-            </h1>
-            <div className="mt-4 flex items-center gap-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              <span className="text-slate-300">ID: {activeProject.id.split('-')[0].toUpperCase()}</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-              <span>Status: <span className="text-blue-500">{activeProject.status}</span></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-              <span className="flex items-center gap-2 italic text-slate-600 font-medium lowercase tracking-tight">
-                <Clock size={14} /> environment active
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/50 px-5 py-3 text-[11px] font-bold text-slate-300 uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all shadow-lg active:scale-95">
-              <FileText size={16} className="text-blue-500" />
-              Upload File
-            </button>
-            <button className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/50 px-5 py-3 text-[11px] font-bold text-slate-300 uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all shadow-lg active:scale-95">
-              <AlertTriangle size={16} className="text-amber-500" />
-              Create Issue
-            </button>
-            <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-[11px] font-bold text-white uppercase tracking-widest hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/20 active:scale-95">
-              <Plus size={16} />
-              New RFI
-            </button>
-          </div>
-        </header>
+      <main className="max-w-[1600px] mx-auto p-6 md:p-10">
+        <div className="grid lg:grid-cols-4 gap-10">
+            {/* Main Section */}
+            <div className="lg:col-span-3 space-y-10">
+                <header className="animate-fade-in">
+                    <h1 className="text-3xl font-black tracking-tight uppercase italic mb-2">Welcome Back, Alex</h1>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em]">Wednesday, October 28, 2026</p>
+                </header>
 
-        {/* Stats Grid */}
-        <div className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Document Health */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-              <FileText size={60} />
-            </div>
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">Document Health</h3>
-              <Activity className="text-blue-500" size={18} />
-            </div>
-            <div className="mb-1 text-3xl font-black text-white tracking-tighter leading-none">{stats?.filesCount || 0}</div>
-            <div className="mb-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Active Docs</div>
-            <div className="flex h-1.5 overflow-hidden rounded-full bg-slate-800/50">
-              <div className="bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" style={{ width: `${stats?.wipPercentage || 0}%` }}></div>
-              <div className="bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]" style={{ width: `${stats?.sharedPercentage || 0}%` }}></div>
-              <div className="bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${stats?.publishedPercentage || 0}%` }}></div>
-            </div>
-            <div className="mt-4 flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-600">
-              <span className="text-amber-500/80">WIP {stats?.wipPercentage || 0}%</span>
-              <span className="text-blue-500/80">Shared {stats?.sharedPercentage || 0}%</span>
-              <span className="text-emerald-500/80">Pub {stats?.publishedPercentage || 0}%</span>
-            </div>
-          </div>
-
-          {/* BIM Coordination */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-              <LayoutGrid size={60} />
-            </div>
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">BIM Coordination</h3>
-              <Globe className="text-indigo-500" size={18} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-2xl font-black text-red-500 tracking-tighter">{stats?.clashesCount || 0}</div>
-                <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Active Clashes</div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-white tracking-tighter">{stats?.openBcfCount || 0}</div>
-                <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Open BCFs</div>
-              </div>
-            </div>
-            <div className="mt-6 flex items-center gap-3 border-t border-slate-800/50 pt-4">
-              <div className="flex -space-x-2.5">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-7 w-7 rounded-lg border-2 border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                    {String.fromCharCode(64 + i)}
-                  </div>
-                ))}
-              </div>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Team Sync Active</span>
-            </div>
-          </div>
-
-          {/* HSE Stats */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-              <ShieldCheck size={60} />
-            </div>
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">HSE Performance</h3>
-              <ShieldCheck className="text-emerald-500" size={18} />
-            </div>
-            <div className="mb-1 text-3xl font-black text-emerald-500 tracking-tighter leading-none">{stats?.ltiFreeDays || 0} Days</div>
-            <div className="mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Incident Free Period</div>
-            <div className="text-sm font-black text-white">
-              {stats?.totalManhours || 0} <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest ml-1">Total Manhours</span>
-            </div>
-          </div>
-
-          {/* Schedule Variance */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-              <TrendingUp size={60} />
-            </div>
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">Schedule Variance</h3>
-              <TrendingUp className="text-red-500" size={18} />
-            </div>
-            <div className="mb-1 text-3xl font-black text-red-500 tracking-tighter leading-none">{stats?.scheduleVariance || '0.0'}%</div>
-            <div className="mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Variance Status</div>
-            <div className="h-10 w-full flex items-end gap-1.5 px-1 pb-1 border-b border-slate-800/50">
-              {[20, 40, 60, 90, 70, 80].map((h, i) => (
-                <div key={i} className={`flex-1 rounded-t-sm transition-all duration-500 ${i === 5 ? 'bg-red-500/50' : 'bg-blue-600/30'}`} style={{ height: `${h}%` }}></div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* My Tasks */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="text-blue-500" size={20} />
-                <h2 className="text-sm font-black uppercase tracking-[0.25em] text-white leading-none">Priority Tasks</h2>
-                <span className="rounded-md bg-blue-600/10 border border-blue-600/20 px-2 py-0.5 text-[10px] font-black text-blue-500 uppercase tracking-widest">{stats?.tasks?.length || 0} Active</span>
-              </div>
-              <button className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-colors">View All Actions</button>
-            </div>
-
-            <div className="space-y-4">
-              {stats?.tasks?.length > 0 ? stats.tasks.map((task: any, i: number) => (
-                <div key={task.id} className="group flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md p-5 shadow-xl transition-all hover:border-blue-500/50 hover:translate-x-1">
-                  <div className="flex items-start gap-5">
-                    <div className="mt-1 rounded-xl bg-blue-600/10 p-3 text-blue-500 border border-blue-600/20 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                      <FileText size={20} />
+                <section className="space-y-6">
+                    <div className="flex justify-between items-end">
+                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Active Projects</h2>
+                        <Link href="/projects" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">View All</Link>
                     </div>
-                    <div>
-                      <div className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">{task.status}</div>
-                      <h4 className="font-bold text-white group-hover:text-blue-400 transition-colors tracking-tight text-base italic uppercase">{task.title}</h4>
-                      <div className="mt-2 flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5 italic lowercase tracking-tight">assigned to: {task.assignee || 'Unassigned'}</span>
-                      </div>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {projects.map((p, i) => (
+                            <div key={p.name} className="group bg-white dark:bg-surface-dark rounded-[2rem] border border-slate-100 dark:border-border-dark shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 animate-fade-in" style={{ animationDelay: `${0.1 * i}s` }}>
+                                <div className="p-8">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="w-12 h-12 bg-slate-50 dark:bg-background-dark rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-slate-100 dark:border-border-dark">
+                                            {p.image}
+                                        </div>
+                                        <button className="text-slate-300 hover:text-primary transition-colors"><MoreVertical className="w-5 h-5" /></button>
+                                    </div>
+                                    
+                                    <h3 className="text-lg font-black uppercase tracking-tight italic mb-1 group-hover:text-primary transition-colors">{p.name}</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">{p.role}</p>
+
+                                    <div className="space-y-2 mb-8">
+                                        <div className="flex justify-between text-[8px] font-black uppercase tracking-widest mb-1">
+                                            <span>Project Progress</span>
+                                            <span>{p.progress}%</span>
+                                        </div>
+                                        <div className="h-1.5 w-full bg-slate-50 dark:bg-background-dark rounded-full overflow-hidden">
+                                            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${p.progress}%` }}></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <button title="BIM Viewer" className="p-2.5 bg-blue-50 dark:bg-blue-900/20 text-primary rounded-xl flex items-center justify-center hover:bg-primary hover:text-white transition-all"><Box className="w-4 h-4" /></button>
+                                        <button title="CDE Documents" className="p-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-xl flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all"><FolderOpen className="w-4 h-4" /></button>
+                                        <button title="Issues" className="p-2.5 bg-orange-50 dark:bg-orange-900/20 text-orange-600 rounded-xl flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all"><AlertCircle className="w-4 h-4" /></button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                  </div>
-                  <ChevronRight size={20} className="text-slate-800 group-hover:text-blue-500 transition-colors" />
-                </div>
-              )) : (
-                <div className="p-10 text-center border border-dashed border-slate-800 rounded-3xl text-slate-600 font-bold uppercase tracking-widest text-[10px]">
-                  No priority tasks assigned
-                </div>
-              )}
-            </div>
-          </div>
+                </section>
 
-          {/* Activity Feed */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md p-8 shadow-2xl relative overflow-hidden">
-            <div className="mb-8 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <MessageSquare className="text-slate-500" size={18} />
-                <h2 className="text-sm font-black uppercase tracking-[0.25em] text-white leading-none">Project Activity</h2>
-              </div>
-              <button className="text-slate-600 hover:text-white transition-colors">
-                <Filter size={16} />
-              </button>
+                <section className="bg-white dark:bg-surface-dark rounded-[2.5rem] border border-slate-100 dark:border-border-dark p-8 shadow-sm">
+                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Recent Documents</h2>
+                    <div className="space-y-2">
+                        {[
+                            { name: 'STR-IFC-001-MODEL.ifc', project: 'Jakarta MRT', date: '10 mins ago', size: '142 MB' },
+                            { name: 'SITE-PHOTO-OCT-28.jpg', project: 'Dubai Sky-Rise', date: '1 hour ago', size: '12 MB' },
+                            { name: 'ARCH-RVT-V4-COORD.rvt', project: 'London Crossrail', date: '3 hours ago', size: '2.4 GB' },
+                        ].map((file, i) => (
+                            <div key={file.name} className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-background-dark/50 rounded-2xl transition-colors cursor-pointer group">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-slate-100 dark:bg-background-dark rounded-xl flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                        <FolderOpen className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-black uppercase italic tracking-tight">{file.name}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{file.project} • {file.date}</p>
+                                    </div>
+                                </div>
+                                <div className="text-[10px] font-black text-slate-400 uppercase">{file.size}</div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
             </div>
 
-            <div className="relative space-y-8 before:absolute before:left-3.5 before:top-2 before:h-[calc(100%-16px)] before:w-px before:bg-slate-800">
-              {stats?.recentActivity?.length > 0 ? stats.recentActivity.map((activity: any, i: number) => (
-                <div key={i} className="relative pl-10">
-                  <div className="absolute left-0 top-1.5 h-7 w-7 rounded-lg border-2 border-slate-950 bg-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.4)] flex items-center justify-center text-white text-[10px] font-bold">
-                    {activity.userInitials || 'SY'}
-                  </div>
-                  <div className="text-sm text-slate-300 leading-relaxed">
-                    <span className="font-black text-white italic">{activity.userName || 'System'}</span> {activity.description}
-                  </div>
-                  <div className="mt-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">{activity.timeAgo || 'Recently'}</div>
+            {/* Sidebar Section */}
+            <div className="space-y-10">
+                <section className="bg-slate-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden border border-white/5 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10"></div>
+                    <div className="flex items-center gap-3 mb-8">
+                        <CheckSquare className="w-5 h-5 text-primary" />
+                        <h2 className="text-sm font-black uppercase tracking-widest italic leading-none">Pending Tasks</h2>
+                    </div>
+
+                    <div className="space-y-6">
+                        {tasks.map((t) => (
+                            <div key={t.title} className="group cursor-pointer">
+                                <div className="flex items-start justify-between mb-2">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">{t.title}</h4>
+                                        <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{t.project}</p>
+                                    </div>
+                                    <div className={`text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-tighter ${
+                                        t.priority === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400'
+                                    }`}>
+                                        {t.due}
+                                    </div>
+                                </div>
+                                <div className="h-0.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div className={`h-full bg-primary/50 group-hover:bg-primary transition-all duration-500 w-0 group-hover:w-full`}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="w-full mt-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
+                        View Task Board
+                    </button>
+                </section>
+
+                <section className="bg-white dark:bg-surface-dark rounded-[2.5rem] border border-slate-100 dark:border-border-dark p-8 shadow-sm animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">System Status</h2>
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <div className="flex-1">
+                                <p className="text-[10px] font-black uppercase tracking-widest mb-1">Global CDE Sync</p>
+                                <div className="h-1 w-full bg-slate-50 dark:bg-background-dark rounded-full">
+                                    <div className="h-full w-full bg-green-500/50 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <div className="flex-1">
+                                <p className="text-[10px] font-black uppercase tracking-widest mb-1">BIM Rendering Cluster</p>
+                                <div className="h-1 w-full bg-slate-50 dark:bg-background-dark rounded-full">
+                                    <div className="h-full w-3/4 bg-green-500/50 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div className="bg-primary/10 rounded-[2.5rem] p-8 border border-primary/20 group cursor-pointer hover:bg-primary/20 transition-all">
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
+                            <ArrowUpRight className="w-5 h-5" />
+                        </div>
+                    </div>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-primary italic mb-2">Upgrade to Pro</h3>
+                    <p className="text-xs font-medium text-primary/70 leading-relaxed">Unlock advanced clash detection and unlimited document storage.</p>
                 </div>
-              )) : (
-                <div className="relative pl-10 text-slate-600 text-[10px] font-bold uppercase tracking-widest">
-                  No recent activity recorded
-                </div>
-              )}
             </div>
-          </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="mt-12 border-t border-slate-900 bg-slate-950/50 py-12 px-6">
-        <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-xs font-black text-slate-500 shadow-inner">R</div>
-            <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Rukon2 Enterprise CDE</p>
-              <p className="text-[9px] font-bold text-slate-700 uppercase tracking-widest mt-0.5">Built for ISO 19650 Compliance</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-10">
-            <a href="#" className="text-[10px] font-black text-slate-600 hover:text-white transition-colors uppercase tracking-[0.2em]">Privacy</a>
-            <a href="#" className="text-[10px] font-black text-slate-600 hover:text-white transition-colors uppercase tracking-[0.2em]">Terms</a>
-            <a href="#" className="text-[10px] font-black text-slate-600 hover:text-white transition-colors uppercase tracking-[0.2em]">Security</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
-}
+};
+
+export default UserDashboardPage;

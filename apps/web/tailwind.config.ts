@@ -19,9 +19,13 @@ const config: Config = {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#2563eb',
+					DEFAULT: '#2b8cee',
 					foreground: '#ffffff'
 				},
+				"background-light": "#f6f7f8",
+				"background-dark": "#101922",
+				"surface-dark": "#1c242d",
+				"border-dark": "#283039",
 				glass: {
 					100: 'rgba(255, 255, 255, 0.4)',
 					200: 'rgba(255, 255, 255, 0.7)',

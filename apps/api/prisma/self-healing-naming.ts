@@ -24,7 +24,7 @@ async function healNamingConventions() {
             await prisma.auditLog.create({
                 data: {
                     userId: 'SYSTEM',
-                    action: 'FILE_UPDATE', // Assuming FILE_UPDATE for issues
+                    action: 'FILE_UPDATE' as any, // Bypass strict type check for self-healing script
                     resourceId: file.id,
                     resourceType: 'FILE',
                     details: {

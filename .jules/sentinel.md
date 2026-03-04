@@ -1,0 +1,4 @@
+## 2024-05-18 - Missing Authentication Guards on Scaffolded Controllers
+**Vulnerability:** Found multiple controllers within the `apps/api/src/construction` module (`ConstructionController`, `SubmittalController`) that were lacking authentication because the `@UseGuards(JwtAuthGuard)` decorators were commented out.
+**Learning:** During scaffolding or early development, authentication guards may be commented out to ease testing and then accidentally left out in production, exposing sensitive endpoints like creating work packages, logging progress, creating submittals, and starting workflows.
+**Prevention:** Always verify that newly created controllers or recently modified modules have their authentication guards (e.g. `@UseGuards(JwtAuthGuard)`) uncommented and actively enforcing authorization rules before committing code.

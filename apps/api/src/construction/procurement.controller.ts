@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProcurementService } from './procurement.service';
 import { ProcurementStatus } from '@prisma/client';
 
@@ -37,6 +38,7 @@ export class CreateBQItemDto {
 }
 
 @Controller('construction/procurement')
+@UseGuards(JwtAuthGuard)
 export class ProcurementController {
     constructor(private readonly procurementService: ProcurementService) { }
 

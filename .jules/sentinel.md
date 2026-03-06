@@ -1,0 +1,4 @@
+## 2025-03-05 - Missing Authentication on Construction Endpoints
+**Vulnerability:** Five controllers within `apps/api/src/construction` handling sensitive data (claims, submittals, procurements, correspondence, progress) were found missing class-level authentication guards, exposing all endpoints publicly.
+**Learning:** Development scaffolds or commented-out decorators (`// @UseGuards(JwtAuthGuard)`) are easily missed when moving from development to production. The codebase structure groups domain-specific modules, but there was no global enforcer for auth, making it easy to forget per-controller enforcement.
+**Prevention:** Implement a global auth guard by default and use a `@Public()` decorator for intentional exclusions, rather than requiring manual addition of `@UseGuards(JwtAuthGuard)` to every new controller. Include automated security tests that specifically scan for unauthenticated routes.

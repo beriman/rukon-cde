@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, Request } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SubmittalService } from './submittal.service';
 import { SubmittalType, SubmittalStatus } from '@prisma/client';
 
@@ -17,7 +18,7 @@ export class UpdateStatusDto {
 }
 
 @Controller('construction/submittals')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class SubmittalController {
     constructor(private readonly submittalService: SubmittalService) { }
 

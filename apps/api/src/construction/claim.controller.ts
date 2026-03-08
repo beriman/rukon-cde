@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ClaimService } from './claim.service';
 
 export class CreateClaimDto {
@@ -23,6 +24,7 @@ export class CreateVODto {
 }
 
 @Controller('construction/claims')
+@UseGuards(JwtAuthGuard)
 export class ClaimController {
     constructor(private readonly claimService: ClaimService) { }
 

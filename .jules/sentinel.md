@@ -1,0 +1,4 @@
+## 2024-05-24 - [Missing Authentication Guard in Controllers]
+**Vulnerability:** Several controllers within the `apps/api/src/construction` module either had their `@UseGuards(JwtAuthGuard)` decorators commented out or entirely missing. This exposed sensitive internal APIs allowing an unauthenticated user to access, create, or manipulate critical construction data.
+**Learning:** It is common for authentication guards to be commented out during early scaffolding or active local development to ease testing. If developers forget to restore these guards before committing, the endpoints are pushed unprotected into production or staging environments.
+**Prevention:** Always verify that authentication and authorization guards (e.g. `@UseGuards(JwtAuthGuard)`) are active on newly created or modified controllers and endpoints before submitting code.

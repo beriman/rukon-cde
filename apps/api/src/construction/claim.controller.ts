@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ClaimService } from './claim.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 export class CreateClaimDto {
     projectId: string;
@@ -23,6 +24,8 @@ export class CreateVODto {
 }
 
 @Controller('construction/claims')
+// 🛡️ Sentinel: Enforce authentication to prevent unauthorized access to sensitive claim data
+@UseGuards(JwtAuthGuard)
 export class ClaimController {
     constructor(private readonly claimService: ClaimService) { }
 

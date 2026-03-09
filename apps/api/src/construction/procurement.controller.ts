@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ProcurementService } from './procurement.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProcurementStatus } from '@prisma/client';
 
 export class CreateProcurementItemDto {
@@ -37,6 +38,8 @@ export class CreateBQItemDto {
 }
 
 @Controller('construction/procurement')
+// 🛡️ Sentinel: Enforce authentication to prevent unauthorized modification of procurement data
+@UseGuards(JwtAuthGuard)
 export class ProcurementController {
     constructor(private readonly procurementService: ProcurementService) { }
 

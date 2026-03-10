@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] Missing Authentication Guards in Controllers
+**Vulnerability:** Scaffolding comments out `@UseGuards(JwtAuthGuard)` leaving sensitive endpoints completely exposed to unauthenticated users. Found specifically in the `construction` module (`construction.controller.ts`, `submittal.controller.ts`).
+**Learning:** During scaffolding or early development, authentication guards are commented out to ease testing but often forgotten before moving to production, resulting in critical security gaps. The custom `JwtAuthGuard` should be uniformly used rather than the default `AuthGuard('jwt')` since the custom guard supports the `@Public()` decorator correctly.
+**Prevention:** Always verify that authentication guards are active on new and modified controllers. Use automated linting or security scanning rules to flag controllers missing global or class-level `@UseGuards` definitions unless explicitly marked public.

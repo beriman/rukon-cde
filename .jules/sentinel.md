@@ -1,0 +1,4 @@
+## 2024-05-24 - Path Traversal Vulnerability in Files Service
+**Vulnerability:** The `FilesService.uploadSystemFile` method in `apps/api/src/files/files.service.ts` directly used `file.originalname` and `subfolder` to construct file paths for local saving via `path.join()`. This allowed an attacker to input a malicious `originalname` like `../../etc/passwd` or `subfolder` like `../../../` to overwrite arbitrary files on the system or traverse directories when S3 was not enabled.
+**Learning:** Even internal or "system" upload functions that might not be directly exposed to end-users need strict input validation. Always assume filenames and dynamic folder paths can be maliciously manipulated.
+**Prevention:** Sanitize filenames using `path.basename()` to strip any directory path components. Always validate dynamic folder parameters (like `subfolder`) against strict alphanumeric regex patterns (e.g., `/^[a-zA-Z0-9_-]+$/`) to prevent directory climbing attacks.

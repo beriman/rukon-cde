@@ -1,0 +1,4 @@
+## 2024-03-16 - [Critical Authentication Bypass] Google OAuth Sync Missing Server-Side Token Validation
+**Vulnerability:** The `googleSync` endpoint in `auth.service.ts` accepted any email without verifying ownership or origin. An attacker could impersonate any user by sending a POST request to `/auth/google-sync` with `{ email: "target@example.com", name: "Target" }`.
+**Learning:** Client-side authentication cannot be trusted blindly. While the frontend retrieved a token from Supabase/Google, the backend didn't require or validate it, trusting the unauthenticated payload.
+**Prevention:** Always require and validate the provider's token (e.g., via `https://oauth2.googleapis.com/tokeninfo?access_token=...`) on the server side when synchronizing OAuth accounts, ensuring the returned `email` matches the payload and that `email_verified` is true.

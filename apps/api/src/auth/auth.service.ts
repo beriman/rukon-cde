@@ -202,7 +202,29 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string }) {
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Missing provider token');
+        }
+
+        try {
+            // Validate token with Google's tokeninfo API
+            const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(dto.providerToken)}`);
+            if (!response.ok) {
+                throw new UnauthorizedException('Invalid Google token');
+            }
+
+            const tokenInfo = await response.json();
+
+            // Verify email match and email_verified status
+            const emailVerified = String(tokenInfo.email_verified) === 'true';
+            if (!emailVerified || tokenInfo.email !== dto.email) {
+                throw new UnauthorizedException('Google token validation failed');
+            }
+        } catch (error) {
+            throw new UnauthorizedException('Google authentication failed');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

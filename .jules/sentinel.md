@@ -1,0 +1,4 @@
+## 2025-02-18 - Missing OAuth Sync Token Validation
+**Vulnerability:** The API endpoint `auth/google-sync` accepted an email address to fetch or create a user account, but it did not require a valid token from the OAuth provider (Google). An attacker could send arbitrary email addresses to this endpoint and gain full access to any account or create new accounts for unauthorized users.
+**Learning:** OAuth client-side synchronization endpoints that bypass standard authentication mechanisms must validate provider tokens server-side. Simply accepting user attributes (like email or name) directly from the client without verifying the token claims against the provider's token info API leads to complete authentication bypass.
+**Prevention:** Always require and validate a provider token (e.g., Google OAuth access token) on the backend before syncing or auto-registering a user via OAuth.

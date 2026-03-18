@@ -21,16 +21,19 @@ function AuthCallbackContent() {
             }
 
             try {
-                // Sync with NestJS Backend
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
-                    email: session.user.email,
-                    name: session.user.user_metadata.full_name || session.user.email,
-                });
+                if (session.user.app_metadata.provider === 'google') {
+                    // Sync with NestJS Backend
+                    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
+                        email: session.user.email,
+                        name: session.user.user_metadata.full_name || session.user.email,
+                        providerToken: session.provider_token,
+                    });
 
-                // Store our local JWT (Rukon Token)
-                localStorage.setItem('token', response.data.access_token);
-                localStorage.setItem('refresh_token', response.data.refresh_token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+                    // Store our local JWT (Rukon Token)
+                    localStorage.setItem('token', response.data.access_token);
+                    localStorage.setItem('refresh_token', response.data.refresh_token);
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                }
 
                 // Redirect to dashboard
                 router.push('/dashboard');

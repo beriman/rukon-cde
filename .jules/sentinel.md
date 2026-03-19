@@ -1,0 +1,4 @@
+## 2024-05-25 - [Missing Authentication Guards on Construction Controllers]
+**Vulnerability:** Several construction-related controllers (`ConstructionController`, `SubmittalController`, `ProcurementController`, `ClaimController`) either had their `@UseGuards(JwtAuthGuard)` decorators commented out (likely from scaffolding) or were entirely missing authentication guards, leaving sensitive endpoints publicly accessible without authorization.
+**Learning:** Scaffolding or rapid prototyping can sometimes leave authentication disabled for ease of development. These temporary measures must be removed before code is merged or deployed. Reviewing all controllers for missing or commented-out security guards is critical.
+**Prevention:** Integrate automated linting rules or static analysis to detect and alert on controllers or route handlers missing authentication decorators (e.g., ensuring all `@Controller` classes have `@UseGuards` unless explicitly marked public).

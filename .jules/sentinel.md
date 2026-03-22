@@ -1,0 +1,4 @@
+## 2025-03-22 - Authentication Bypass via Commented Guard Decorators
+**Vulnerability:** The `JwtAuthGuard` decorator (`@UseGuards(JwtAuthGuard)`) was commented out in `ConstructionController` and `SubmittalController` within the `apps/api/src/construction` module. This allowed unauthorized, unauthenticated access to the endpoints.
+**Learning:** During scaffolding or development, authentication decorators are sometimes commented out to facilitate easier testing or to temporarily bypass auth. If not carefully tracked and re-enabled before production, this creates a severe authentication bypass vulnerability.
+**Prevention:** Always verify that authentication and authorization guards are active on all controllers, particularly newly generated or scaffolded ones. Avoid commenting out security guards; instead, use proper mocking or testing tokens during local development or testing.

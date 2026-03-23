@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards, Request } from '@nestjs/common';
 import { ProgressService } from './progress.service';
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; // Assuming this exists
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Discipline } from '@prisma/client';
 
 // Simple DTOs
@@ -20,7 +20,7 @@ export class CreateProgressUpdateDto {
 }
 
 @Controller('construction')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class ConstructionController {
     constructor(private readonly progressService: ProgressService) { }
 

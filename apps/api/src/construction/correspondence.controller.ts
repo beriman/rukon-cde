@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Request, UseGuards, Query, Patch } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CorrespondenceService } from './correspondence.service';
-import { AuthGuard } from '@nestjs/passport';
+
 
 export class CreateCorrespondenceDto {
     projectId: string;
@@ -14,10 +15,10 @@ export class CreateCorrespondenceDto {
 }
 
 @Controller('construction/correspondence')
-// @UseGuards(AuthGuard('jwt')) 
+// @UseGuards(JwtAuthGuard)
 // Assuming global auth or imported guard. ConstructionController uses commented out guard.
 // Use 'jwt' for now as standard.
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class CorrespondenceController {
     constructor(private readonly correspondenceService: CorrespondenceService) { }
 

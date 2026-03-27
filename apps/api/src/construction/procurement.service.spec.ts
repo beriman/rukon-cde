@@ -13,7 +13,7 @@ describe('ProcurementService', () => {
             update: jest.fn(),
             findMany: jest.fn(),
         },
-        billOfQuantities: {
+        boQItem: {
             create: jest.fn(),
             update: jest.fn(),
             findMany: jest.fn(),
@@ -39,11 +39,11 @@ describe('ProcurementService', () => {
     describe('getBQSummary', () => {
         it('should calculate BQ summary correctly', async () => {
             const mockItems = [
-                { itemCode: 'A', plannedQty: 100, actualQty: 90, unitPrice: 10 },
-                { itemCode: 'B', plannedQty: 50, actualQty: 60, unitPrice: 20 },
+                { itemCode: 'A', quantity: 100, actualQty: 90, unitRate: 10 },
+                { itemCode: 'B', quantity: 50, actualQty: 60, unitRate: 20 },
             ];
 
-            mockPrismaService.billOfQuantities.findMany.mockResolvedValue(mockItems);
+            mockPrismaService.boQItem.findMany.mockResolvedValue(mockItems);
 
             const result = await service.getBQSummary('proj-1');
 

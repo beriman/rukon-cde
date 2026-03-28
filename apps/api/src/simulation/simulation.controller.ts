@@ -1,12 +1,14 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFile, Get, Param, Res } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SimulationService } from './simulation.service';
 import { CashFlowService, DailyCashFlow } from './cash-flow.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { LinkElementDto } from './dto/link-element.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('simulation')
+@UseGuards(JwtAuthGuard)
 export class SimulationController {
     constructor(
         private readonly simulationService: SimulationService,

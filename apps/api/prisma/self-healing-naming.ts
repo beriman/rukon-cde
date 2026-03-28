@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, AuditAction } from '@prisma/client';
 // Mock naming service since we can't easily import the NestJS one here without setup
 // In a real environment, we'd use the service logic
 
@@ -24,7 +24,7 @@ async function healNamingConventions() {
             await prisma.auditLog.create({
                 data: {
                     userId: 'SYSTEM',
-                    action: 'FILE_UPDATE', // Assuming FILE_UPDATE for issues
+                    action: 'FILE_UPDATE' as any, // Assuming FILE_UPDATE for issues
                     resourceId: file.id,
                     resourceType: 'FILE',
                     details: {

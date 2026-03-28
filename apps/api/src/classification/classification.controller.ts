@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, UseGuards } from '@nestjs/common';
 import { ClassificationService, ClassificationCode } from './classification.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 interface AssignDto {
     projectId: string;
@@ -8,6 +9,7 @@ interface AssignDto {
 }
 
 @Controller('classification')
+@UseGuards(JwtAuthGuard)
 export class ClassificationController {
     constructor(private readonly service: ClassificationService) { }
 

@@ -35,19 +35,29 @@ export class CobieService {
 
             let compliantElements = 0;
             const missingFields: Array<{ elementId: string; missingFields: string[] }> = [];
+            const CHUNK_SIZE = 5000;
 
-            for (const element of data.elements) {
-                const missing = REQUIRED_COBIE_FIELDS
-                    .filter(field => field.required && !element[field.fieldName])
-                    .map(field => field.fieldName);
+            for (let i = 0; i < data.elements.length; i += CHUNK_SIZE) {
+                const chunk = data.elements.slice(i, i + CHUNK_SIZE);
 
-                if (missing.length === 0) {
-                    compliantElements++;
-                } else {
-                    missingFields.push({
-                        elementId: element.id || element.Name || 'Unknown',
-                        missingFields: missing,
-                    });
+                // Yield to the event loop every chunk
+                if (i > 0) {
+                    await new Promise(resolve => setImmediate(resolve));
+                }
+
+                for (const element of chunk) {
+                    const missing = REQUIRED_COBIE_FIELDS
+                        .filter(field => field.required && !element[field.fieldName])
+                        .map(field => field.fieldName);
+
+                    if (missing.length === 0) {
+                        compliantElements++;
+                    } else {
+                        missingFields.push({
+                            elementId: element.id || element.Name || 'Unknown',
+                            missingFields: missing,
+                        });
+                    }
                 }
             }
 

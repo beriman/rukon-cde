@@ -202,13 +202,54 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
-        let user = await this.usersService.findOneByEmail(dto.email);
+    async googleSync(dto: { email: string; name: string; token?: string }) {
+        let email = dto.email;
+
+        // Security: Verify Google Token
+        if (dto.token) {
+            try {
+                // Enforce 5s timeout to prevent hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${dto.token}`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new UnauthorizedException('Invalid Google Token');
+                }
+
+                const data: any = await response.json();
+
+                if (data.email_verified !== 'true' && data.email_verified !== true) {
+                     throw new UnauthorizedException('Google Email not verified');
+                }
+
+                // Use the verified email from Google
+                email = data.email;
+
+                // Optional: Check aud (client ID) if available in env
+                if (process.env.GOOGLE_CLIENT_ID && data.aud !== process.env.GOOGLE_CLIENT_ID) {
+                    throw new UnauthorizedException('Invalid Client ID');
+                }
+
+            } catch (error) {
+                if (error instanceof UnauthorizedException) throw error;
+                throw new UnauthorizedException('Token validation failed');
+            }
+        } else {
+            // Reject requests without token to prevent account takeover
+            throw new UnauthorizedException('Google Access Token is required');
+        }
+
+        let user = await this.usersService.findOneByEmail(email);
 
         if (!user) {
             // Auto-register user from Google
             user = await this.usersService.create({
-                email: dto.email,
+                email: email,
                 name: dto.name,
                 password: '', // OAuth users don't have local passwords
             });

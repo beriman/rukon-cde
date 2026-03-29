@@ -2,10 +2,13 @@ import { Controller, Get, Patch, Delete, Body, Param, UseGuards, Query, Post, Us
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { GlobalRole } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
@@ -46,11 +49,13 @@ export class UsersController {
     }
 
     @Patch(':id/role')
+    @Roles(GlobalRole.SUPER_ADMIN)
     updateRole(@Param('id') id: string, @Body() body: { role: string }) {
         return this.usersService.updateRole(id, body.role);
     }
 
     @Delete(':id')
+    @Roles(GlobalRole.SUPER_ADMIN)
     deactivate(@Param('id') id: string) {
         return this.usersService.deactivate(id);
     }

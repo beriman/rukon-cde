@@ -49,11 +49,12 @@ export class EmailService {
     }
 
     async sendInvitation(email: string, inviteLink: string, organizationName: string): Promise<void> {
+        const safeOrgName = this.escapeHtml(organizationName);
         const subject = `Undangan Bergabung ke ${organizationName} - Rukon CDE`;
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1E40AF;">Undangan Organisasi</h2>
-                <p>Anda telah diundang untuk bergabung dengan organisasi <strong>${organizationName}</strong> di Rukon CDE.</p>
+                <p>Anda telah diundang untuk bergabung dengan organisasi <strong>${safeOrgName}</strong> di Rukon CDE.</p>
                 <p>Klik tombol di bawah untuk menerima undangan:</p>
                 <p style="text-align: center; margin: 30px 0;">
                     <a href="${inviteLink}" style="background-color: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
@@ -68,11 +69,13 @@ export class EmailService {
     }
 
     async sendNotification(email: string, title: string, message: string): Promise<void> {
+        const safeTitle = this.escapeHtml(title);
+        const safeMessage = this.escapeHtml(message);
         const subject = `${title} - Rukon CDE`;
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #1E40AF;">${title}</h2>
-                <p>${message}</p>
+                <h2 style="color: #1E40AF;">${safeTitle}</h2>
+                <p>${safeMessage}</p>
                 <hr style="border-color: #eee; margin: 20px 0;">
                 <p style="color: #666; font-size: 12px;">Email ini dikirim dari Rukon CDE Platform.</p>
             </div>
@@ -108,6 +111,20 @@ export class EmailService {
         console.log(`Subject: ${subject}`);
         console.log(`Content: ${html.replace(/<[^>]*>/g, ' ').trim()}`);
         console.log('=========================================================');
+    }
+
+    /**
+     * Sanitizes input to prevent HTML injection in emails.
+     * This is critical because email clients may render HTML.
+     */
+    private escapeHtml(unsafe: string): string {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 }
 

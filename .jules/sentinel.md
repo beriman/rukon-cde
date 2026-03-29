@@ -1,0 +1,4 @@
+## 2026-01-29 - Path Traversal in Local File Upload
+**Vulnerability:** A Path Traversal vulnerability was found in `FilesService.uploadSystemFile` where `file.originalname` was used directly in `path.join` for local file storage. This allowed attackers to traverse out of the upload directory and write files to arbitrary locations on the file system when the application is running in local storage mode (S3 not configured).
+**Learning:** `path.join` does not sanitize path traversal characters like `../` if they are part of a segment. Even with a prefix like `${timestamp}-`, if the filename contains `../` sequences, `path.join` resolves them. Specifically, `123-../../../` is treated as a directory `123-..` followed by `..` and `..`, resulting in net traversal.
+**Prevention:** Always sanitize user-provided filenames using `path.basename()` before using them in file system operations. Do not rely on prefixes or `path.join` to neutralize traversal attacks.

@@ -2,13 +2,13 @@ import { Controller, Get, Post, Body, Param, UseGuards, Request, UseInterceptors
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OrganizationsService } from './organizations.service';
 import { InvitationsService } from './invitations.service';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateOrgDto } from './dto/create-org.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('organizations')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class OrganizationsController {
     constructor(
         private readonly organizationsService: OrganizationsService,

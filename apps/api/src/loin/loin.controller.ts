@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { LoinService, ElementData } from './loin.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('loin')
+@UseGuards(JwtAuthGuard)
 export class LoinController {
     constructor(private readonly loinService: LoinService) { }
 

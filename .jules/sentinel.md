@@ -1,0 +1,4 @@
+## 2024-03-31 - [Missing Authentication Guards in Scaffolded Controllers]
+**Vulnerability:** Several controllers within the `apps/api/src/construction` module (such as `construction.controller.ts`, `submittal.controller.ts`, `procurement.controller.ts`, and `claim.controller.ts`) had their `@UseGuards(JwtAuthGuard)` annotations commented out or entirely missing, leaving sensitive endpoints exposed.
+**Learning:** This typically happens during scaffolding or early development phases when authentication is temporarily bypassed and developers forget to re-enable it. It creates a critical security risk as unauthorized users can access or manipulate data.
+**Prevention:** Establish a code review checklist that explicitly includes verifying authentication guards on all new or modified controllers. Implement linting rules or automated tests that ensure endpoints are protected by default unless explicitly marked as public.

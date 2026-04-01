@@ -1,0 +1,4 @@
+## 2025-04-01 - Path Traversal Vulnerability in File Uploads
+**Vulnerability:** In `apps/api/src/files/files.service.ts` and `apps/api/src/site-capture/site-capture.service.ts`, the `file.originalname` property from multipart uploads was used directly to construct file paths and S3 keys without any sanitization. Furthermore, a `subfolder` parameter was directly concatenated without validation. An attacker could provide paths like `../../../etc/passwd` or exploit S3 directory traversal.
+**Learning:** `file.originalname` from Express/Multer is completely user-controlled and untrusted. Relying on it directly leads to path traversal.
+**Prevention:** Always sanitize `file.originalname` using `path.basename` to extract just the file name, and apply regex replacing to strip out illegal or potentially problematic characters (e.g., `/[^a-zA-Z0-9.\-_]/g`). Always validate user-provided subfolder strings.

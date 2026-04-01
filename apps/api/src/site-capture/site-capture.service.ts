@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSiteCaptureDto, UpdateSiteCaptureDto, QuerySiteCaptureDto } from './site-capture.dto';
 import { CaptureType } from '@prisma/client';
@@ -19,7 +20,9 @@ export class SiteCaptureService {
 
     async create(dto: CreateSiteCaptureDto, file: any, userId: string) {
         // Upload file to S3
-        const fileKey = `site-captures/${dto.projectId}/${uuidv4()}-${file.originalname}`;
+        // SECURITY: Sanitize originalname to prevent path traversal (e.g. ../../../etc/passwd)
+        const sanitizedFilename = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '');
+        const fileKey = `site-captures/${dto.projectId}/${uuidv4()}-${sanitizedFilename}`;
 
         await this.s3Client.send(new PutObjectCommand({
             Bucket: this.bucket,

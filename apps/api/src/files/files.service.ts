@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { NamingConventionService } from '../common/services/naming-convention.service';
 import { AuditService } from '../common/services/audit.service';
@@ -457,8 +458,15 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        // SECURITY: Validate subfolder to prevent directory traversal
+        if (!/^[a-zA-Z0-9_-]+$/.test(subfolder)) {
+            throw new BadRequestException('Invalid subfolder name');
+        }
+
         const timestamp = Date.now();
-        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
+        // SECURITY: Sanitize originalname to prevent path traversal (e.g. ../../../etc/passwd)
+        const sanitizedFilename = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '');
+        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${sanitizedFilename}`;
 
         if (process.env.AWS_S3_BUCKET) {
             await this.s3Client.send(new PutObjectCommand({
@@ -471,14 +479,13 @@ export class FilesService {
         } else {
             // Local fallback
             const fs = require('fs');
-            const path = require('path');
             const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
 
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filePath = path.join(uploadDir, `${timestamp}-${file.originalname}`);
+            const filePath = path.join(uploadDir, `${timestamp}-${sanitizedFilename}`);
             fs.writeFileSync(filePath, file.buffer);
         }
 

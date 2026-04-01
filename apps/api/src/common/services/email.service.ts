@@ -30,13 +30,16 @@ export class EmailService {
 
     async sendPasswordReset(email: string, resetLink: string): Promise<void> {
         const subject = 'Reset Password - Rukon CDE';
+        // HTML Injection Protection: Escape input
+        const safeLink = this.escapeHtml(resetLink);
+
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1E40AF;">Reset Password</h2>
                 <p>Anda menerima email ini karena ada permintaan reset password untuk akun Anda di Rukon CDE.</p>
                 <p>Klik tombol di bawah untuk reset password Anda:</p>
                 <p style="text-align: center; margin: 30px 0;">
-                    <a href="${resetLink}" style="background-color: #1E40AF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                    <a href="${safeLink}" style="background-color: #1E40AF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                         Reset Password
                     </a>
                 </p>
@@ -49,14 +52,17 @@ export class EmailService {
     }
 
     async sendInvitation(email: string, inviteLink: string, organizationName: string): Promise<void> {
-        const subject = `Undangan Bergabung ke ${organizationName} - Rukon CDE`;
+        const safeOrgName = this.escapeHtml(organizationName);
+        const safeLink = this.escapeHtml(inviteLink);
+
+        const subject = `Undangan Bergabung ke ${safeOrgName} - Rukon CDE`;
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1E40AF;">Undangan Organisasi</h2>
-                <p>Anda telah diundang untuk bergabung dengan organisasi <strong>${organizationName}</strong> di Rukon CDE.</p>
+                <p>Anda telah diundang untuk bergabung dengan organisasi <strong>${safeOrgName}</strong> di Rukon CDE.</p>
                 <p>Klik tombol di bawah untuk menerima undangan:</p>
                 <p style="text-align: center; margin: 30px 0;">
-                    <a href="${inviteLink}" style="background-color: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                    <a href="${safeLink}" style="background-color: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                         Terima Undangan
                     </a>
                 </p>
@@ -68,11 +74,14 @@ export class EmailService {
     }
 
     async sendNotification(email: string, title: string, message: string): Promise<void> {
-        const subject = `${title} - Rukon CDE`;
+        const safeTitle = this.escapeHtml(title);
+        const safeMessage = this.escapeHtml(message);
+
+        const subject = `${safeTitle} - Rukon CDE`;
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #1E40AF;">${title}</h2>
-                <p>${message}</p>
+                <h2 style="color: #1E40AF;">${safeTitle}</h2>
+                <p>${safeMessage}</p>
                 <hr style="border-color: #eee; margin: 20px 0;">
                 <p style="color: #666; font-size: 12px;">Email ini dikirim dari Rukon CDE Platform.</p>
             </div>
@@ -109,5 +118,17 @@ export class EmailService {
         console.log(`Content: ${html.replace(/<[^>]*>/g, ' ').trim()}`);
         console.log('=========================================================');
     }
-}
 
+    /**
+     * Escapes unsafe characters to prevent HTML injection/XSS.
+     */
+    private escapeHtml(unsafe: string): string {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+}

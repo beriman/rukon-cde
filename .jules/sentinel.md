@@ -1,0 +1,4 @@
+## 2024-05-22 - [Critical] Path Traversal in Local File Uploads
+**Vulnerability:** Found arbitrary file write vulnerability in `FilesService.uploadSystemFile`. The method constructed file paths using unsanitized user inputs (`subfolder` and `file.originalname`) combined with `path.join`, allowing attackers to traverse directories (`../`) and write files anywhere the process has write access.
+**Learning:** The application implements a local filesystem fallback when S3 is not configured. This fallback logic manually constructs paths without validation, bypassing the safety checks present in the main `upload` method (which uses `NamingConventionService`).
+**Prevention:** Always use `path.basename()` for filenames derived from user input. Strictly validate or whitelist directory names (e.g., `^[a-zA-Z0-9-_]+$`) before using them in path construction. Avoid passing raw user input to `path.join`.

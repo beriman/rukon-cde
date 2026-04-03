@@ -14,9 +14,6 @@ export class CreateCorrespondenceDto {
 }
 
 @Controller('construction/correspondence')
-// @UseGuards(AuthGuard('jwt')) 
-// Assuming global auth or imported guard. ConstructionController uses commented out guard.
-// Use 'jwt' for now as standard.
 @UseGuards(AuthGuard('jwt'))
 export class CorrespondenceController {
     constructor(private readonly correspondenceService: CorrespondenceService) { }

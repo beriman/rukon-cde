@@ -202,7 +202,37 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string }) {
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Missing provider token');
+        }
+
+        try {
+            // Native fetch (Node v22+)
+            const tokenResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(dto.providerToken)}`);
+
+            if (!tokenResponse.ok) {
+                throw new UnauthorizedException('Invalid Google token');
+            }
+
+            const tokenInfo = await tokenResponse.json();
+
+            // Prevent Confused Deputy Attack: verify token audience
+            if (tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID) {
+                throw new UnauthorizedException('Token audience mismatch');
+            }
+
+            // Verify email match and verified status
+            if (tokenInfo.email !== dto.email || String(tokenInfo.email_verified) !== 'true') {
+                throw new UnauthorizedException('Email mismatch or not verified');
+            }
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new UnauthorizedException('Failed to validate token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

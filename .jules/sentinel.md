@@ -1,0 +1,4 @@
+## 2025-05-18 - [Path Traversal in File Uploads]
+**Vulnerability:** Found `file.originalname` directly interpolated into S3 object keys and local file paths across `FilesService.uploadSystemFile` and `SiteCaptureService.create` without sanitization. In combination with user-controlled subfolder arguments (e.g. `../`), this can allow writing files outside intended upload directories or traversing S3 key structures.
+**Learning:** Even when uploading to S3 (where keys aren't strictly a filesystem), untrusted original filenames can alter intended key structures or lead to path traversal if falling back to local filesystems.
+**Prevention:** Always sanitize `file.originalname` using `path.basename()` and regex character stripping (e.g., `/[^a-zA-Z0-9.\-_]/g`), and validate user-provided directory arguments (`subfolder`) with strict regex bounds (`/^[a-zA-Z0-9_-]+$/`).

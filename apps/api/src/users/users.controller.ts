@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Body, Param, UseGuards, Query, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Body, Param, UseGuards, Query, Post, UseInterceptors, UploadedFile, ForbiddenException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -46,12 +46,18 @@ export class UsersController {
     }
 
     @Patch(':id/role')
-    updateRole(@Param('id') id: string, @Body() body: { role: string }) {
+    updateRole(@Param('id') id: string, @Body() body: { role: string }, @CurrentUser() user: any) {
+        if (user.role !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SUPER_ADMIN can update roles');
+        }
         return this.usersService.updateRole(id, body.role);
     }
 
     @Delete(':id')
-    deactivate(@Param('id') id: string) {
+    deactivate(@Param('id') id: string, @CurrentUser() user: any) {
+        if (user.role !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SUPER_ADMIN can deactivate users');
+        }
         return this.usersService.deactivate(id);
     }
     @Post('me/signature')

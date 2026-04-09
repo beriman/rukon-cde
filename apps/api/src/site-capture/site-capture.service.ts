@@ -18,8 +18,11 @@ export class SiteCaptureService {
     }
 
     async create(dto: CreateSiteCaptureDto, file: any, userId: string) {
+        const path = require('path');
+        const safeOriginalName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '');
+
         // Upload file to S3
-        const fileKey = `site-captures/${dto.projectId}/${uuidv4()}-${file.originalname}`;
+        const fileKey = `site-captures/${dto.projectId}/${uuidv4()}-${safeOriginalName}`;
 
         await this.s3Client.send(new PutObjectCommand({
             Bucket: this.bucket,

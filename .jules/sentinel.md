@@ -1,0 +1,4 @@
+## 2025-03-01 - [Path Traversal in File Uploads]
+**Vulnerability:** Path traversal vulnerability due to using user-controlled `file.originalname` directly in S3 keys or file paths without sanitization (e.g., `files.service.ts` and `site-capture.service.ts`).
+**Learning:** The `originalname` property from file uploads (such as multipart form data) is completely untrusted and can contain path manipulation characters like `../`. Failing to sanitize this allows attackers to write files to arbitrary locations or malformed S3 keys.
+**Prevention:** Always use `path.basename()` and regex stripping (`/[^a-zA-Z0-9.\-_]/g`) on user-provided filenames before using them in file operations or S3 keys. Ensure subfolders are also validated.

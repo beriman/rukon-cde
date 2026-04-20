@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NamingConventionService } from '../common/services/naming-convention.service';
@@ -34,6 +35,10 @@ export class FilesService {
         file: any,
         uploadedBy: string,
     ) {
+        // Sanitize filename to prevent path traversal
+        const safeFilename = path.basename(file.originalname);
+        file.originalname = safeFilename;
+
         // Story 1.14: Validate ISO 19650 naming convention
         const validation = this.namingService.validate(file.originalname);
 
@@ -156,7 +161,6 @@ export class FilesService {
                 } else {
                     // Local Fallback
                     const fs = require('fs');
-                    const path = require('path');
                     const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, `project-${projectId}`);
 
                     if (!fs.existsSync(uploadDir)) {
@@ -233,7 +237,6 @@ export class FilesService {
                 } else {
                     // Local Fallback
                     const fs = require('fs');
-                    const path = require('path');
                     const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, `project-${projectId}`);
 
                     if (!fs.existsSync(uploadDir)) {
@@ -458,7 +461,13 @@ export class FilesService {
         subfolder: string = 'assets'
     ) {
         const timestamp = Date.now();
-        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
+
+        // Sanitize subfolder to prevent path traversal
+        const safeSubfolder = subfolder.replace(/\\/g, '/').replace(/(^|\/)\.\.(?=\/|$)/g, '').replace(/^\/+/, '');
+        // Sanitize filename to prevent path traversal
+        const safeFilename = path.basename(file.originalname);
+
+        const s3Key = `org-${organizationId}/system/${safeSubfolder}/${timestamp}-${safeFilename}`;
 
         if (process.env.AWS_S3_BUCKET) {
             await this.s3Client.send(new PutObjectCommand({
@@ -471,14 +480,13 @@ export class FilesService {
         } else {
             // Local fallback
             const fs = require('fs');
-            const path = require('path');
-            const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
+            const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', safeSubfolder);
 
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filePath = path.join(uploadDir, `${timestamp}-${file.originalname}`);
+            const filePath = path.join(uploadDir, `${timestamp}-${safeFilename}`);
             fs.writeFileSync(filePath, file.buffer);
         }
 

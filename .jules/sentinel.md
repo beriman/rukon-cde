@@ -1,0 +1,4 @@
+## 2025-03-09 - Path Traversal Vulnerability in `uploadSystemFile`
+**Vulnerability:** The `uploadSystemFile` method in `FilesService` and `SiteCaptureService.create` allows path traversal because `file.originalname` and `subfolder` are not sanitized. A malicious user could provide a filename like `../../../etc/passwd` to write outside the intended directory when using local fallback storage, or an unexpected S3 key.
+**Learning:** Always treat file names and paths uploaded by users as untrusted input. The system inherently trusts user-provided properties like `file.originalname` without validation or sanitization.
+**Prevention:** Use `path.basename()` to extract only the file name, stripping any directory traversal elements. Validate or sanitize the `subfolder` input to prevent directory traversal up the tree. Ensure user inputs are never directly interpolated into critical paths.

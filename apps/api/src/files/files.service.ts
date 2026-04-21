@@ -6,6 +6,8 @@ import { ConversionService } from '../common/services/conversion.service';
 import { AuditAction } from '@prisma/client';
 import { S3Client, PutObjectCommand, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class FilesService {
@@ -457,8 +459,15 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        // Sanitize subfolder and filename to prevent path traversal
+        const safeSubfolder = subfolder
+            .replace(/\\/g, '/')
+            .replace(/(^|\/)\.\.(?=\/|$)/g, '')
+            .replace(/^\/+/, '');
+        const safeOriginalName = path.basename(file.originalname || 'upload.bin');
+
         const timestamp = Date.now();
-        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
+        const s3Key = `org-${organizationId}/system/${safeSubfolder}/${timestamp}-${safeOriginalName}`;
 
         if (process.env.AWS_S3_BUCKET) {
             await this.s3Client.send(new PutObjectCommand({
@@ -470,15 +479,13 @@ export class FilesService {
             }));
         } else {
             // Local fallback
-            const fs = require('fs');
-            const path = require('path');
-            const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
+            const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', safeSubfolder);
 
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filePath = path.join(uploadDir, `${timestamp}-${file.originalname}`);
+            const filePath = path.join(uploadDir, `${timestamp}-${safeOriginalName}`);
             fs.writeFileSync(filePath, file.buffer);
         }
 

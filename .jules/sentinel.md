@@ -1,0 +1,5 @@
+
+## 2024-05-24 - [Path Traversal in S3 Key and Local Path Construction]
+**Vulnerability:** The `file.originalname` from user uploads in `SiteCaptureService.create` and `FilesService.uploadSystemFile`, and the `subfolder` variable in `FilesService.uploadSystemFile` were used without sanitization to construct `s3Key` and `filePath`, introducing path traversal risks (`../`) or absolute path bypasses.
+**Learning:** Using unsanitized user-provided input such as `file.originalname` directly inside file paths or S3 object keys can lead to Path Traversal vulnerabilities, where an attacker might upload files to arbitrary locations outside the intended folder structure (e.g. `../../../etc/passwd` style or modifying other S3 paths).
+**Prevention:** Always sanitize filenames from user uploads before use. Using `path.basename(file.originalname.replace(/\\/g, '/'))` is an effective way to extract just the filename from potentially malicious paths. Sanitize custom folder parameters as well using regex filtering and stripping `../` sequences.

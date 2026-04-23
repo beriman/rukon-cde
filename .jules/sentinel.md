@@ -1,0 +1,4 @@
+## 2025-02-25 - [CRITICAL] Fix Google OAuth Authentication Bypass and Confused Deputy
+**Vulnerability:** The `googleSync` endpoint accepted any email and name to auto-register or log in a user without verifying that the request actually came from a legitimate Google authentication flow. This allowed anyone to spoof an email and bypass authentication. Furthermore, it lacked validation of the token's audience.
+**Learning:** OAuth endpoints must *always* verify the provider token (e.g., via Google's `tokeninfo` API) to ensure the request is legitimate and the email is verified by the provider. Additionally, the audience (`aud`) of the token must be checked against the application's client ID to prevent Confused Deputy attacks.
+**Prevention:** Always require and validate a provider token server-side for OAuth synchronization endpoints. Never trust client-provided claims without cryptographically verifying them with the provider.

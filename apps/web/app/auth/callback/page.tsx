@@ -21,10 +21,14 @@ function AuthCallbackContent() {
             }
 
             try {
+                // Determine if we have a provider token to send for server-side validation
+                const providerToken = session.user.app_metadata.provider === 'google' ? session.provider_token : undefined;
+
                 // Sync with NestJS Backend
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
                     email: session.user.email,
                     name: session.user.user_metadata.full_name || session.user.email,
+                    providerToken,
                 });
 
                 // Store our local JWT (Rukon Token)

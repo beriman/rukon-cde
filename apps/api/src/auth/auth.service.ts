@@ -202,7 +202,41 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string }) {
+        if (dto.providerToken) {
+            try {
+                const tokenInfoResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${dto.providerToken}`);
+                if (!tokenInfoResponse.ok) {
+                    throw new UnauthorizedException('Invalid Google token');
+                }
+
+                const tokenInfo = await tokenInfoResponse.json();
+
+                // Validate the audience to prevent Confused Deputy attacks
+                // We only do this if GOOGLE_CLIENT_ID is defined
+                if (process.env.GOOGLE_CLIENT_ID && tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID) {
+                    throw new UnauthorizedException('Token was not issued for this application');
+                }
+
+                // Validate that the email in the token matches the requested email
+                if (tokenInfo.email !== dto.email) {
+                    throw new UnauthorizedException('Token email does not match requested email');
+                }
+
+                // Validate that the email is verified
+                if (String(tokenInfo.email_verified) !== 'true') {
+                    throw new UnauthorizedException('Email is not verified by Google');
+                }
+            } catch (error) {
+                if (error instanceof UnauthorizedException) {
+                    throw error;
+                }
+                throw new UnauthorizedException('Failed to verify Google token');
+            }
+        } else if (process.env.REQUIRE_PROVIDER_TOKEN === 'true') {
+             throw new UnauthorizedException('Provider token is required for Google synchronization');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

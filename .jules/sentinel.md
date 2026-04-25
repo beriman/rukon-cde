@@ -1,0 +1,4 @@
+## 2026-04-25 - [Path Traversal in File Uploads]
+**Vulnerability:** Path Traversal via `file.originalname` in S3 Key and Local File Paths
+**Learning:** In `apps/api/src/files/files.service.ts` and `apps/api/src/site-capture/site-capture.service.ts`, the user-controlled `file.originalname` and `subfolder` fields from file uploads were being directly interpolated into S3 object keys and local filesystem paths without sanitization. This allowed attackers to craft malicious filenames (e.g., `../../../etc/passwd`) to upload files outside intended directories or overwrite arbitrary files when local fallback is used.
+**Prevention:** Always sanitize user-provided file names using `path.basename(file.originalname)` and validate/sanitize subfolder strings to remove `..` and leading/trailing slashes before using them in path construction or S3 key formation.

@@ -1,0 +1,4 @@
+## 2025-04-26 - [Path Traversal in File Uploads via unsanitized subfolders and originalname]
+**Vulnerability:** The methods `uploadSystemFile` in `apps/api/src/files/files.service.ts` and `create` in `apps/api/src/site-capture/site-capture.service.ts` use `file.originalname` and `subfolder` arguments to construct file paths and S3 keys without any sanitization. This introduces a path traversal vulnerability.
+**Learning:** Hardcoded paths or paths that dynamically incorporate unsanitized user input (like `file.originalname` or `subfolder` parameters) allow attackers to upload files to arbitrary locations or overwrite existing files by using characters like `..` and slashes.
+**Prevention:** Always sanitize `file.originalname` using `path.basename` and validate directory components (like `subfolder`) to ensure they do not contain directory traversal sequences before utilizing them in file operations or S3 key generation. Use `path.join` securely.

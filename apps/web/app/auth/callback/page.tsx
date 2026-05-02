@@ -21,11 +21,23 @@ function AuthCallbackContent() {
             }
 
             try {
-                // Sync with NestJS Backend
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
+                // Prepare sync payload
+                const syncPayload: any = {
                     email: session.user.email,
                     name: session.user.user_metadata.full_name || session.user.email,
-                });
+                };
+
+                // If it's a Google login, pass the provider token for server-side verification
+                // to prevent Confused Deputy / account takeover attacks.
+                if (session.user.app_metadata?.provider === 'google' && session.provider_token) {
+                    syncPayload.providerToken = session.provider_token;
+                    syncPayload.provider = 'google';
+                }
+
+                // Sync with NestJS Backend
+                // We use google-sync as our primary OAuth sync endpoint.
+                // Only enforce providerToken if we are actually doing Google auth to avoid breaking other flows.
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, syncPayload);
 
                 // Store our local JWT (Rukon Token)
                 localStorage.setItem('token', response.data.access_token);

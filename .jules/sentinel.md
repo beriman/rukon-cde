@@ -1,0 +1,4 @@
+## 2025-05-15 - Confused Deputy via OAuth Sync
+**Vulnerability:** The backend endpoint `/auth/google-sync` accepted an email and name to synchronize/auto-register a user, effectively trusting the client's assertion of the user's identity based purely on the payload. A malicious user could craft a request with any arbitrary email and hijack an existing account or create a new one under that identity (Confused Deputy attack).
+**Learning:** In a decoupled architecture using Supabase on the frontend and NestJS on the backend, backend endpoints must not blindly trust client-provided OAuth data. The authentication context established on the frontend must be independently verified on the backend.
+**Prevention:** Always require and validate a `providerToken` (access token) directly against the OAuth provider's token info API (e.g., Google's `tokeninfo`) from the backend to ensure the token is valid, matches the requested email, and is verified by the provider.

@@ -24,7 +24,7 @@ async function healNamingConventions() {
             await prisma.auditLog.create({
                 data: {
                     userId: 'SYSTEM',
-                    action: 'FILE_UPDATE', // Assuming FILE_UPDATE for issues
+                    action: 'FILE_MOVE', // Assuming FILE_MOVE for issues as FILE_UPDATE is invalid
                     resourceId: file.id,
                     resourceType: 'FILE',
                     details: {

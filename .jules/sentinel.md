@@ -1,0 +1,4 @@
+## 2024-05-03 - Path Traversal Vulnerability in Upload Endpoints
+**Vulnerability:** The application was vulnerable to path traversal because `file.originalname` and user-controlled strings like `subfolder` were directly appended to file paths (`path.join`) and S3 keys without sanitization. An attacker could upload files to unintended directories or overwrite existing ones.
+**Learning:** Even internal system files or user uploads need to have their filenames sanitized. Directly concatenating user input or `file.originalname` to construct file paths or object keys is a critical security flaw.
+**Prevention:** Always use `path.basename()` to extract only the filename from user-provided paths and sanitize directory parameters (e.g., using `.replace(/\\/g, '/').replace(/(^|\/)\.\.(?=\/|$)/g, '').replace(/^\/+/, '')` to remove `../` segments) before using them in `fs` operations or cloud storage APIs.

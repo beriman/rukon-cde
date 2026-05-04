@@ -202,7 +202,39 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string; provider?: string }) {
+        // We must validate the token to prevent Confused Deputy attacks
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Provider token is required for authentication');
+        }
+
+        try {
+            // Because the frontend uses Supabase, session.access_token is a JWT signed by Supabase.
+            // We must verify its signature to securely authenticate the user.
+            const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET;
+
+            if (!SUPABASE_JWT_SECRET) {
+                throw new InternalServerErrorException('JWT secret is not configured');
+            }
+
+            const payload = await this.jwtService.verifyAsync(dto.providerToken, {
+                secret: SUPABASE_JWT_SECRET,
+            });
+
+            if (payload.email !== dto.email) {
+                throw new UnauthorizedException('Token email mismatch');
+            }
+
+            // Note: Since we are validating the Supabase JWT directly,
+            // we do not need to make an external call to Google's tokeninfo API.
+            // The Supabase token already cryptographically proves the user's identity.
+        } catch (error) {
+            if (error instanceof UnauthorizedException || error instanceof InternalServerErrorException) {
+                throw error;
+            }
+            throw new UnauthorizedException('Failed to validate provider token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

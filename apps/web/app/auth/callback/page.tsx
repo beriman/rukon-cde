@@ -22,10 +22,18 @@ function AuthCallbackContent() {
 
             try {
                 // Sync with NestJS Backend
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
+                const payload: any = {
                     email: session.user.email,
                     name: session.user.user_metadata.full_name || session.user.email,
-                });
+                };
+
+                // Use the Supabase access token (JWT) to securely authenticate with the backend
+                if (session.access_token) {
+                    payload.providerToken = session.access_token;
+                    payload.provider = session.user.app_metadata?.provider || 'supabase';
+                }
+
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, payload);
 
                 // Store our local JWT (Rukon Token)
                 localStorage.setItem('token', response.data.access_token);

@@ -202,7 +202,58 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string; provider?: string }) {
+        // 🛡️ Sentinel: Enforce token validation to prevent auth bypass
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Provider token is required');
+        }
+
+        try {
+            if (dto.provider === 'google') {
+                // Verify Google token
+                const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${dto.providerToken}`);
+                if (!response.ok) {
+                    // Try access_token if id_token fails
+                    const accessResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${dto.providerToken}`);
+                    if (!accessResponse.ok) {
+                        throw new UnauthorizedException('Invalid Google token');
+                    }
+                    const data = await accessResponse.json();
+
+                    if (data.aud !== process.env.GOOGLE_CLIENT_ID) {
+                        throw new UnauthorizedException('Token audience mismatch (Confused Deputy attack prevention)');
+                    }
+                    if (data.email !== dto.email) {
+                        throw new UnauthorizedException('Email mismatch');
+                    }
+                } else {
+                    const data = await response.json();
+                    if (data.aud !== process.env.GOOGLE_CLIENT_ID) {
+                        throw new UnauthorizedException('Token audience mismatch (Confused Deputy attack prevention)');
+                    }
+                    if (data.email !== dto.email) {
+                        throw new UnauthorizedException('Email mismatch');
+                    }
+                    if (String(data.email_verified) !== 'true') {
+                         throw new UnauthorizedException('Email not verified');
+                    }
+                }
+            } else {
+                // Verify Supabase JWT
+                // Note: Ensure SUPABASE_JWT_SECRET is set, falling back to standard JWT_SECRET if running without separate keys.
+                const secret = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET;
+                const payload = await this.jwtService.verifyAsync(dto.providerToken, {
+                    secret: secret,
+                });
+
+                if (payload.email !== dto.email) {
+                    throw new UnauthorizedException('Email mismatch');
+                }
+            }
+        } catch (error) {
+            throw new UnauthorizedException('Invalid provider token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

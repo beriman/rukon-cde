@@ -1,0 +1,4 @@
+## 2025-02-14 - [CRITICAL] Authentication Bypass via Unverified OAuth Endpoint
+**Vulnerability:** The `/auth/google-sync` endpoint accepted an `email` in the request body and granted full access (generated JWTs) without verifying the identity of the user. Anyone who knew a valid user's email could make a POST request and assume their session.
+**Learning:** Security checks for authentication must never trust the client's assertion of identity (e.g., an email address). The application must enforce validation of a secure token issued by the Identity Provider.
+**Prevention:** Unconditionally enforce validation of `providerToken` using the Identity Provider's token verification endpoints (e.g., Google's `tokeninfo` API) or using a JWT verifier (for Supabase). Additionally, ensure the `aud` claim matches the `CLIENT_ID` to prevent Confused Deputy token replacement attacks.

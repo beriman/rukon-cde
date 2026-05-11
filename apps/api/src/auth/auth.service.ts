@@ -202,7 +202,66 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken: string; provider?: string }) {
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Provider token is required');
+        }
+
+        try {
+            // Check if it's a Supabase JWT or a Google Token
+            // A simple heuristic: if it has 3 parts separated by dots, it's likely a JWT (or Google ID Token)
+            // But we should try decoding it as Supabase token first
+            let isVerified = false;
+
+            try {
+                // Try verifying as Supabase JWT
+                const jwtSecret = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET;
+                const payload = await this.jwtService.verifyAsync(dto.providerToken, {
+                    secret: jwtSecret
+                });
+
+                // If we get here, it's a valid Supabase token
+                // Check if the email matches
+                if (payload.email !== dto.email) {
+                    throw new UnauthorizedException('Email mismatch in token');
+                }
+                isVerified = true;
+            } catch (jwtError) {
+                // Not a valid Supabase JWT, fallback to Google tokeninfo
+            }
+
+            if (!isVerified) {
+                // Unconditionally verify Google tokens using tokeninfo
+                let response = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${dto.providerToken}`);
+
+                if (!response.ok) {
+                    // Try as ID token if access token fails
+                    response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${dto.providerToken}`);
+                }
+
+                if (!response.ok) {
+                    throw new UnauthorizedException('Invalid provider token');
+                }
+
+                const tokenInfo = await response.json();
+
+                // Prevent Confused Deputy attacks by verifying audience
+                if (tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID) {
+                    throw new UnauthorizedException('Invalid token audience');
+                }
+
+                // Verify email matches
+                if (tokenInfo.email !== dto.email) {
+                    throw new UnauthorizedException('Email mismatch');
+                }
+            }
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new UnauthorizedException('Failed to verify token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

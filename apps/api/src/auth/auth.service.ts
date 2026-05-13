@@ -202,7 +202,63 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string }) {
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Missing provider token');
+        }
+
+        let isTokenValid = false;
+
+        // Try validating as a Supabase JWT
+        try {
+            const secret = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET;
+            const payload = await this.jwtService.verifyAsync(dto.providerToken, { secret });
+            if (payload && payload.email === dto.email) {
+                isTokenValid = true;
+            }
+        } catch (e) {
+            // Ignore error and fall back to Google OAuth validation
+        }
+
+        // Try validating as a Google OAuth Token
+        if (!isTokenValid) {
+            try {
+                // The provider token could be an ID token or an access token.
+                // We test ID token first, then access token.
+                const urlIdToken = `https://oauth2.googleapis.com/tokeninfo?id_token=${dto.providerToken}`;
+                const urlAccessToken = `https://oauth2.googleapis.com/tokeninfo?access_token=${dto.providerToken}`;
+
+                let response = await fetch(urlIdToken);
+                if (!response.ok) {
+                    response = await fetch(urlAccessToken);
+                }
+
+                if (response.ok) {
+                    const tokenInfo = await response.json();
+
+                    if (tokenInfo.email === dto.email) {
+                        // Prevent Confused Deputy Attack
+                        const aud = tokenInfo.aud;
+                        const expectedAud = process.env.GOOGLE_CLIENT_ID;
+
+                        if (!expectedAud || aud === expectedAud) {
+                            // If GOOGLE_CLIENT_ID is set, we check it. If not, we still accept since we verified email.
+                            // In strict mode, we'd require GOOGLE_CLIENT_ID to be set.
+                            isTokenValid = true;
+                        } else {
+                            throw new UnauthorizedException('Invalid token audience');
+                        }
+                    }
+                }
+            } catch (e) {
+                // Ignore and fail authentication below
+            }
+        }
+
+        if (!isTokenValid) {
+            throw new UnauthorizedException('Invalid provider token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

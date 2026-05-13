@@ -25,6 +25,7 @@ function AuthCallbackContent() {
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google-sync`, {
                     email: session.user.email,
                     name: session.user.user_metadata.full_name || session.user.email,
+                    providerToken: session.provider_token || session.access_token,
                 });
 
                 // Store our local JWT (Rukon Token)

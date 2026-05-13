@@ -1,0 +1,4 @@
+## 2026-05-13 - [Auth Bypass & Confused Deputy in Google Sync]
+**Vulnerability:** The `/auth/google-sync` endpoint completely trusted client-provided `email` and `name` to issue JWTs without verifying any underlying identity tokens. This allowed an unauthenticated attacker to supply arbitrary emails and gain unauthorized access (Auth Bypass). Furthermore, the fix required preventing Confused Deputy token replacement attacks by enforcing Audience (`aud`) validation if validating raw OAuth tokens.
+**Learning:** Security checks for authentication must never rely on untrusted client-provided identity assertions without cryptographic validation.
+**Prevention:** Unconditionally enforce server-side validation of identity tokens (e.g. Supabase JWT or Google OAuth `id_token` / `access_token`) and check token constraints (e.g. audience) to verify claims prior to local authentication and JWT issuance.

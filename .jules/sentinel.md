@@ -1,0 +1,5 @@
+## 2024-05-14 - Fix Path Traversal in File Upload and S3 Key Generation
+
+**Vulnerability:** Path traversal vulnerability due to unsanitized `file.originalname` in `SiteCaptureService.create` and `FilesService.uploadSystemFile` methods. Unsanitized `subfolder` variable in `FilesService.uploadSystemFile`. Attackers could provide filenames with `../` to overwrite arbitrary files on the local filesystem or write objects outside the intended S3 bucket prefix.
+**Learning:** `file.originalname` from upload frameworks (like Multer) is entirely user-controlled and untrusted. Appending it directly to file paths or S3 keys creates a path traversal vulnerability. Prepending a timestamp or UUID does *not* mitigate this if `path.join()` or S3 keys are used.
+**Prevention:** Always extract just the base filename using `path.basename(file.originalname)` and replace unsafe characters with `_` using a regex like `.replace(/[^a-zA-Z0-9.\-_]/g, '_')`. Sanitize variables like `subfolder` to prevent directory escape.

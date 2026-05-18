@@ -1,0 +1,4 @@
+## 2024-05-15 - Prepending UUID/Timestamp to Filename Does Not Prevent Path Traversal
+**Vulnerability:** Path traversal vulnerabilities existed in file upload endpoints (`FilesService.uploadSystemFile` and `SiteCaptureService.create`) because user-supplied `file.originalname` was concatenated with a UUID or timestamp and then processed by `path.join()` or used as an S3 key.
+**Learning:** Prepending a string (like a timestamp or UUID) to an unsanitized filename containing directory separators (e.g., `../../`) does not stop `path.join()` from traversing directories backward after the prepended string, nor does it stop arbitrary directory creation in S3 buckets. The assumption that adding a unique prefix makes the whole path safe is false.
+**Prevention:** Always extract the basename using `path.basename()` and further sanitize the resulting string (e.g., `.replace(/[^a-zA-Z0-9.\-_]/g, _)`) *before* applying any prefixes or combining it with base directories.

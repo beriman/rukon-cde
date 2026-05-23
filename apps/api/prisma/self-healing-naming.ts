@@ -24,7 +24,7 @@ async function healNamingConventions() {
             await prisma.auditLog.create({
                 data: {
                     userId: 'SYSTEM',
-                    action: 'FILE_UPDATE', // Assuming FILE_UPDATE for issues
+                    action: 'FILE_UPLOAD', // Log as FILE_UPLOAD or valid enum since FILE_UPDATE is invalid
                     resourceId: file.id,
                     resourceType: 'FILE',
                     details: {

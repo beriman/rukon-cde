@@ -1,0 +1,4 @@
+## 2024-05-24 - [Path Traversal in File Uploads]
+**Vulnerability:** FilesService and SiteCaptureService were directly appending unsanitized user-controlled `file.originalname` to file paths and S3 keys. The `subfolder` parameter was also completely untrusted and passed directly into path combinations. This allowed attackers to use characters like `../` to upload files outside of intended directories.
+**Learning:** Prepending values (like a timestamp or UUID) before an untrusted string does not prevent path traversal if the untrusted string is processed by `path.join()`.
+**Prevention:** Always sanitize filenames from user input (e.g. multipart/form-data) using `path.basename()` followed by a regex strip (e.g. `.replace(/[^a-zA-Z0-9.\-_]/g, '_')`) before using them. Check string parameters meant to be directory names (like `subfolder`) for `..` and `\0`.

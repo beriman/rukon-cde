@@ -1,0 +1,4 @@
+## 2026-05-26 - [Path Traversal in S3 and FS file uploads]
+**Vulnerability:** File upload endpoints (like `FilesService.uploadSystemFile` and `SiteCaptureService.create`) constructed file paths and S3 keys using raw, user-provided inputs (`file.originalname` and `subfolder`) without sanitization. This allows path traversal vulnerabilities (e.g. `../../malicious.js`) allowing attackers to overwrite sensitive files or break S3 folder hierarchies.
+**Learning:** Prepending strings (like `Date.now()` or `uuidv4()`) to untrusted filenames does not prevent path traversal if the original filename contains directory separators and is processed by path building functions.
+**Prevention:** Always explicitly validate untrusted `subfolder` inputs (e.g., rejecting paths with `..` or `\0`) and sanitize raw filenames by extracting the base name via `path.basename()` and replacing unsafe characters using a regex like `.replace(/[^a-zA-Z0-9.\-_]/g, '_')` before prepending them.

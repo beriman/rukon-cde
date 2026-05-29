@@ -1,0 +1,4 @@
+## 2024-05-29 - Sanitize originalname before path creation
+**Vulnerability:** Path traversal vulnerability due to using user-supplied `file.originalname` directly in `s3Key` and `filePath` generation without sanitization in `FilesService.uploadSystemFile` and `SiteCaptureService.create`.
+**Learning:** Even when constructing paths by prepending UUIDs or timestamps, an attacker can still traverse directories if the user-controlled filename contains `/` or `..` sequences, as string concatenation does not resolve relative path traversal strings. Always sanitize raw uploaded filenames using `path.basename` (and optionally removing invalid characters) before appending them to path or key generation.
+**Prevention:** Unconditionally sanitize `file.originalname` or any raw upload metadata to extract only the safe base name before it is stored in databases or used in file paths / object storage keys.

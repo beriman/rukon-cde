@@ -1,0 +1,4 @@
+## 2026-05-31 - Path Traversal via Unsanitized `file.originalname`
+**Vulnerability:** User-controlled `file.originalname` from multipart form data uploads was directly interpolated into file paths (via `path.join`) and S3 keys without sanitization, leading to potential path traversal and unintended file overwrites/access.
+**Learning:** Even if a file upload method is internal or relies on some structured parameter, raw properties derived from external HTTP requests like `originalname` are inherently untrusted and can contain malicious payloads (e.g., `../`, null bytes).
+**Prevention:** Always sanitize filenames extracted from user input using `path.basename()` followed by removing unsafe characters (e.g., via regex `.replace(/[^a-zA-Z0-9.\-_]/g, '_')`) before utilizing them in file path construction or external storage metadata.

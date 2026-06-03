@@ -1,0 +1,5 @@
+
+## 2024-06-03 - [Path Traversal in S3 Keys & Local File Writing via file.originalname]
+**Vulnerability:** The application was using the untrusted `file.originalname` directly to construct S3 keys (`site-captures/.../${uuid}-${file.originalname}`) and local file system paths (`path.join(uploadDir, `${timestamp}-${file.originalname}`)`). An attacker could upload a file with a name like `../../../etc/passwd` to overwrite arbitrary files on the local filesystem or write to unauthorized paths in the S3 bucket.
+**Learning:** Simply prepending a UUID or timestamp (e.g. `${uuidv4()}-${file.originalname}`) does NOT protect against path traversal when using `path.join()`. If `file.originalname` contains `../`, it resolves backward, potentially escaping the intended upload directory.
+**Prevention:** Always explicitly sanitize untrusted filenames. Use `path.basename(file.originalname)` to strip any directory paths provided by the client, and optionally sanitize remaining invalid characters (e.g. `.replace(/[^a-zA-Z0-9.\-_]/g, '_')`) before using it in any path/key concatenation logic.

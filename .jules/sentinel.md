@@ -1,0 +1,4 @@
+## 2024-05-24 - [Path Traversal in Pre-pended Filenames]
+**Vulnerability:** Path traversal vulnerabilities where `file.originalname` is used to construct S3 keys and local file paths after a timestamp or UUID. For example, `` `${timestamp}-${file.originalname}` `` is vulnerable if `originalname` is `../../../etc/passwd` because `path.join` collapses the prepended string and the path goes back up.
+**Learning:** Prepending a string to user-controlled input in `path.join` does not prevent directory traversal. The `path.basename()` must be called on raw inputs *before* prepending or processing.
+**Prevention:** Always extract the basename using `path.basename()` and further sanitize with a regex (like `.replace(/[^a-zA-Z0-9.\-_]/g, '_')`) immediately upon receiving an untrusted file name to ensure it's a flat filename.

@@ -202,7 +202,25 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string }) {
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Authentication token is missing');
+        }
+
+        try {
+            // Validate the external token (Supabase JWT in this case)
+            const decoded = await this.jwtService.verifyAsync(dto.providerToken, {
+                secret: process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET,
+            });
+
+            // Ensure the token's email matches the requested email
+            if (decoded.email !== dto.email) {
+                throw new UnauthorizedException('Token email mismatch');
+            }
+        } catch (error) {
+            throw new UnauthorizedException('Invalid authentication token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

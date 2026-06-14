@@ -6,6 +6,8 @@ import { ConversionService } from '../common/services/conversion.service';
 import { AuditAction } from '@prisma/client';
 import { S3Client, PutObjectCommand, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class FilesService {
@@ -35,13 +37,14 @@ export class FilesService {
         uploadedBy: string,
     ) {
         // Story 1.14: Validate ISO 19650 naming convention
-        const validation = this.namingService.validate(file.originalname);
+        const safeOriginalName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        const validation = this.namingService.validate(safeOriginalName);
 
         if (!validation.isValid) {
             throw new BadRequestException({
                 message: 'Invalid file naming convention',
                 error: validation.error,
-                yourFilename: file.originalname,
+                yourFilename: safeOriginalName,
             });
         }
 
@@ -147,7 +150,7 @@ export class FilesService {
                         Body: file.buffer,
                         ContentType: file.mimetype,
                         Metadata: {
-                            'original-name': file.originalname,
+                            'original-name': safeOriginalName,
                             'unique-id': uniqueId,
                             'version': String(newVersion),
                         },
@@ -173,7 +176,7 @@ export class FilesService {
                     where: { id: existingFile.id },
                     data: {
                         currentVersion: newVersion,
-                        name: file.originalname,
+                        name: safeOriginalName,
                         size: file.size,
                         mimeType: file.mimetype,
                         s3Key,
@@ -197,7 +200,7 @@ export class FilesService {
                 });
 
                 // Trigger Conversion if RVT
-                if (file.originalname.toLowerCase().endsWith('.rvt')) {
+                if (safeOriginalName.toLowerCase().endsWith('.rvt')) {
                     this.conversionService.processFile(updatedFile.id, s3Key).catch(console.error);
                 }
 
@@ -224,7 +227,7 @@ export class FilesService {
                         Body: file.buffer,
                         ContentType: file.mimetype,
                         Metadata: {
-                            'original-name': file.originalname,
+                            'original-name': safeOriginalName,
                             'unique-id': uniqueId,
                             'version': '1',
                         },
@@ -247,8 +250,8 @@ export class FilesService {
 
                 const newFile = await tx.file.create({
                     data: {
-                        name: file.originalname,
-                        originalName: file.originalname,
+                        name: safeOriginalName,
+                        originalName: safeOriginalName,
                         uniqueId,
                         s3Key,
                         size: file.size,
@@ -271,7 +274,7 @@ export class FilesService {
                 });
 
                 // Trigger Conversion if RVT
-                if (file.originalname.toLowerCase().endsWith('.rvt')) {
+                if (safeOriginalName.toLowerCase().endsWith('.rvt')) {
                     this.conversionService.processFile(newFile.id, s3Key).catch(console.error);
                 }
 
@@ -296,7 +299,7 @@ export class FilesService {
             result.id,
             'FILE',
             {
-                fileName: file.originalname,
+                fileName: safeOriginalName,
                 version: result.version,
                 size: file.size
             }
@@ -457,8 +460,13 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        if (subfolder.includes('..') || subfolder.includes('\0')) {
+            throw new BadRequestException('Invalid subfolder path');
+        }
+
+        const safeOriginalName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
         const timestamp = Date.now();
-        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
+        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${safeOriginalName}`;
 
         if (process.env.AWS_S3_BUCKET) {
             await this.s3Client.send(new PutObjectCommand({
@@ -470,15 +478,13 @@ export class FilesService {
             }));
         } else {
             // Local fallback
-            const fs = require('fs');
-            const path = require('path');
             const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
 
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filePath = path.join(uploadDir, `${timestamp}-${file.originalname}`);
+            const filePath = path.join(uploadDir, `${timestamp}-${safeOriginalName}`);
             fs.writeFileSync(filePath, file.buffer);
         }
 

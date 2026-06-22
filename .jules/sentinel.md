@@ -1,0 +1,5 @@
+
+## 2024-06-22 - [Path Traversal via Unsanitized file.originalname]
+**Vulnerability:** Path traversal vulnerabilities in `FilesService.uploadSystemFile` and `SiteCaptureService.create` due to the direct use of untrusted `file.originalname` in constructing S3 object keys and local file paths via `path.join()`.
+**Learning:** Even though IDs or timestamps are prepended to filenames, an attacker can bypass directory boundaries or overwrite arbitrary files by uploading a file with a name containing directory traversal sequences (e.g., `../../../etc/passwd`).
+**Prevention:** Always sanitize user-provided filenames immediately upon receipt, especially when dealing with multipart file uploads. Use `path.basename()` to extract only the final filename component and replace unsafe characters with a strict regex (e.g., `/[^a-zA-Z0-9.\-_]/g`) before appending it to internal storage paths or metadata. Additionally, explicitly validate folder/subfolder path arguments to reject traversal sequences (`..`) and null bytes (`\0`).

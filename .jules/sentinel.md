@@ -1,0 +1,5 @@
+
+## 2024-06-26 - [Path Traversal in File Uploads]
+**Vulnerability:** The application used the raw, user-provided `file.originalname` directly within file paths and S3 object keys (e.g., `apps/api/src/files/files.service.ts` and `apps/api/src/site-capture/site-capture.service.ts`). This allows an attacker to upload files with malicious directory traversal characters (e.g., `../../../etc/passwd` or `../`), potentially overwriting sensitive arbitrary files or traversing outside intended storage boundaries. Additionally, the `subfolder` variable was unsanitized.
+**Learning:** Directly appending raw strings to dynamically generated paths or object keys, even with other prepended identifiers (like timestamps or UUIDs), still leaves the software vulnerable because directory separators are processed by `path.join()`.
+**Prevention:** Always sanitize `file.originalname` using `path.basename(file.originalname)` and regex substitution (`.replace(/[^a-zA-Z0-9.\-_]/g, '_')`) before using the value for storage or downstream validation. Ensure strict validation checks for specific parameter injections like `..` or `\0` in `subfolder` variables.

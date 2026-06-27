@@ -6,6 +6,8 @@ import { ConversionService } from '../common/services/conversion.service';
 import { AuditAction } from '@prisma/client';
 import { S3Client, PutObjectCommand, GetObjectCommand, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class FilesService {
@@ -34,14 +36,17 @@ export class FilesService {
         file: any,
         uploadedBy: string,
     ) {
+        // Sanitize the filename to prevent path traversal
+        const sanitizedOriginalName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
         // Story 1.14: Validate ISO 19650 naming convention
-        const validation = this.namingService.validate(file.originalname);
+        const validation = this.namingService.validate(sanitizedOriginalName);
 
         if (!validation.isValid) {
             throw new BadRequestException({
                 message: 'Invalid file naming convention',
                 error: validation.error,
-                yourFilename: file.originalname,
+                yourFilename: sanitizedOriginalName,
             });
         }
 
@@ -147,7 +152,7 @@ export class FilesService {
                         Body: file.buffer,
                         ContentType: file.mimetype,
                         Metadata: {
-                            'original-name': file.originalname,
+                            'original-name': sanitizedOriginalName,
                             'unique-id': uniqueId,
                             'version': String(newVersion),
                         },
@@ -155,8 +160,6 @@ export class FilesService {
                     console.log(`[FILE UPLOAD] Uploaded to S3: ${s3Key}`);
                 } else {
                     // Local Fallback
-                    const fs = require('fs');
-                    const path = require('path');
                     const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, `project-${projectId}`);
 
                     if (!fs.existsSync(uploadDir)) {
@@ -173,7 +176,7 @@ export class FilesService {
                     where: { id: existingFile.id },
                     data: {
                         currentVersion: newVersion,
-                        name: file.originalname,
+                        name: sanitizedOriginalName,
                         size: file.size,
                         mimeType: file.mimetype,
                         s3Key,
@@ -197,7 +200,7 @@ export class FilesService {
                 });
 
                 // Trigger Conversion if RVT
-                if (file.originalname.toLowerCase().endsWith('.rvt')) {
+                if (sanitizedOriginalName.toLowerCase().endsWith('.rvt')) {
                     this.conversionService.processFile(updatedFile.id, s3Key).catch(console.error);
                 }
 
@@ -224,7 +227,7 @@ export class FilesService {
                         Body: file.buffer,
                         ContentType: file.mimetype,
                         Metadata: {
-                            'original-name': file.originalname,
+                            'original-name': sanitizedOriginalName,
                             'unique-id': uniqueId,
                             'version': '1',
                         },
@@ -232,8 +235,6 @@ export class FilesService {
                     console.log(`[FILE UPLOAD] Uploaded to S3: ${s3Key}`);
                 } else {
                     // Local Fallback
-                    const fs = require('fs');
-                    const path = require('path');
                     const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, `project-${projectId}`);
 
                     if (!fs.existsSync(uploadDir)) {
@@ -247,8 +248,8 @@ export class FilesService {
 
                 const newFile = await tx.file.create({
                     data: {
-                        name: file.originalname,
-                        originalName: file.originalname,
+                        name: sanitizedOriginalName,
+                        originalName: sanitizedOriginalName,
                         uniqueId,
                         s3Key,
                         size: file.size,
@@ -271,7 +272,7 @@ export class FilesService {
                 });
 
                 // Trigger Conversion if RVT
-                if (file.originalname.toLowerCase().endsWith('.rvt')) {
+                if (sanitizedOriginalName.toLowerCase().endsWith('.rvt')) {
                     this.conversionService.processFile(newFile.id, s3Key).catch(console.error);
                 }
 
@@ -296,7 +297,7 @@ export class FilesService {
             result.id,
             'FILE',
             {
-                fileName: file.originalname,
+                fileName: sanitizedOriginalName,
                 version: result.version,
                 size: file.size
             }
@@ -457,8 +458,14 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        if (subfolder.includes('..') || subfolder.includes('\0')) {
+            throw new BadRequestException('Invalid subfolder path');
+        }
+
+        const sanitizedOriginalName = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
         const timestamp = Date.now();
-        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
+        const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${sanitizedOriginalName}`;
 
         if (process.env.AWS_S3_BUCKET) {
             await this.s3Client.send(new PutObjectCommand({
@@ -470,15 +477,13 @@ export class FilesService {
             }));
         } else {
             // Local fallback
-            const fs = require('fs');
-            const path = require('path');
             const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
 
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filePath = path.join(uploadDir, `${timestamp}-${file.originalname}`);
+            const filePath = path.join(uploadDir, `${timestamp}-${sanitizedOriginalName}`);
             fs.writeFileSync(filePath, file.buffer);
         }
 

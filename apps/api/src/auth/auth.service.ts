@@ -202,7 +202,23 @@ export class AuthService {
         };
     }
 
-    async googleSync(dto: { email: string; name: string }) {
+    async googleSync(dto: { email: string; name: string; providerToken?: string }) {
+        if (!dto.providerToken) {
+            throw new UnauthorizedException('Missing provider token');
+        }
+
+        try {
+            const decodedToken = await this.jwtService.verifyAsync(dto.providerToken, {
+                secret: process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET,
+            });
+
+            if (decodedToken.email !== dto.email) {
+                throw new UnauthorizedException('Token email mismatch');
+            }
+        } catch (error) {
+            throw new UnauthorizedException('Invalid provider token');
+        }
+
         let user = await this.usersService.findOneByEmail(dto.email);
 
         if (!user) {

@@ -1,3 +1,5 @@
+import * as path from "path";
+import * as fs from "fs";
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NamingConventionService } from '../common/services/naming-convention.service';
@@ -34,6 +36,11 @@ export class FilesService {
         file: any,
         uploadedBy: string,
     ) {
+        // [SECURITY] Sanitize filename to prevent path traversal
+        if (file && file.originalname) {
+            file.originalname = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        }
+
         // Story 1.14: Validate ISO 19650 naming convention
         const validation = this.namingService.validate(file.originalname);
 
@@ -155,8 +162,8 @@ export class FilesService {
                     console.log(`[FILE UPLOAD] Uploaded to S3: ${s3Key}`);
                 } else {
                     // Local Fallback
-                    const fs = require('fs');
-                    const path = require('path');
+
+
                     const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, `project-${projectId}`);
 
                     if (!fs.existsSync(uploadDir)) {
@@ -232,8 +239,8 @@ export class FilesService {
                     console.log(`[FILE UPLOAD] Uploaded to S3: ${s3Key}`);
                 } else {
                     // Local Fallback
-                    const fs = require('fs');
-                    const path = require('path');
+
+
                     const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, `project-${projectId}`);
 
                     if (!fs.existsSync(uploadDir)) {
@@ -457,6 +464,16 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        // [SECURITY] Validate subfolder to prevent path traversal
+        if (subfolder.includes('..') || subfolder.includes('\0')) {
+            throw new BadRequestException('Invalid subfolder');
+        }
+
+        // [SECURITY] Sanitize filename to prevent path traversal
+        if (file && file.originalname) {
+            file.originalname = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        }
+
         const timestamp = Date.now();
         const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
 
@@ -470,8 +487,8 @@ export class FilesService {
             }));
         } else {
             // Local fallback
-            const fs = require('fs');
-            const path = require('path');
+
+
             const uploadDir = path.join(process.cwd(), 'uploads', `org-${organizationId}`, 'system', subfolder);
 
             if (!fs.existsSync(uploadDir)) {

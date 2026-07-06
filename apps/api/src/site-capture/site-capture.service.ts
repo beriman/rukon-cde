@@ -4,6 +4,7 @@ import { CreateSiteCaptureDto, UpdateSiteCaptureDto, QuerySiteCaptureDto } from 
 import { CaptureType } from '@prisma/client';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
 
 @Injectable()
 export class SiteCaptureService {
@@ -18,6 +19,10 @@ export class SiteCaptureService {
     }
 
     async create(dto: CreateSiteCaptureDto, file: any, userId: string) {
+        // Sanitize filename to prevent path traversal
+        const safeFilename = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        file.originalname = safeFilename;
+
         // Upload file to S3
         const fileKey = `site-captures/${dto.projectId}/${uuidv4()}-${file.originalname}`;
 

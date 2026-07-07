@@ -1,0 +1,4 @@
+## 2024-05-24 - Path Traversal via Unsanitized `file.originalname` in File Uploads
+**Vulnerability:** The application was using the raw user-provided `file.originalname` to construct S3 keys and local file paths without any sanitization in the `FilesService` and `SiteCaptureService`.
+**Learning:** Even when the backend extracts validation IDs (like `uniqueId`), passing the raw `file.originalname` downstream into `path.join` or S3 keys allows path traversal attacks (e.g. `../` injection). Prepending a timestamp or UUID does not stop it since the `/` character modifies the directory structure.
+**Prevention:** Always sanitize untrusted input like `file.originalname`. Extract the basename using `path.basename()` and further restrict characters to safe sets (e.g., `.replace(/[^a-zA-Z0-9.\-_]/g, '_')`) before any path construction or validation processing. Reassigning the sanitized name back to `file.originalname` ensures all downstream uses get the safe string.

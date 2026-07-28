@@ -1,0 +1,5 @@
+
+## 2024-05-27 - [CRITICAL] Path Traversal in File Uploads
+**Vulnerability:** Path traversal vulnerability exists in `FilesService.upload`, `FilesService.uploadSystemFile`, and `SiteCaptureService.create` due to the use of untrusted `file.originalname` when constructing local file paths and S3 keys.
+**Learning:** Even if a file's content or metadata is checked, failing to sanitize its name allows malicious path characters (e.g. `../`) to be injected into path resolution or S3 key generation, potentially writing files out of expected bounds or overwriting existing objects. Additionally, untrusted generic path variables (like `subfolder`) must be validated to ensure they don't contain path traversal sequences.
+**Prevention:** Always extract the base filename using `path.basename()`, apply regex replacement to remove potentially harmful characters (`.replace(/[^a-zA-Z0-9.\-_]/g, '_')`), and explicitly validate arbitrary subfolder path variables against invalid characters like `..` and `\0` before constructing paths or keys.

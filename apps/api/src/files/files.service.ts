@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { NamingConventionService } from '../common/services/naming-convention.service';
 import { AuditService } from '../common/services/audit.service';
@@ -34,6 +35,9 @@ export class FilesService {
         file: any,
         uploadedBy: string,
     ) {
+        // Security Enhancement: Sanitize user-provided filename to prevent path traversal
+        file.originalname = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
         // Story 1.14: Validate ISO 19650 naming convention
         const validation = this.namingService.validate(file.originalname);
 
@@ -457,6 +461,12 @@ export class FilesService {
         file: any,
         subfolder: string = 'assets'
     ) {
+        // Security Enhancement: Sanitize filename and validate subfolder
+        file.originalname = path.basename(file.originalname).replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        if (subfolder.includes('..') || subfolder.includes('\0')) {
+            throw new BadRequestException('Invalid subfolder path');
+        }
+
         const timestamp = Date.now();
         const s3Key = `org-${organizationId}/system/${subfolder}/${timestamp}-${file.originalname}`;
 

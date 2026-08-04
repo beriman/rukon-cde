@@ -1,0 +1,11 @@
+const eng=[['Shop Drawing',5.2],['Metode Kerja',18.75],['JSA',25],['RFI',30],['NCR',15]];
+document.querySelector('#engineering-bars').innerHTML=eng.map(([n,v])=>`<div class="barrow"><span>${n}</span><div class="track"><i style="width:${v}%"></i></div><b>${v}%</b></div>`).join('');
+const mats=[['MSP Ars',1,1,100],['MSP MEP',6,6,62],['GBI MEP',12,4,104],['Tamil Ars',16,16,40],['Tamil Str',5,5,19],['Tamil MEP',2,2,20]];
+document.querySelector('#material-chart').innerHTML=mats.map(([n,s,a,t])=>`<div class="col"><div class="stack"><i class="submitted" style="height:${Math.max(4,s/t*160)}px"></i><i class="approved" style="height:${Math.max(4,a/t*160)}px"></i></div><span>${n}</span></div>`).join('');
+const clash=[['M-1',45,78,32,20],['M-2',42,65,28,30]];
+document.querySelector('#clash-chart').innerHTML=clash.map(([w,h,s,c,r])=>`<div class="week"><i class="hard" style="height:${h*2}px"></i><i class="soft" style="height:${s*2}px"></i><i class="clearance" style="height:${c*2}px"></i><i class="resolved" style="height:${r*2}px"></i><label>${w}</label></div>`).join('');
+const svg=document.querySelector('#line-chart'),plan=[.1152,.2365,.52,.9,1.4,2.1,2.9,3.8],actual=[.1152,0],W=760,H=260,p=40,max=4,x=i=>p+i*(W-2*p)/(plan.length-1),y=v=>H-p-v/max*(H-2*p);
+let out=`<line class="axis" x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}"/><line class="axis" x1="${p}" y1="${p}" x2="${p}" y2="${H-p}"/>`;
+for(let i=0;i<plan.length;i++)out+=`<text class="tick" x="${x(i)}" y="${H-16}" text-anchor="middle">M-${i+1}</text>`;
+for(let v=0;v<=4;v++)out+=`<text class="tick" x="10" y="${y(v)+4}">${v}%</text><line class="axis" x1="${p}" y1="${y(v)}" x2="${W-p}" y2="${y(v)}" opacity=".35"/>`;
+const path=a=>a.map((v,i)=>(i?'L':'M')+x(i)+','+y(v)).join(' ');out+=`<path class="plan" d="${path(plan)}"/>${plan.map((v,i)=>`<circle class="dot" cx="${x(i)}" cy="${y(v)}" r="4"/>`).join('')}<path class="actual" d="${path(actual)}"/>${actual.map((v,i)=>`<circle class="dot actual" cx="${x(i)}" cy="${y(v)}" r="4"/>`).join('')}`;svg.innerHTML=out;

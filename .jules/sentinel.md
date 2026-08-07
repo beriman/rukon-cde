@@ -1,0 +1,4 @@
+## 2024-08-07 - Fix Path Traversal in File Uploads
+**Vulnerability:** The application used unsanitized user-provided filenames (`file.originalname`) and subfolder strings directly in constructing local file paths via `path.join` and S3 object keys. This could allow directory traversal attacks (e.g., `../../`) or overriding arbitrary S3 objects.
+**Learning:** Even if filenames are validated later (like the ISO 19650 check), initial processing or parallel methods (like `uploadSystemFile` and `site-capture.create`) were left vulnerable. S3 object keys are also susceptible to manipulation.
+**Prevention:** Always explicitly sanitize `file.originalname` using `path.basename()` and restrict allowed characters at the very beginning of upload handlers. Validate all path arguments like `subfolder` against directory traversal characters (e.g., `..`, `\0`).

@@ -1,3 +1,11 @@
+> **Status: historical / superseded.** This document describes an earlier target
+> architecture and is retained for traceability. It is not an implementation
+> contract. Use [`docs/strategy/architecture-current.md`](./strategy/architecture-current.md)
+> and the accepted ADRs in [`docs/architecture/adr/`](./architecture/adr/) for
+> current decisions. In particular, database-per-tenant, AWS-first deployment,
+> S3/MinIO as the initial store, and the native mobile application described
+> below are not current MVP decisions.
+
 # Architecture Document: ISO 19650 Compliant SaaS CDE
 
 ## 1. System Overview

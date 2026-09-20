@@ -1,179 +1,150 @@
-# Rukon CDE - ISO 19650 Compliant Common Data Environment
+# Ruang Konstruksi
 
-A multi-tenant SaaS platform for construction document management, compliant with ISO 19650 standards.
+> **AI-first Construction Operating System**  
+> CDE sebagai source of truth, dashboard sebagai command center, text/voice sebagai control layer, dan AI/engineering workers sebagai pelaksana terkontrol.
 
-## 🏗️ Project Structure
+**Product Owner:** Beriman Juliano
 
-```
-rukon/
+## Arah Produk
+
+Ruang Konstruksi ditujukan untuk tim kontraktor yang perlu mengelola dokumen, drawing, model BIM, progress, approval, procurement, dan pekerjaan digital proyek dalam satu lingkungan yang dapat ditelusuri.
+
+Prinsip inti:
+
+- **CDE** = source of truth proyek
+- **Dashboard** = command center
+- **Text / Voice** = natural control interface
+- **AI Agents** = intelligent workers
+- **Engineering Workers** = deterministic execution layer
+- **Human Approval** = authority / final decision
+
+Target pertama adalah **contractor workspace**. Workspace konsultan perencana direncanakan sebagai fase lanjutan.
+
+## Current Product Scope
+
+MVP diarahkan ke:
+
+- multi-tenant organization / project / role / permission,
+- CDE dengan revision + status workflow,
+- mobile/PWA field access,
+- PDF drawing viewer,
+- lightweight BIM 3D viewer,
+- project control baseline vs actual,
+- basic AI Command Center,
+- controlled action + audit trail.
+
+Full Revit automation disiapkan sebagai fase lanjutan melalui **Windows BIM Worker + job queue**, bukan Revit di browser atau Linux container.
+
+## Dokumentasi Strategi Terkini
+
+Mulai dari:
+
+- [Strategy Index](./docs/strategy/README.md)
+- [Product Vision](./docs/strategy/product-vision.md)
+- [MVP Contractor](./docs/strategy/mvp-contractor.md)
+- [Current Architecture](./docs/strategy/architecture-current.md)
+- [Decision Log](./docs/strategy/decision-log.md)
+- [Lovable Planning Brief](./docs/strategy/lovable-plan-brief.md)
+- [Security Policy](./SECURITY.md)
+- [Contributing](./CONTRIBUTING.md)
+
+Dokumentasi lama di `docs/` tetap dipertahankan sebagai referensi historis sampai direkonsiliasi secara bertahap.
+
+## Repository Structure
+
+```text
+rukon-cde/
 ├── apps/
-│   ├── api/          # NestJS Backend API
-│   └── web/          # Next.js Frontend
-├── docs/             # Documentation
-└── .github/          # CI/CD Workflows
+│   ├── api/          # Current backend implementation
+│   └── web/          # Current frontend implementation
+├── docs/
+│   ├── strategy/     # Current product decisions and planning
+│   └── ...           # Existing technical/research docs
+├── execution/
+├── infra/
+├── tests/
+└── docker-compose.yml
 ```
 
-## 🚀 Quick Start
+## Current Technical Implementation
 
-### Prerequisites
-- Node.js 20.x or higher
-- Docker & Docker Compose (recommended)
-- PostgreSQL 15+ (or use Supabase)
-
-### Local Development (with Docker)
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/rukon.git
-   cd rukon
-   ```
-
-2. **Setup environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-3. **Start all services**
-   ```bash
-   docker-compose up
-   ```
-
-4. **Access the applications**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
-   - API Docs: http://localhost:3001/api
-
-### Local Development (without Docker)
-
-1. **Install dependencies**
-   ```bash
-   npm install
-   cd apps/api && npm install
-   cd ../web && npm install
-   ```
-
-2. **Setup database**
-   ```bash
-   cd apps/api
-   npx prisma migrate deploy
-   npx prisma generate
-   ```
-
-3. **Run applications**
-   ```bash
-   # Terminal 1 - API
-   cd apps/api
-   npm run start:dev
-
-   # Terminal 2 - Web
-   cd apps/web
-   npm run dev
-   ```
-
-## 🧪 Testing
-
-### Run all tests
-```bash
-# API tests
-cd apps/api
-npm run test              # Unit tests
-npm run test:e2e          # E2E tests
-npm run test:cov          # Coverage report
-
-# Web tests
-cd apps/web
-npm run test
-```
-
-### Linting
-```bash
-cd apps/api && npm run lint
-cd apps/web && npm run lint
-```
-
-## 📦 Building for Production
-
-```bash
-# Build API
-cd apps/api
-npm run build
-
-# Build Web
-cd apps/web
-npm run build
-```
-
-## 🚢 Deployment
-
-See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed deployment instructions.
-
-### Quick Deploy
-- **Frontend**: Deploy to Vercel
-  ```bash
-  cd apps/web
-  vercel --prod
-  ```
-
-- **Backend**: Deploy to Railway/Render
-  ```bash
-  # Follow platform-specific instructions
-  ```
-
-> [!IMPORTANT]
-> **RVT Conversion Support**
-> To enable automatic conversion of Revit (.rvt) files to IFC, you MUST install **ODA File Converter** on the backend server.
-> 1. Download: [ODA File Converter](https://www.opendesign.com/guestfiles/oda_file_converter)
-> 2. Install using default settings.
-> 3. Set `ODA_PATH` in `.env` if installed in a custom location (Default: `C:\Program Files\ODA\ODAFileConverter 25.x.x\ODAFileConverter.exe`).
-> If not installed, the system will use a MOCK simulation for demonstration purposes.
-
-## 🛠️ Tech Stack
-
-### Backend
-- NestJS (Node.js framework)
-- Prisma ORM
-- PostgreSQL (via Supabase)
-- JWT Authentication
-- AWS S3 (file storage)
+Repository saat ini menggunakan monorepo Node.js dengan:
 
 ### Frontend
-- Next.js 14 (App Router)
-- React 18
+- Next.js
+- React
+- TypeScript
 - Tailwind CSS
-- Zustand (state management)
-- Axios (HTTP client)
 
-### DevOps
-- Docker & Docker Compose
-- GitHub Actions (CI/CD)
-- ESLint & Prettier
+### Backend
+- NestJS
+- Prisma
+- PostgreSQL / Supabase direction
 
-## 📝 Environment Variables
+### Platform Direction
+- Supabase: PostgreSQL, Auth, RLS, initial Storage
+- OpenAI API: AI layer
+- GitHub: source control / CI
+- Docker: backend/supporting services
+- Windows Revit Worker: BIM execution
+- Responsive PWA: field access
 
-See [.env.example](./.env.example) for all required variables.
+> Arsitektur target dan implementation repo dapat berbeda selama transisi. Jangan mengubah framework hanya untuk menyamakan dokumen; perubahan stack harus berdasarkan keputusan teknis yang terdokumentasi.
 
-### Essential Variables
-```bash
-DATABASE_URL=postgresql://...
-JWT_SECRET=your-secret-key
-NEXT_PUBLIC_API_URL=http://localhost:3001
+## CDE State Principle
+
+```text
+WIP
+ -> Shared
+ -> For Review
+ -> Approved / Need Revision / Rejected
+ -> Published
+ -> Superseded
 ```
 
-## 🤝 Contributing
+**Newest upload is not automatically the valid published document.**
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Approval dan review harus selalu terikat pada exact revision.
 
-## 📄 License
+## Development
 
-This project is proprietary software.
+### Prerequisites
 
-## 👥 Team
+- Node.js 20+
+- npm
+- Docker & Docker Compose (recommended)
+- PostgreSQL/Supabase configuration
 
-- Backend: NestJS Team
-- Frontend: Next.js Team
-- DevOps: Infrastructure Team
+### Install
+
+```bash
+git clone https://github.com/beriman/rukon-cde.git
+cd rukon-cde
+npm install
+```
+
+### Environment
+
+```bash
+cp .env.example .env
+```
+
+Jangan commit production secret atau customer project data. Lihat [SECURITY.md](./SECURITY.md).
+
+### Run
+
+```bash
+npm run dev
+```
+
+Atau gunakan Docker Compose sesuai konfigurasi repository.
+
+## Development Principle
+
+> Natural interaction, formal execution.
+
+AI boleh membantu membaca, menjelaskan, menyiapkan, dan mengorkestrasi pekerjaan. AI tidak boleh melewati permission, publish dokumen resmi, approve technical submission, atau mengubah approved baseline tanpa authority dan workflow yang benar.
+
+## License
+
+Repository saat ini menggunakan model proprietary/internal project. Lisensi distribusi final harus diputuskan sebelum public release atau commercial distribution.

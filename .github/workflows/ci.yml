@@ -1,49 +1,30 @@
-name: CI
+name: Production baseline
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [main, master]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [main, master]
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json'
-
-    # Install dependencies for root and workspaces if any
-    # Assuming standard npm workspace or simple structure. 
-    # Since we have apps/web and apps/api usually in a monorepo, 
-    # we might need to install in root.
-    # Checking if root package.json exists, otherwise assume separate installs would be needed but monorepo is typical.
-    # For this specific project structure (d:\Coding\Rukon2), it seems to be a monorepo (NX or Turbo or just plain workspaces).
-    # Let's try standard npm ci in root.
-    
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Lint Web
-      run: cd apps/web && npm run lint
-
-    - name: Type Check Web
-      run: cd apps/web && npx tsc --noEmit
-
-    - name: Build Web
-      run: cd apps/web && npm run build
-
-    # API checks (optional, if API code is also in this repo)
-    # - name: Build API
-    #   run: cd apps/api && npm run build
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck API
+        run: npm exec --workspace apps/api tsc -- --project tsconfig.build.json --noEmit
+      - name: Typecheck web
+        run: npm exec --workspace apps/web tsc -- --noEmit
+      - name: Unit tests
+        run: npm run test -- --only
+      - name: Production build
+        run: npm run build

@@ -26,6 +26,8 @@ Ruang Konstruksi adalah **AI-first Construction Operating System** dengan CDE se
 - [Current Architecture](./architecture-current.md)
 - [Decision Log](./decision-log.md)
 - [Lovable Planning Brief](./lovable-plan-brief.md)
+- [Phase 0 Repository Audit](./phase-0-audit.md)
+- [ADR-0001: Production MVP Foundation](../architecture/adr/0001-production-mvp-foundation.md)
 
 ## Fokus Saat Ini
 

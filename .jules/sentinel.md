@@ -1,0 +1,4 @@
+## 2024-05-31 - Fix Path Traversal in file uploads
+**Vulnerability:** `file.originalname` is used directly in S3 keys and local file paths without sanitization, leading to a path traversal vulnerability. A user could pass `../../etc/passwd` to overwrite sensitive files when local fallback is used, or manipulate S3 keys. The `subfolder` variable is also vulnerable in `uploadSystemFile`.
+**Learning:** Raw upload metadata such as filename can never be trusted and must always be sanitized at the beginning of the handler. Complex logic might validate the filename but still use the unsafe raw version if not reassigned immediately.
+**Prevention:** Always sanitize `file.originalname` with `path.basename` and whitelist regexes, and validate variables used in directory structures (like `subfolder`). Assign the result back to `file.originalname`.
